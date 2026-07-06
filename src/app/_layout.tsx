@@ -6,6 +6,7 @@ import { useColorScheme } from 'react-native'
 import { AnimatedSplashOverlay } from '@/components/animated-icon'
 import { playersStore } from '@/lib/players-store'
 import { settingsStore } from '@/lib/settings-store'
+import { topicsStore } from '@/lib/topics-store'
 import { colors } from '@/theme/tokens'
 
 SplashScreen.preventAutoHideAsync()
@@ -16,6 +17,9 @@ export default function RootLayout() {
 	useEffect(() => {
 		settingsStore.hydrate()
 		playersStore.hydrate()
+		topicsStore.hydrate().then(() => {
+			topicsStore.refresh()
+		})
 	}, [])
 
 	return (
