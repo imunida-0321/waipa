@@ -1,3 +1,4 @@
+import { Link } from 'expo-router'
 import * as Device from 'expo-device'
 import { Platform, StyleSheet } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
@@ -8,6 +9,7 @@ import { ThemedText } from '@/components/themed-text'
 import { ThemedView } from '@/components/themed-view'
 import { WebBadge } from '@/components/web-badge'
 import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme'
+import { colors } from '@/theme/tokens'
 
 function getDevMenuHint() {
 	if (Platform.OS === 'web') {
@@ -56,6 +58,14 @@ export default function HomeScreen() {
 				</ThemedView>
 
 				{Platform.OS === 'web' && <WebBadge />}
+
+				{__DEV__ && (
+					<Link href="/gallery" style={styles.galleryLink}>
+						<ThemedText type="small" style={styles.galleryLinkText}>
+							デザインギャラリー
+						</ThemedText>
+					</Link>
+				)}
 			</SafeAreaView>
 		</ThemedView>
 	)
@@ -94,5 +104,11 @@ const styles = StyleSheet.create({
 		paddingHorizontal: Spacing.three,
 		paddingVertical: Spacing.four,
 		borderRadius: Spacing.four,
+	},
+	galleryLink: {
+		marginTop: Spacing.two,
+	},
+	galleryLinkText: {
+		color: colors.textMuted,
 	},
 })

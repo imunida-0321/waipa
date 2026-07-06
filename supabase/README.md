@@ -18,13 +18,13 @@ curl "https://ltkkzucuzngtavpreixq.supabase.co/rest/v1/topics?select=pack&limit=
 
 ## お題パック構成
 
-| pack | 用途 | is_premium |
-|---|---|---|
-| `king` | 王様のいない王様ゲーム | false |
-| `talk` | カウントダウン爆弾リレー（カテゴリお題） | false |
-| `pointing` | 指差しヒートアップ | false |
-| `king_premium` | 王様ゲーム限定パック（恋愛系） | true |
-| `pointing_premium` | 指差し限定パック（恋愛系） | true |
+| pack               | 用途                                     | is_premium |
+| ------------------ | ---------------------------------------- | ---------- |
+| `king`             | 王様のいない王様ゲーム                   | false      |
+| `talk`             | カウントダウン爆弾リレー（カテゴリお題） | false      |
+| `pointing`         | 指差しヒートアップ                       | false      |
+| `king_premium`     | 王様ゲーム限定パック（恋愛系）           | true       |
+| `pointing_premium` | 指差し限定パック（恋愛系）               | true       |
 
 - お題本文の `{B}` はアプリ側で「実行役以外のランダムな参加者番号」に置換する
 - プレミアムパックは RLS で読み取り不可（解放経路は #収益2 で実装）

@@ -43,3 +43,4 @@ yarn-error.log*
 .metro-health-check*
 *.tsbuildinfo
 *.pem
+.claude/scheduled_tasks.lock
