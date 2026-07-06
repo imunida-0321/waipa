@@ -1231,3 +1231,392 @@ git add -A && git commit -m "feat: ゲーム画面ルートと共通フレーム
 - 型整合: `GameMeta` は Task 1 定義を Task 6 が参照。`playersStore` API は Task 2 定義を Task 4 が使用。`DrumrollPhase` は Task 5 内で完結
 - 未定義参照なし: `useSafeAreaInsets` は react-native-safe-area-context（テンプレート同梱）、`ChevronRow`/`Card`/`SectionHeader`/`GradientButton`/`PillButton` は #2 で実装済み
 - サウンド: `playSound('drumroll')`/`playSound('reveal')` は音源未登録のため無音 no-op（既存仕様）。音源追加時に `_layout.tsx` で registerSound する
+
+---
+
+### Task 7: プレイヤー設定画面リデザイン（参考UI準拠）
+
+**背景:** 2026-07-06 にユーザーから参考UIスクショの追加指定あり。Task 4 のステッパー式を、プレイヤーカラー付きカードのリスト＋「⊕ 追加」＋履歴＋白い「つぎへ」構成に置き換える（CLAUDE.md「プレイヤー設定画面」参照）。外部シグネチャ `<PlayerSetupSheet visible onClose minPlayers? maxPlayers? />` は不変（GameScreen への影響なし）。
+
+**Files:**
+
+- Create: `src/theme/player-colors.ts`
+- Modify: `src/lib/players-store.ts`（addPlayer / removePlayer / history 追加）
+- Rewrite: `src/components/game/player-setup-sheet.tsx`
+- Modify: `src/lib/__tests__/players-store.test.ts`（追加 API のテスト）
+- Rewrite: `src/components/game/__tests__/player-setup-sheet.test.tsx`
+
+**Interfaces:**
+
+- Produces: `PLAYER_COLORS: readonly { name: string; value: string }[]`（12色）、`playerColor(index): { name; value }`、playersStore 追加 API `addPlayer(): Promise<void>` / `removePlayer(index): Promise<void>` / `saveToHistory(): Promise<void>` / `applyHistory(index): Promise<void>`、state に `history: string[][]`（最大5件・新しい順）
+
+- [ ] **Step 1: player-colors.ts を実装**
+
+`src/theme/player-colors.ts`:
+
+```ts
+// プレイヤー識別色。index 順に割り当て、13人目以降は循環（MVP は最大12人）
+export const PLAYER_COLORS = [
+	{ name: '赤', value: '#FF3B5C' },
+	{ name: '青', value: '#3B82F6' },
+	{ name: '緑', value: '#22C55E' },
+	{ name: '黄', value: '#FACC15' },
+	{ name: '紫', value: '#A855F7' },
+	{ name: 'オレンジ', value: '#FB923C' },
+	{ name: 'ピンク', value: '#F472B6' },
+	{ name: '水色', value: '#38BDF8' },
+	{ name: '黄緑', value: '#A3E635' },
+	{ name: 'ゴールド', value: '#EAB308' },
+	{ name: 'シルバー', value: '#94A3B8' },
+	{ name: '茶', value: '#A16207' },
+] as const
+
+export function playerColor(index: number) {
+	return PLAYER_COLORS[index % PLAYER_COLORS.length]
+}
+```
+
+- [ ] **Step 2: players-store の失敗するテストを追記**
+
+`src/lib/__tests__/players-store.test.ts` に describe を追加:
+
+```ts
+describe('addPlayer / removePlayer / history', () => {
+	it('addPlayer で1人増え、removePlayer で対象の名前ごと消える', async () => {
+		await playersStore.setCount(3)
+		await playersStore.setName(0, 'A')
+		await playersStore.setName(1, 'B')
+		await playersStore.setName(2, 'C')
+		await playersStore.addPlayer()
+		expect(playersStore.getState().count).toBe(4)
+		await playersStore.removePlayer(1)
+		const s = playersStore.getState()
+		expect(s.count).toBe(3)
+		expect(s.names.slice(0, 2)).toEqual(['A', 'C'])
+	})
+
+	it('saveToHistory は空でないセットを先頭に最大5件保存する', async () => {
+		await playersStore.setCount(2)
+		await playersStore.setName(0, 'ひろ')
+		await playersStore.saveToHistory()
+		expect(playersStore.getState().history[0]).toEqual(['ひろ', ''])
+	})
+
+	it('全員未入力なら saveToHistory は何もしない', async () => {
+		await playersStore.saveToHistory()
+		expect(playersStore.getState().history).toHaveLength(0)
+	})
+
+	it('applyHistory が人数と名前を復元する', async () => {
+		await playersStore.setCount(2)
+		await playersStore.setName(0, 'ひろ')
+		await playersStore.saveToHistory()
+		await playersStore.setCount(6)
+		await playersStore.applyHistory(0)
+		expect(playersStore.getState().count).toBe(2)
+		expect(playersStore.getState().names[0]).toBe('ひろ')
+	})
+})
+```
+
+- [ ] **Step 3: テストが落ちることを確認 → players-store.ts を拡張**
+
+`src/lib/players-store.ts` 変更点:
+
+```ts
+export type PlayersState = {
+	count: number
+	names: string[]
+	history: string[][]
+}
+
+const DEFAULTS: PlayersState = { count: 4, names: [], history: [] }
+
+// playersStore に追加:
+	async addPlayer() {
+		if (state.count >= MAX_PLAYERS) return
+		state = { ...state, count: state.count + 1 }
+		emit()
+		await persist()
+	},
+	async removePlayer(index: number) {
+		if (state.count <= MIN_PLAYERS) return
+		const names = state.names.slice(0, state.count)
+		names.splice(index, 1)
+		state = { ...state, count: state.count - 1, names }
+		emit()
+		await persist()
+	},
+	async saveToHistory() {
+		const set = Array.from({ length: state.count }, (_, i) => state.names[i] ?? '')
+		if (!set.some((n) => n.trim())) return
+		const history = [set, ...state.history.filter((h) => JSON.stringify(h) !== JSON.stringify(set))].slice(0, 5)
+		state = { ...state, history }
+		emit()
+		await persist()
+	},
+	async applyHistory(index: number) {
+		const set = state.history[index]
+		if (!set) return
+		state = {
+			...state,
+			count: Math.min(MAX_PLAYERS, Math.max(MIN_PLAYERS, set.length)),
+			names: [...set],
+		}
+		emit()
+		await persist()
+	},
+```
+
+Run: `bun run test src/lib` → PASS
+
+- [ ] **Step 4: player-setup-sheet の失敗するテストを書き直す**
+
+`src/components/game/__tests__/player-setup-sheet.test.tsx` を全面書き換え（jest.mock ブロックは既存のまま流用）:
+
+```tsx
+it('人数分のプレイヤーカードが表示される', async () => {
+	const { getAllByPlaceholderText } = await render(
+		<PlayerSetupSheet visible onClose={jest.fn()} />,
+	)
+	expect(getAllByPlaceholderText('プレイヤー名を入力...')).toHaveLength(4)
+})
+
+it('「追加」で1人増える', async () => {
+	const { getByText } = await render(<PlayerSetupSheet visible onClose={jest.fn()} />)
+	fireEvent.press(getByText('⊕ 追加'))
+	expect(playersStore.getState().count).toBe(5)
+})
+
+it('×で対象プレイヤーが削除される', async () => {
+	const { getAllByText } = await render(<PlayerSetupSheet visible onClose={jest.fn()} />)
+	fireEvent.press(getAllByText('×')[0])
+	expect(playersStore.getState().count).toBe(3)
+})
+
+it('名前入力がストアに反映される', async () => {
+	const { getAllByPlaceholderText } = await render(
+		<PlayerSetupSheet visible onClose={jest.fn()} />,
+	)
+	fireEvent.changeText(getAllByPlaceholderText('プレイヤー名を入力...')[0], 'ひろ')
+	expect(playersStore.getState().names[0]).toBe('ひろ')
+})
+
+it('「つぎへ」で履歴保存と onClose', async () => {
+	await playersStore.setName(0, 'ひろ')
+	const onClose = jest.fn()
+	const { getByText } = await render(<PlayerSetupSheet visible onClose={onClose} />)
+	fireEvent.press(getByText('つぎへ'))
+	await waitFor(() => expect(onClose).toHaveBeenCalledTimes(1))
+	expect(playersStore.getState().history.length).toBeGreaterThan(0)
+})
+
+it('履歴が空のとき空状態メッセージを表示', async () => {
+	const { getByText } = await render(<PlayerSetupSheet visible onClose={jest.fn()} />)
+	expect(getByText('履歴がまだありません。')).toBeTruthy()
+})
+```
+
+- [ ] **Step 5: player-setup-sheet.tsx を参考UIどおり書き直す**
+
+```tsx
+import { Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native'
+import { haptics } from '@/lib/haptics'
+import { MAX_PLAYERS, MIN_PLAYERS, playersStore, usePlayers } from '@/lib/players-store'
+import { playerColor } from '@/theme/player-colors'
+import { colors, radii, spacing, typography } from '@/theme/tokens'
+
+type Props = {
+	visible: boolean
+	onClose: () => void
+	minPlayers?: number
+	maxPlayers?: number
+}
+
+// 参考UI準拠: プレイヤーカラー付きカード / ⊕追加 / 履歴 / 白い「つぎへ」
+export function PlayerSetupSheet({
+	visible,
+	onClose,
+	minPlayers = MIN_PLAYERS,
+	maxPlayers = MAX_PLAYERS,
+}: Props) {
+	const players = usePlayers()
+
+	const finish = async () => {
+		haptics.tap()
+		await playersStore.saveToHistory()
+		onClose()
+	}
+
+	return (
+		<Modal visible={visible} animationType="slide" onRequestClose={onClose}>
+			<View style={styles.screen}>
+				<View style={styles.header}>
+					<Pressable
+						accessibilityRole="button"
+						onPress={onClose}
+						style={styles.headerBtn}
+					>
+						<Text style={styles.headerIcon}>×</Text>
+					</Pressable>
+					<Text style={styles.headerTitle}>参加メンバー</Text>
+					<View style={styles.headerBtn} />
+				</View>
+
+				<ScrollView
+					contentContainerStyle={styles.content}
+					keyboardShouldPersistTaps="handled"
+				>
+					{Array.from({ length: players.count }, (_, i) => {
+						const color = playerColor(i)
+						return (
+							<View key={`${i}-${players.count}`} style={styles.card}>
+								<View style={[styles.colorBar, { backgroundColor: color.value }]} />
+								<View style={styles.cardBody}>
+									<Text style={[styles.colorLabel, { color: color.value }]}>
+										プレイヤーカラー：{color.name}
+									</Text>
+									<TextInput
+										style={styles.input}
+										placeholder="プレイヤー名を入力..."
+										placeholderTextColor={colors.textMuted}
+										value={players.names[i] ?? ''}
+										onChangeText={(t) => playersStore.setName(i, t)}
+										maxLength={10}
+									/>
+								</View>
+								{players.count > minPlayers && (
+									<Pressable
+										accessibilityRole="button"
+										onPress={() => {
+											haptics.tap()
+											playersStore.removePlayer(i)
+										}}
+										style={styles.removeBtn}
+									>
+										<Text style={styles.removeIcon}>×</Text>
+									</Pressable>
+								)}
+							</View>
+						)
+					})}
+
+					{players.count < maxPlayers && (
+						<Pressable
+							accessibilityRole="button"
+							onPress={() => {
+								haptics.tap()
+								playersStore.addPlayer()
+							}}
+							style={styles.addBtn}
+						>
+							<Text style={styles.addLabel}>⊕ 追加</Text>
+						</Pressable>
+					)}
+
+					<Text style={styles.sectionTitle}>履歴</Text>
+					<View style={styles.historyBox}>
+						{players.history.length === 0 ? (
+							<Text style={styles.historyEmpty}>履歴がまだありません。</Text>
+						) : (
+							players.history.map((set, i) => (
+								<Pressable
+									accessibilityRole="button"
+									key={i}
+									onPress={() => {
+										haptics.tap()
+										playersStore.applyHistory(i)
+									}}
+									style={styles.historyRow}
+								>
+									<Text style={styles.historyText} numberOfLines={1}>
+										{set
+											.map((n, j) => (n.trim() ? n : `${j + 1}番`))
+											.join('、')}
+									</Text>
+								</Pressable>
+							))
+						)}
+					</View>
+				</ScrollView>
+
+				<View style={styles.footer}>
+					<Pressable accessibilityRole="button" onPress={finish} style={styles.nextBtn}>
+						<Text style={styles.nextLabel}>つぎへ</Text>
+					</Pressable>
+				</View>
+			</View>
+		</Modal>
+	)
+}
+
+const styles = StyleSheet.create({
+	screen: { flex: 1, backgroundColor: colors.background },
+	header: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		height: 56,
+		paddingHorizontal: spacing.sm,
+	},
+	headerBtn: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center' },
+	headerIcon: { fontSize: 28, color: colors.text },
+	headerTitle: { ...typography.title, flex: 1, textAlign: 'center' },
+	content: { padding: spacing.md, gap: spacing.md },
+	card: {
+		flexDirection: 'row',
+		backgroundColor: colors.surface,
+		borderRadius: radii.md,
+		borderWidth: 1,
+		borderColor: colors.surfaceBorder,
+		overflow: 'hidden',
+	},
+	colorBar: { width: 5 },
+	cardBody: { flex: 1, padding: spacing.md, gap: spacing.sm },
+	colorLabel: { fontSize: 13, fontWeight: '700' },
+	input: {
+		...typography.body,
+		borderBottomWidth: 1,
+		borderBottomColor: colors.surfaceBorder,
+		paddingVertical: spacing.xs,
+	},
+	removeBtn: { width: 44, alignItems: 'center', justifyContent: 'center' },
+	removeIcon: { fontSize: 22, color: colors.text },
+	addBtn: {
+		alignSelf: 'center',
+		borderWidth: 1,
+		borderColor: colors.text,
+		borderRadius: radii.md,
+		paddingVertical: spacing.sm,
+		paddingHorizontal: spacing.xl,
+	},
+	addLabel: { ...typography.body, fontWeight: '700' },
+	sectionTitle: { ...typography.title, fontSize: 18, marginTop: spacing.md },
+	historyBox: {
+		backgroundColor: colors.surface,
+		borderRadius: radii.md,
+		padding: spacing.md,
+		minHeight: 96,
+		justifyContent: 'center',
+	},
+	historyEmpty: { ...typography.body, fontWeight: '700', textAlign: 'center' },
+	historyRow: { paddingVertical: spacing.sm },
+	historyText: { ...typography.body },
+	footer: { padding: spacing.md },
+	nextBtn: {
+		backgroundColor: colors.text,
+		borderRadius: radii.md,
+		paddingVertical: spacing.md,
+		alignItems: 'center',
+	},
+	nextLabel: { fontSize: 18, fontWeight: '800', color: colors.background },
+})
+```
+
+- [ ] **Step 6: 全テスト・検証・commit**
+
+```bash
+bun run test && bun run typecheck && bun run lint && bunx prettier --write src/theme/player-colors.ts src/lib/players-store.ts src/components/game/player-setup-sheet.tsx
+git add -A && git commit -m "feat: プレイヤー設定画面を参考UI準拠にリデザイン (#4)"
+```
+
+※ 注意: カードの `key` に `${i}-${players.count}` を使うのは削除時の TextInput 値残留を避けるため
