@@ -22,7 +22,7 @@ export default function RootLayout() {
 		<ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
 			<AnimatedSplashOverlay />
 			<Stack screenOptions={{ headerShown: false }}>
-				<Stack.Screen name="(tabs)" />
+				<Stack.Screen name="index" />
 				<Stack.Screen
 					name="gallery"
 					options={{
@@ -33,6 +33,15 @@ export default function RootLayout() {
 					}}
 				/>
 				<Stack.Screen name="game/[id]" />
+				<Stack.Screen
+					name="settings"
+					options={{
+						headerShown: true,
+						title: '設定とアクティビティ',
+						headerStyle: { backgroundColor: colors.background },
+						headerTintColor: colors.text,
+					}}
+				/>
 			</Stack>
 		</ThemeProvider>
 	)
