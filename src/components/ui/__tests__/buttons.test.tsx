@@ -17,18 +17,18 @@ jest.mock('expo-linear-gradient', () => ({
 }))
 
 describe('GradientButton', () => {
-	it('タイトルを表示し、タップで onPress が呼ばれる', async () => {
+	it('タイトルを表示し、タップで onPress が呼ばれる', () => {
 		const onPress = jest.fn()
-		const { getByText } = await render(
+		const { getByText } = render(
 			<GradientButton title="アップグレード" onPress={onPress} />,
 		)
 		fireEvent.press(getByText('アップグレード'))
 		expect(onPress).toHaveBeenCalledTimes(1)
 	})
 
-	it('disabled のとき onPress が呼ばれない', async () => {
+	it('disabled のとき onPress が呼ばれない', () => {
 		const onPress = jest.fn()
-		const { getByText } = await render(
+		const { getByText } = render(
 			<GradientButton title="実行" onPress={onPress} disabled />,
 		)
 		fireEvent.press(getByText('実行'))
@@ -37,9 +37,9 @@ describe('GradientButton', () => {
 })
 
 describe('PillButton', () => {
-	it('タイトルを表示し、タップで onPress が呼ばれる', async () => {
+	it('タイトルを表示し、タップで onPress が呼ばれる', () => {
 		const onPress = jest.fn()
-		const { getByText } = await render(<PillButton title="👑 プレミアム" onPress={onPress} />)
+		const { getByText } = render(<PillButton title="👑 プレミアム" onPress={onPress} />)
 		fireEvent.press(getByText('👑 プレミアム'))
 		expect(onPress).toHaveBeenCalledTimes(1)
 	})
