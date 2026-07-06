@@ -1,4 +1,4 @@
-import { Redirect } from 'expo-router'
+import { Redirect, router } from 'expo-router'
 import { ScrollView, StyleSheet, View } from 'react-native'
 import { Card } from '@/components/ui/card'
 import { ChevronRow } from '@/components/ui/chevron-row'
@@ -49,6 +49,17 @@ export default function GalleryScreen() {
 					onValueChange={(v) => settingsStore.setHapticsEnabled(v)}
 				/>
 				<ChevronRow icon="⭐" label="レビューを書く" onPress={() => haptics.heavy()} />
+			</Card>
+
+			<SectionHeader title="ゲームフレーム" />
+			<Card>
+				<ChevronRow
+					icon="🎮"
+					label="デモ: ゲーム画面を開く（Who will pay）"
+					onPress={() =>
+						router.push({ pathname: '/game/[id]', params: { id: 'who-will-pay' } })
+					}
+				/>
 			</Card>
 		</ScrollView>
 	)

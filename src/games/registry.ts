@@ -1,0 +1,140 @@
+import type { ComponentType } from 'react'
+import { ComingSoonGame } from './coming-soon'
+
+export type GameMeta = {
+	id: string
+	title: string
+	tagline: string
+	emoji: string
+	gradient: readonly [string, string]
+	minPlayers: number
+	maxPlayers: number
+	howToPlay: readonly string[]
+	Component: ComponentType
+}
+
+// MVP 8ゲーム。Component は各ゲーム Issue (#9〜#16) で差し替える
+export const games: readonly GameMeta[] = [
+	{
+		id: 'who-will-pay',
+		title: 'Who will pay',
+		tagline: '会計はルーレットで決めよう！',
+		emoji: '💸',
+		gradient: ['#E85BF7', '#7B5CFA'],
+		minPlayers: 2,
+		maxPlayers: 12,
+		howToPlay: [
+			'ルーレットを回して「支払う人」を決めます',
+			'止まった番号の人が今日の会計！結果には逆らえません',
+		],
+		Component: ComingSoonGame,
+	},
+	{
+		id: 'bomb-2-16',
+		title: 'BOMB!! 2/16',
+		tagline: '16個のボタンにハズレが2個！',
+		emoji: '💣',
+		gradient: ['#FF6B6B', '#C0392B'],
+		minPlayers: 2,
+		maxPlayers: 12,
+		howToPlay: [
+			'16個のボタンの中に爆弾が2つ隠れています',
+			'順番にタップしていき、爆弾を引いた人が負け！',
+			'「全員負け爆弾」を引いたら…全員アウト！',
+		],
+		Component: ComingSoonGame,
+	},
+	{
+		id: 'five-sec-stop',
+		title: '5秒STOP',
+		tagline: '5秒ぴったりで止めろ！',
+		emoji: '⏱️',
+		gradient: ['#4ECDC4', '#2C7A7B'],
+		minPlayers: 2,
+		maxPlayers: 12,
+		howToPlay: [
+			'タイマーを 5.00 秒ぴったりを狙って止めます',
+			'途中から数字は見えなくなります！',
+			'一番ズレた人が負け',
+		],
+		Component: ComingSoonGame,
+	},
+	{
+		id: 'kimagure-ox',
+		title: 'きまぐれ◯×',
+		tagline: '普通じゃない◯×ゲーム',
+		emoji: '⭕',
+		gradient: ['#F7B731', '#E67E22'],
+		minPlayers: 2,
+		maxPlayers: 2,
+		howToPlay: [
+			'普通の◯×ゲーム…と思いきや、ターンの合間に「きまぐれイベント」が発生！',
+			'マスが入れ替わったり、駒が消えたり。最後に笑うのは誰だ',
+		],
+		Component: ComingSoonGame,
+	},
+	{
+		id: 'no-king-game',
+		title: '王様のいない王様ゲーム',
+		tagline: 'お題も実行役もランダム！',
+		emoji: '👑',
+		gradient: ['#F1C40F', '#B7791F'],
+		minPlayers: 3,
+		maxPlayers: 12,
+		howToPlay: [
+			'全員に番号が配られます（自分の番号は内緒）',
+			'お題と実行する番号がランダムで発表されます',
+			'王様はいないので、誰も文句は言えません！',
+		],
+		Component: ComingSoonGame,
+	},
+	{
+		id: 'pointing-heat-up',
+		title: '指差しヒートアップ',
+		tagline: 'せーので一斉に指差せ！',
+		emoji: '👉',
+		gradient: ['#FF9F43', '#EE5253'],
+		minPlayers: 3,
+		maxPlayers: 12,
+		howToPlay: [
+			'お題（例:「一番寝坊しそうな人」）が表示されます',
+			'カウントダウンで全員一斉に「その人」を指差します',
+			'一番指を差された人が負け！',
+		],
+		Component: ComingSoonGame,
+	},
+	{
+		id: 'bomb-relay',
+		title: 'カウントダウン爆弾リレー',
+		tagline: '爆発した時に持ってた人が負け',
+		emoji: '🧨',
+		gradient: ['#A55EEA', '#8854D0'],
+		minPlayers: 3,
+		maxPlayers: 12,
+		howToPlay: [
+			'お題に答えたらスマホを次の人へ回します',
+			'爆弾のタイマーはランダム。チクタク音が速くなってきたら…',
+			'爆発した瞬間に持っていた人が負け！',
+		],
+		Component: ComingSoonGame,
+	},
+	{
+		id: 'reaction-pairs',
+		title: 'リアクション神経衰弱',
+		tagline: 'ペアが揃ったら罰ゲーム!?',
+		emoji: '🃏',
+		gradient: ['#26DE81', '#20BF6B'],
+		minPlayers: 2,
+		maxPlayers: 12,
+		howToPlay: [
+			'みんなで順番にカードをめくる神経衰弱',
+			'ペアが揃った瞬間、罰ゲーム対象者がルーレットで決定！',
+			'ジョーカーを引いた人は即アウト',
+		],
+		Component: ComingSoonGame,
+	},
+]
+
+export function getGame(id: string): GameMeta | undefined {
+	return games.find((g) => g.id === id)
+}
