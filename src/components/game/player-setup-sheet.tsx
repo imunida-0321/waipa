@@ -1,4 +1,5 @@
 import { Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { haptics } from '@/lib/haptics'
 import { MAX_PLAYERS, MIN_PLAYERS, playersStore, usePlayers } from '@/lib/players-store'
 import { playerColor } from '@/theme/player-colors'
@@ -18,6 +19,7 @@ export function PlayerSetupSheet({
 	minPlayers = MIN_PLAYERS,
 	maxPlayers = MAX_PLAYERS,
 }: Props) {
+	const insets = useSafeAreaInsets()
 	const players = usePlayers()
 
 	const finish = async () => {
@@ -28,7 +30,7 @@ export function PlayerSetupSheet({
 
 	return (
 		<Modal visible={visible} animationType="slide" onRequestClose={onClose}>
-			<View style={styles.screen}>
+			<View style={[styles.screen, { paddingTop: insets.top }]}>
 				<View style={styles.header}>
 					<Pressable
 						accessibilityRole="button"
@@ -120,7 +122,7 @@ export function PlayerSetupSheet({
 					</View>
 				</ScrollView>
 
-				<View style={styles.footer}>
+				<View style={[styles.footer, { paddingBottom: insets.bottom + spacing.md }]}>
 					<Pressable accessibilityRole="button" onPress={finish} style={styles.nextBtn}>
 						<Text style={styles.nextLabel}>つぎへ</Text>
 					</Pressable>
@@ -181,7 +183,7 @@ const styles = StyleSheet.create({
 	historyEmpty: { ...typography.body, fontWeight: '700', textAlign: 'center' },
 	historyRow: { paddingVertical: spacing.sm },
 	historyText: { ...typography.body },
-	footer: { padding: spacing.md },
+	footer: { paddingHorizontal: spacing.md, paddingTop: spacing.md },
 	nextBtn: {
 		backgroundColor: colors.text,
 		borderRadius: radii.md,

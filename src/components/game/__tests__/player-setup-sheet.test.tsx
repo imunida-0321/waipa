@@ -3,6 +3,27 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import { playersStore } from '@/lib/players-store'
 import { PlayerSetupSheet } from '../player-setup-sheet'
 
+jest.mock('@react-native-async-storage/async-storage', () =>
+	// eslint-disable-next-line @typescript-eslint/no-require-imports
+	require('@react-native-async-storage/async-storage/jest/async-storage-mock'),
+)
+jest.mock('expo-haptics', () => ({
+	impactAsync: jest.fn(),
+	ImpactFeedbackStyle: { Light: 'light', Heavy: 'heavy' },
+	NotificationFeedbackType: { Success: 'success' },
+	notificationAsync: jest.fn(),
+}))
+jest.mock('@/theme/player-colors', () => ({
+	playerColor: (index: number) => ({ name: `色${index}`, value: '#FF0000' }),
+}))
+jest.mock('react-native-safe-area-context', () => ({
+	useSafeAreaInsets: jest.fn(() => ({
+		top: 0,
+		bottom: 0,
+		left: 0,
+		right: 0,
+	})),
+}))
 jest.mock('react-native-reanimated', () => ({
 	__esModule: true,
 	useAnimatedStyle: jest.fn(() => ({})),
@@ -16,31 +37,6 @@ jest.mock('react-native-reanimated', () => ({
 jest.mock('react-native-worklets', () => ({
 	__esModule: true,
 	Worklets: { defaultContext: {} },
-}))
-
-jest.mock('@react-native-async-storage/async-storage', () =>
-	// eslint-disable-next-line @typescript-eslint/no-require-imports
-	require('@react-native-async-storage/async-storage/jest/async-storage-mock'),
-)
-jest.mock('expo-haptics', () => ({
-	impactAsync: jest.fn(),
-	ImpactFeedbackStyle: { Light: 'light', Heavy: 'heavy' },
-	NotificationFeedbackType: { Success: 'success' },
-	notificationAsync: jest.fn(),
-}))
-jest.mock('@/components/ui/gradient-button', () => {
-	// eslint-disable-next-line @typescript-eslint/no-require-imports
-	const { Pressable, Text } = require('react-native')
-	return {
-		GradientButton: ({ title, onPress }: { title: string; onPress: () => void }) => (
-			<Pressable onPress={onPress}>
-				<Text>{title}</Text>
-			</Pressable>
-		),
-	}
-})
-jest.mock('@/theme/player-colors', () => ({
-	playerColor: (index: number) => ({ name: `色${index}`, value: '#FF0000' }),
 }))
 
 beforeEach(async () => {
