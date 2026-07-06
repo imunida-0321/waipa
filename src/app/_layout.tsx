@@ -33,6 +33,15 @@ export default function RootLayout() {
 					}}
 				/>
 				<Stack.Screen name="game/[id]" />
+				<Stack.Screen
+					name="settings"
+					options={{
+						headerShown: true,
+						title: '設定とアクティビティ',
+						headerStyle: { backgroundColor: colors.background },
+						headerTintColor: colors.text,
+					}}
+				/>
 			</Stack>
 		</ThemeProvider>
 	)

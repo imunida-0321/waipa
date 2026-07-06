@@ -1,4 +1,3 @@
-import type { Href } from 'expo-router'
 import { router } from 'expo-router'
 import { Pressable, StyleSheet, Text, View } from 'react-native'
 import { PillButton } from '@/components/ui/pill-button'
@@ -11,16 +10,13 @@ export function HomeHeader() {
 		<View style={styles.row}>
 			<Text style={styles.logo}>WaiPa</Text>
 			<View style={styles.right}>
-				<PillButton
-					title="👑 プレミアム"
-					onPress={() => router.push('/settings' as Href)}
-				/>
+				<PillButton title="👑 プレミアム" onPress={() => router.push('/settings')} />
 				<Pressable
 					accessibilityRole="button"
 					accessibilityLabel="メニュー"
 					onPress={() => {
 						haptics.tap()
-						router.push('/settings' as Href)
+						router.push('/settings')
 					}}
 					style={styles.menuBtn}
 				>
