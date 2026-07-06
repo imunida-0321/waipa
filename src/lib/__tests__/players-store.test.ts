@@ -42,3 +42,45 @@ describe('playersStore', () => {
 		expect(playersStore.getState().names[0]).toBe('A')
 	})
 })
+
+describe('addPlayer / removePlayer / history', () => {
+	beforeEach(async () => {
+		await AsyncStorage.clear()
+		await playersStore.hydrate()
+	})
+
+	it('addPlayer で1人増え、removePlayer で対象の名前ごと消える', async () => {
+		await playersStore.setCount(3)
+		await playersStore.setName(0, 'A')
+		await playersStore.setName(1, 'B')
+		await playersStore.setName(2, 'C')
+		await playersStore.addPlayer()
+		expect(playersStore.getState().count).toBe(4)
+		await playersStore.removePlayer(1)
+		const s = playersStore.getState()
+		expect(s.count).toBe(3)
+		expect(s.names.slice(0, 2)).toEqual(['A', 'C'])
+	})
+
+	it('saveToHistory は空でないセットを先頭に最大5件保存する', async () => {
+		await playersStore.setCount(2)
+		await playersStore.setName(0, 'ひろ')
+		await playersStore.saveToHistory()
+		expect(playersStore.getState().history[0]).toEqual(['ひろ', ''])
+	})
+
+	it('全員未入力なら saveToHistory は何もしない', async () => {
+		await playersStore.saveToHistory()
+		expect(playersStore.getState().history).toHaveLength(0)
+	})
+
+	it('applyHistory が人数と名前を復元する', async () => {
+		await playersStore.setCount(2)
+		await playersStore.setName(0, 'ひろ')
+		await playersStore.saveToHistory()
+		await playersStore.setCount(6)
+		await playersStore.applyHistory(0)
+		expect(playersStore.getState().count).toBe(2)
+		expect(playersStore.getState().names[0]).toBe('ひろ')
+	})
+})

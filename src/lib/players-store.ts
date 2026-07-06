@@ -8,9 +8,10 @@ export const MAX_PLAYERS = 12
 export type PlayersState = {
 	count: number
 	names: string[]
+	history: string[][]
 }
 
-const DEFAULTS: PlayersState = { count: 4, names: [] }
+const DEFAULTS: PlayersState = { count: 4, names: [], history: [] }
 
 let state: PlayersState = { ...DEFAULTS }
 const listeners = new Set<() => void>()
@@ -46,6 +47,42 @@ export const playersStore = {
 		const names = [...state.names]
 		names[index] = name
 		state = { ...state, names }
+		emit()
+		await persist()
+	},
+	async addPlayer() {
+		if (state.count >= MAX_PLAYERS) return
+		state = { ...state, count: state.count + 1 }
+		emit()
+		await persist()
+	},
+	async removePlayer(index: number) {
+		if (state.count <= MIN_PLAYERS) return
+		const names = state.names.slice(0, state.count)
+		names.splice(index, 1)
+		state = { ...state, count: state.count - 1, names }
+		emit()
+		await persist()
+	},
+	async saveToHistory() {
+		const set = Array.from({ length: state.count }, (_, i) => state.names[i] ?? '')
+		if (!set.some((n) => n.trim())) return
+		const history = [
+			set,
+			...state.history.filter((h) => JSON.stringify(h) !== JSON.stringify(set)),
+		].slice(0, 5)
+		state = { ...state, history }
+		emit()
+		await persist()
+	},
+	async applyHistory(index: number) {
+		const set = state.history[index]
+		if (!set) return
+		state = {
+			...state,
+			count: Math.min(MAX_PLAYERS, Math.max(MIN_PLAYERS, set.length)),
+			names: [...set],
+		}
 		emit()
 		await persist()
 	},
