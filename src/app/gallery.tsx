@@ -9,12 +9,14 @@ import { SettingToggleRow } from '@/components/ui/setting-toggle-row'
 import { haptics } from '@/lib/haptics'
 import { settingsStore, useSettings } from '@/lib/settings-store'
 import { playSound } from '@/lib/sound'
+import { useTopics } from '@/lib/topics-store'
 import { colors, spacing } from '@/theme/tokens'
 import { ThemedText } from '@/components/themed-text'
 
 // デザインシステム確認用ギャラリー。本番ビルドではアクセス不可
 export default function GalleryScreen() {
 	const settings = useSettings()
+	const topics = useTopics()
 
 	if (!__DEV__) {
 		return <Redirect href="/" />
@@ -60,6 +62,16 @@ export default function GalleryScreen() {
 						router.push({ pathname: '/game/[id]', params: { id: 'who-will-pay' } })
 					}
 				/>
+			</Card>
+
+			<SectionHeader title="お題データ" />
+			<Card>
+				<ThemedText>
+					読み込み済み: {topics.topics.length}件
+					{topics.fetchedAt
+						? `（${new Date(topics.fetchedAt).toLocaleTimeString()} 取得）`
+						: '（キャッシュなし）'}
+				</ThemedText>
 			</Card>
 		</ScrollView>
 	)
