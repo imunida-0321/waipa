@@ -1,0 +1,61 @@
+import { Redirect } from 'expo-router'
+import { ScrollView, StyleSheet, View } from 'react-native'
+import { Card } from '@/components/ui/card'
+import { ChevronRow } from '@/components/ui/chevron-row'
+import { GradientButton } from '@/components/ui/gradient-button'
+import { PillButton } from '@/components/ui/pill-button'
+import { SectionHeader } from '@/components/ui/section-header'
+import { SettingToggleRow } from '@/components/ui/setting-toggle-row'
+import { haptics } from '@/lib/haptics'
+import { settingsStore, useSettings } from '@/lib/settings-store'
+import { playSound } from '@/lib/sound'
+import { colors, spacing } from '@/theme/tokens'
+import { ThemedText } from '@/components/themed-text'
+
+// デザインシステム確認用ギャラリー。本番ビルドではアクセス不可
+export default function GalleryScreen() {
+	const settings = useSettings()
+
+	if (!__DEV__) {
+		return <Redirect href="/" />
+	}
+
+	return (
+		<ScrollView style={styles.screen} contentContainerStyle={styles.content}>
+			<SectionHeader title="ボタン" />
+			<GradientButton title="アップグレード" onPress={() => playSound('tap')} />
+			<View style={styles.gap} />
+			<GradientButton title="無効状態" onPress={() => {}} disabled />
+			<View style={styles.gap} />
+			<PillButton title="👑 プレミアム" onPress={() => haptics.success()} />
+
+			<SectionHeader title="カード" />
+			<Card>
+				<ThemedText>サーフェス #211D3A / 枠線 #332E52 / 角丸 24</ThemedText>
+			</Card>
+
+			<SectionHeader title="設定行" />
+			<Card>
+				<SettingToggleRow
+					icon="🔊"
+					label="効果音"
+					value={settings.soundEnabled}
+					onValueChange={(v) => settingsStore.setSoundEnabled(v)}
+				/>
+				<SettingToggleRow
+					icon="📳"
+					label="バイブレーション"
+					value={settings.hapticsEnabled}
+					onValueChange={(v) => settingsStore.setHapticsEnabled(v)}
+				/>
+				<ChevronRow icon="⭐" label="レビューを書く" onPress={() => haptics.heavy()} />
+			</Card>
+		</ScrollView>
+	)
+}
+
+const styles = StyleSheet.create({
+	screen: { flex: 1, backgroundColor: colors.background },
+	content: { padding: spacing.md, paddingBottom: spacing.xl },
+	gap: { height: spacing.sm },
+})
