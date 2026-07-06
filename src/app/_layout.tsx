@@ -30,6 +30,7 @@ export default function RootLayout() {
 						headerTintColor: colors.text,
 					}}
 				/>
+				<Stack.Screen name="game/[id]" />
 			</Stack>
 		</ThemeProvider>
 	)
