@@ -1,0 +1,6 @@
+.agents/
+.claude/
+.expo/
+dist/
+node_modules/
+bun.lock

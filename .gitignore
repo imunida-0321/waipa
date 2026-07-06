@@ -36,3 +36,10 @@ yarn-error.log*
 
 # local settings
 .claude/settings.local.json
+
+# native/build extras
+.kotlin/
+*.orig.*
+.metro-health-check*
+*.tsbuildinfo
+*.pem
