@@ -23,11 +23,13 @@
 ### Task 1: テスト基盤＋デザイントークン
 
 **Files:**
+
 - Create: `src/theme/tokens.ts`
 - Create: `src/theme/__tests__/tokens.test.ts`
 - Modify: `package.json`（jest 設定・scripts 追加）
 
 **Interfaces:**
+
 - Produces: `colors.background/surface/surfaceBorder/accentFrom/accentTo/text/textMuted/success/danger/gold: string`、`spacing.xs/sm/md/lg/xl: number`、`radii.sm/md/lg/pill: number`、`typography.hero/title/body/caption: TextStyle`
 
 - [ ] **Step 1: 依存を追加する**
@@ -150,10 +152,12 @@ git add -A && git commit -m "feat: デザイントークンとテスト基盤を
 ### Task 2: 設定ストア（効果音・バイブの永続化）
 
 **Files:**
+
 - Create: `src/lib/settings-store.ts`
 - Create: `src/lib/__tests__/settings-store.test.ts`
 
 **Interfaces:**
+
 - Produces: `settingsStore.getState(): { soundEnabled: boolean; hapticsEnabled: boolean }`、`settingsStore.setSoundEnabled(v: boolean): Promise<void>`、`settingsStore.setHapticsEnabled(v: boolean): Promise<void>`、`settingsStore.subscribe(fn: () => void): () => void`、`settingsStore.hydrate(): Promise<void>`、`useSettings(): SettingsState`（React hook）
 
 - [ ] **Step 1: 失敗するテストを書く**
@@ -262,7 +266,11 @@ export const settingsStore = {
 }
 
 export function useSettings(): SettingsState {
-	return useSyncExternalStore(settingsStore.subscribe, settingsStore.getState, settingsStore.getState)
+	return useSyncExternalStore(
+		settingsStore.subscribe,
+		settingsStore.getState,
+		settingsStore.getState,
+	)
 }
 ```
 
@@ -283,11 +291,13 @@ git add -A && git commit -m "feat: 効果音・バイブ設定の永続化スト
 ### Task 3: Haptics・サウンドユーティリティ
 
 **Files:**
+
 - Create: `src/lib/haptics.ts`
 - Create: `src/lib/sound.ts`
 - Create: `src/lib/__tests__/haptics.test.ts`
 
 **Interfaces:**
+
 - Consumes: `settingsStore.getState()`（Task 2）
 - Produces: `haptics.tap(): Promise<void>`、`haptics.success(): Promise<void>`、`haptics.heavy(): Promise<void>`、`registerSound(name: string, source: number): void`、`playSound(name: string): void`
 
@@ -404,11 +414,13 @@ git add -A && git commit -m "feat: Haptics・サウンドユーティリティ�
 ### Task 4: GradientButton・PillButton
 
 **Files:**
+
 - Create: `src/components/ui/gradient-button.tsx`
 - Create: `src/components/ui/pill-button.tsx`
 - Create: `src/components/ui/__tests__/buttons.test.tsx`
 
 **Interfaces:**
+
 - Consumes: `colors/spacing/radii/typography`（Task 1）、`haptics.tap`（Task 3）
 - Produces: `<GradientButton title onPress disabled? />`、`<PillButton title onPress icon? />`
 
@@ -571,6 +583,7 @@ git add -A && git commit -m "feat: GradientButton / PillButton を追加 (#2)"
 ### Task 5: Card・SectionHeader・SettingToggleRow・ChevronRow
 
 **Files:**
+
 - Create: `src/components/ui/card.tsx`
 - Create: `src/components/ui/section-header.tsx`
 - Create: `src/components/ui/setting-toggle-row.tsx`
@@ -578,6 +591,7 @@ git add -A && git commit -m "feat: GradientButton / PillButton を追加 (#2)"
 - Create: `src/components/ui/__tests__/rows.test.tsx`
 
 **Interfaces:**
+
 - Consumes: `colors/spacing/radii/typography`（Task 1）、`haptics.tap`（Task 3）
 - Produces: `<Card children style? />`、`<SectionHeader title />`、`<SettingToggleRow icon label value onValueChange />`、`<ChevronRow icon label onPress />`
 
@@ -777,10 +791,12 @@ git add -A && git commit -m "feat: Card / SectionHeader / 設定行コンポー�
 ### Task 6: ギャラリー画面（開発ビルド限定）＋総仕上げ
 
 **Files:**
+
 - Create: `src/app/gallery.tsx`
 - Modify: `src/app/index.tsx`（ギャラリーへの導線を開発ビルド時のみ表示）
 
 **Interfaces:**
+
 - Consumes: Task 1〜5 の全コンポーネント・ユーティリティ
 
 - [ ] **Step 1: gallery.tsx を実装**
@@ -851,7 +867,7 @@ const styles = StyleSheet.create({
 })
 ```
 
-- [ ] **Step 2: 起動時ハイドレーションを _layout.tsx に追加**
+- [ ] **Step 2: 起動時ハイドレーションを \_layout.tsx に追加**
 
 `src/app/_layout.tsx` のルートコンポーネント内（既存の return より前）に追加:
 
