@@ -1,0 +1,38 @@
+# dependencies
+node_modules/
+
+# Expo
+.expo/
+dist/
+web-build/
+expo-env.d.ts
+
+# native builds
+ios/
+android/
+*.ipa
+*.aab
+*.apk
+
+# secrets — 絶対にコミットしない
+.env
+.env.*
+!.env.example
+*.p8
+*.p12
+*.key
+*.jks
+*.mobileprovision
+google-services.json
+GoogleService-Info.plist
+
+# macOS
+.DS_Store
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# local settings
+.claude/settings.local.json
