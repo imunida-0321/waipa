@@ -32,6 +32,7 @@ export function PlayerSetupSheet({
 				<View style={styles.header}>
 					<Pressable
 						accessibilityRole="button"
+						accessibilityLabel="閉じる"
 						onPress={onClose}
 						style={styles.headerBtn}
 					>
@@ -66,6 +67,7 @@ export function PlayerSetupSheet({
 								{players.count > minPlayers && (
 									<Pressable
 										accessibilityRole="button"
+										accessibilityLabel="プレイヤーを削除"
 										onPress={() => {
 											haptics.tap()
 											playersStore.removePlayer(i)

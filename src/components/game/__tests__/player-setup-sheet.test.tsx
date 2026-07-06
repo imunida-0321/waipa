@@ -61,15 +61,22 @@ it('「追加」で1人増える', async () => {
 	expect(playersStore.getState().count).toBe(5)
 })
 
-it('×で対象プレイヤーが削除される', async () => {
-	const { getAllByPlaceholderText, getAllByText } = await render(<PlayerSetupSheet visible onClose={jest.fn()} />)
-	// Make sure we have 4 players first
-	expect(getAllByPlaceholderText('プレイヤー名を入力...')).toHaveLength(4)
-	// Find all remove buttons (should be 4, same as number of cards)
-	const removeButtons = getAllByText('×')
-	// The last 4 should be the remove buttons (first one is header close button)
-	fireEvent.press(removeButtons[removeButtons.length - 4])
-	expect(playersStore.getState().count).toBe(3)
+it('×で対象プレイヤーが名前ごと削除される', async () => {
+	await playersStore.setName(0, 'A')
+	await playersStore.setName(1, 'B')
+	await playersStore.setName(2, 'C')
+	await playersStore.setName(3, 'D')
+	const { getAllByLabelText } = await render(<PlayerSetupSheet visible onClose={jest.fn()} />)
+	fireEvent.press(getAllByLabelText('プレイヤーを削除')[1])
+	const s = playersStore.getState()
+	expect(s.count).toBe(3)
+	expect(s.names.slice(0, 3)).toEqual(['A', 'C', 'D'])
+})
+
+it('最小人数では削除ボタンが表示されない', async () => {
+	await playersStore.setCount(2)
+	const { queryAllByLabelText } = await render(<PlayerSetupSheet visible onClose={jest.fn()} />)
+	expect(queryAllByLabelText('プレイヤーを削除')).toHaveLength(0)
 })
 
 it('名前入力がストアに反映される', async () => {
