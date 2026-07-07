@@ -3,7 +3,7 @@ import { Easing, useSharedValue, withTiming } from 'react-native-reanimated'
 import { haptics } from '@/lib/haptics'
 import { playSound } from '@/lib/sound'
 import { assignSlot, amountToSlots, needsSpin, pickPlayerIndex, type DigitSlot } from './payment'
-import { finalAngleForPlayer, wheelRepeats } from './spin'
+import { nextAngleForSegment, wheelRepeats } from './spin'
 
 const SPIN_DURATION = 3500
 
@@ -49,7 +49,8 @@ export function useDigitRoulette(amount: number, playerCount: number) {
 		const repeats = wheelRepeats(playerCount)
 		const total = playerCount * repeats
 		const segment = playerIndex + playerCount * Math.floor(Math.random() * repeats)
-		rotation.value = withTiming(rotation.value + finalAngleForPlayer(segment, total), {
+		// 累積値に足すのではなく、現在角を基準に絶対目標角を作る（複数スピンでもズレない）
+		rotation.value = withTiming(nextAngleForSegment(rotation.value, segment, total), {
 			duration: SPIN_DURATION,
 			easing: Easing.out(Easing.cubic),
 		})

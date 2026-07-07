@@ -1,4 +1,4 @@
-import { finalAngleForPlayer, sectorForAngle, wheelRepeats } from '../spin'
+import { finalAngleForPlayer, nextAngleForSegment, sectorForAngle, wheelRepeats } from '../spin'
 
 describe('スピン角ロジック', () => {
 	it('finalAngle を適用するとポインタが対象セクターを指す', () => {
@@ -44,5 +44,28 @@ describe('細分割盤の当選色整合性', () => {
 				}
 			}
 		}
+	})
+})
+
+describe('nextAngleForSegment（複数スピンのドリフト非発生）', () => {
+	it('累積回転しても毎回セグメント中心（=当選色）で止まる', () => {
+		for (const count of [2, 3, 4, 5, 6, 8]) {
+			const repeats = wheelRepeats(count)
+			const total = count * repeats
+			let current = 0
+			// 連続する当選プレイヤー列を回し、毎回その色で止まることを確認
+			for (const p of [0, 1, count - 1, 1, 0, count - 1]) {
+				const segment = p + count * (1 % repeats)
+				current = nextAngleForSegment(current, segment, total, 5)
+				expect(sectorForAngle(current, total) % count).toBe(p)
+			}
+		}
+	})
+
+	it('各スピンで少なくとも turns 回転ぶん前進する', () => {
+		const total = 3 * wheelRepeats(3)
+		const prev = 1234 // 任意の累積角
+		const next = nextAngleForSegment(prev, 1, total, 5)
+		expect(next - prev).toBeGreaterThanOrEqual(360 * 5)
 	})
 })
