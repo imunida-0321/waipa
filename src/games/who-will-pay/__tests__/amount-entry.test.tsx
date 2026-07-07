@@ -60,4 +60,34 @@ describe('金額入力画面', () => {
 		})
 		expect(onConfirm).toHaveBeenCalledWith(124)
 	})
+
+	it('⌫で末尾の桁が消える', async () => {
+		const { getByText } = await render(<AmountEntry onConfirm={jest.fn()} />)
+		await act(async () => {
+			fireEvent.press(getByText('1'))
+		})
+		await act(async () => {
+			fireEvent.press(getByText('2'))
+		})
+		await act(async () => {
+			fireEvent.press(getByText('⌫'))
+		})
+		await waitFor(() => {
+			expect(getByText('¥1')).toBeTruthy()
+		})
+	})
+
+	it('上限桁数を超える入力は無視される', async () => {
+		const onConfirm = jest.fn()
+		const { getByText } = await render(<AmountEntry onConfirm={onConfirm} />)
+		for (let i = 0; i < 9; i++) {
+			await act(async () => {
+				fireEvent.press(getByText('9'))
+			})
+		}
+		await act(async () => {
+			fireEvent.press(getByText('確定'))
+		})
+		expect(onConfirm).toHaveBeenCalledWith(9999999)
+	})
 })

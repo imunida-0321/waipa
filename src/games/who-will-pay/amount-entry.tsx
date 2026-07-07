@@ -26,14 +26,15 @@ export function AmountEntry({ onConfirm }: Props) {
 	}
 
 	const handleConfirm = () => {
-		const amount = Number(value) || 0
+		const amount = Number(value)
 		if (amount > 0) {
 			void haptics.success()
 			onConfirm(amount)
 		}
 	}
 
-	const displayAmount = value === '' ? '¥0' : `¥${Number(value).toLocaleString('ja-JP')}`
+	const amount = Number(value)
+	const displayAmount = `¥${amount.toLocaleString('ja-JP')}`
 
 	const keypadButtons = [['1', '2', '3'], ['4', '5', '6'], ['7', '8', '9'], ['0']]
 
