@@ -16,3 +16,12 @@ export function sectorForAngle(angle: number, playerCount: number): number {
 	const atTop = ((-angle % 360) + 360) % 360
 	return Math.floor(atTop / sector) % playerCount
 }
+
+// 盤の細分割: 各プレイヤーの色を何回くり返して並べるか（最低2回）。
+// 目標総数 18 を人数で割って丸める。描画（roulette-wheel）と停止角
+// （use-digit-roulette）の両方がこの関数を単一の真実として参照する。
+export const WHEEL_TARGET_SEGMENTS = 18
+
+export function wheelRepeats(playerCount: number): number {
+	return Math.max(2, Math.round(WHEEL_TARGET_SEGMENTS / playerCount))
+}
