@@ -103,3 +103,8 @@ export function getDisplayNames(s: PlayersState): string[] {
 		return name ? name : `${i + 1}番`
 	})
 }
+
+// count 人ぶんの名前が全員入力済み（空白のみは未入力扱い）か判定する
+export function allNamesFilled(s: PlayersState): boolean {
+	return Array.from({ length: s.count }, (_, i) => s.names[i]?.trim()).every(Boolean)
+}
