@@ -301,9 +301,155 @@ Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>"
 
 ---
 
+### Task 4: 複数回スピンの回転ドリフトを解消（停止角を絶対角に）
+
+**背景:** 最終レビューで既存バグを検出。`use-digit-roulette.ts` は `rotation.value + finalAngleForPlayer(...)` と絶対角を累積回転値に加算しているため、2回目以降のスピンで前回の残り角がオフセットになり、ポインタが当選者と違う色のセグメントで止まって見える（当選＝スロット割当は正しいが、見た目の停止位置がズレる）。金額に非0桁が2つ以上あると必ず再現する。Task 3 の整合性テストは回転0のケースしか検証できず、これを検知できない。本タスクで停止角を「現在角を基準に対象セグメント中心へ正確に着地する絶対角（毎回 turns 回転以上前進）」に変え、複数スピンの回帰テストで守る。
+
+**Files:**
+- Modify: `src/games/who-will-pay/spin.ts`（純粋関数 `nextAngleForSegment` を追加。既存関数は不変）
+- Modify: `src/games/who-will-pay/use-digit-roulette.ts`（`pending` effect の回転計算を `nextAngleForSegment` 使用に変更、import 調整）
+- Test: `src/games/who-will-pay/__tests__/spin.test.ts`（複数スピンの回帰テストを追加）
+
+**Interfaces:**
+- Consumes: 既存 `finalAngleForPlayer(index, count, turns?)`, `sectorForAngle(angle, count)`, `wheelRepeats(playerCount)`
+- Produces:
+    - `nextAngleForSegment(current: number, segmentIndex: number, segmentCount: number, turns?: number): number`（現在角 `current` から、対象セグメント中心を真上へ運ぶ絶対目標角を返す。結果 `mod 360` はセグメント中心に一致し、`current` より常に `turns` 回転以上大きい＝累積ドリフトなし）
+
+- [ ] **Step 1: 失敗するテストを追加**
+
+`src/games/who-will-pay/__tests__/spin.test.ts` の import 行を差し替え、末尾に describe を追加する。
+
+import 行（1行目）を次に変更:
+
+```ts
+import { finalAngleForPlayer, nextAngleForSegment, sectorForAngle, wheelRepeats } from '../spin'
+```
+
+ファイル末尾に追加:
+
+```ts
+describe('nextAngleForSegment（複数スピンのドリフト非発生）', () => {
+	it('累積回転しても毎回セグメント中心（=当選色）で止まる', () => {
+		for (const count of [2, 3, 4, 5, 6, 8]) {
+			const repeats = wheelRepeats(count)
+			const total = count * repeats
+			let current = 0
+			// 連続する当選プレイヤー列を回し、毎回その色で止まることを確認
+			for (const p of [0, 1, count - 1, 1, 0, count - 1]) {
+				const segment = p + count * (1 % repeats)
+				current = nextAngleForSegment(current, segment, total, 5)
+				expect(sectorForAngle(current, total) % count).toBe(p)
+			}
+		}
+	})
+
+	it('各スピンで少なくとも turns 回転ぶん前進する', () => {
+		const total = 3 * wheelRepeats(3)
+		const prev = 1234 // 任意の累積角
+		const next = nextAngleForSegment(prev, 1, total, 5)
+		expect(next - prev).toBeGreaterThanOrEqual(360 * 5)
+	})
+})
+```
+
+- [ ] **Step 2: 落ちることを確認**
+
+Run: `bun run test src/games/who-will-pay/__tests__/spin.test.ts`
+Expected: FAIL（`nextAngleForSegment` 未定義）
+
+- [ ] **Step 3: `spin.ts` に `nextAngleForSegment` を追加**
+
+`src/games/who-will-pay/spin.ts` の末尾（`wheelRepeats` の後）に追加:
+
+```ts
+// 現在角 current から、対象セグメント中心を真上へ運ぶ「絶対」目標角を返す。
+// finalAngleForPlayer を累積値に加算するとドリフトするため、毎回 current を基準に
+// 「turns 回転ぶん前進 ＋ セグメント中心へ合わせる差分」で絶対角を作る。
+// 結果 mod 360 はセグメント中心に一致し、current より常に turns 回転以上大きい。
+export function nextAngleForSegment(
+	current: number,
+	segmentIndex: number,
+	segmentCount: number,
+	turns = 5,
+): number {
+	const base = finalAngleForPlayer(segmentIndex, segmentCount, 0) // 0..360 のセグメント中心角
+	const delta = (((base - (current % 360)) % 360) + 360) % 360
+	return current + turns * 360 + delta
+}
+```
+
+- [ ] **Step 4: PASS 確認**
+
+Run: `bun run test src/games/who-will-pay/__tests__/spin.test.ts`
+Expected: PASS（既存＋新規すべて）
+
+- [ ] **Step 5: `use-digit-roulette.ts` を `nextAngleForSegment` 使用に変更**
+
+6行目の import を次に変更（`finalAngleForPlayer` はフックから直接使わなくなるので除去し、`nextAngleForSegment` を追加）:
+
+変更前:
+```ts
+import { finalAngleForPlayer, wheelRepeats } from './spin'
+```
+
+変更後:
+```ts
+import { nextAngleForSegment, wheelRepeats } from './spin'
+```
+
+`pending` effect の回転計算を次に変更する。
+
+変更前:
+```ts
+		const repeats = wheelRepeats(playerCount)
+		const total = playerCount * repeats
+		const segment = playerIndex + playerCount * Math.floor(Math.random() * repeats)
+		rotation.value = withTiming(
+			rotation.value + finalAngleForPlayer(segment, total),
+			{
+				duration: SPIN_DURATION,
+				easing: Easing.out(Easing.cubic),
+			},
+		)
+```
+
+変更後:
+```ts
+		const repeats = wheelRepeats(playerCount)
+		const total = playerCount * repeats
+		const segment = playerIndex + playerCount * Math.floor(Math.random() * repeats)
+		// 累積値に足すのではなく、現在角を基準に絶対目標角を作る（複数スピンでもズレない）
+		rotation.value = withTiming(nextAngleForSegment(rotation.value, segment, total), {
+			duration: SPIN_DURATION,
+			easing: Easing.out(Easing.cubic),
+		})
+```
+
+（`timerRef.current = setTimeout(...)` 以降の reveal 処理・スロット割当は不変。当選は従来どおり `playerIndex`。）
+
+- [ ] **Step 6: 全検証**
+
+```bash
+bun run test && bun run typecheck && bun run lint && bunx prettier --check .
+bunx expo export --platform web && rm -rf dist
+```
+
+Expected: すべてパス（既存フックテストも挙動不変で通過）
+
+- [ ] **Step 7: commit**
+
+```bash
+git add src/games/who-will-pay/spin.ts src/games/who-will-pay/use-digit-roulette.ts src/games/who-will-pay/__tests__/spin.test.ts
+git commit -m "fix: 複数回スピンの回転ドリフトを解消し停止色を当選者と一致させる (#9)
+
+Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>"
+```
+
+---
+
 ## Self-Review 済みチェック
 
-- スペック対応: 分割数 `wheelRepeats`=Task1 / 盤の細分割描画=Task2 / 停止角のセグメント選択=Task3 / 整合性テスト=Task1 / 当選挙動不変=Task3（既存テスト維持）
-- 型整合: `wheelRepeats(playerCount: number): number` を Task1 で定義し、Task2・Task3 が同一シグネチャで参照。`finalAngleForPlayer` は既存シグネチャのまま総セグメント数を第2引数に渡す
-- 境界: `finalAngleForPlayer` はセグメント中心を狙うため区切り線上に止まらない（不変条件）。描画・停止角が同一 `wheelRepeats` 参照でズレなし
+- スペック対応: 分割数 `wheelRepeats`=Task1 / 盤の細分割描画=Task2 / 停止角のセグメント選択=Task3 / 整合性テスト=Task1 / 当選挙動不変=Task3（既存テスト維持）/ 複数スピンのドリフト解消=Task4
+- 型整合: `wheelRepeats(playerCount: number): number` を Task1 で定義し、Task2・Task3 が同一シグネチャで参照。Task4 で `nextAngleForSegment(current, segmentIndex, segmentCount, turns?)` を追加し、フックが `finalAngleForPlayer` 直呼びからこれに置き換え
+- 境界: `finalAngleForPlayer` はセグメント中心を狙うため区切り線上に止まらない（不変条件）。Task4 後は複数スピンでも `mod 360` がセグメント中心に一致し、描かれた色＝当選者を保証
 - 新規依存なし。`roulette-wheel.tsx` は表示専用のためテストなし（既存方針）
