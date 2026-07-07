@@ -2,6 +2,7 @@ import Animated, { useAnimatedStyle, type SharedValue } from 'react-native-reani
 import { StyleSheet, View } from 'react-native'
 import Svg, { Circle, G, Path, Polygon } from 'react-native-svg'
 import { WWP } from './theme'
+import { wheelRepeats } from './spin'
 
 type Props = {
 	playerColors: string[]
@@ -22,7 +23,8 @@ function sectorPath(cx: number, cy: number, r: number, start: number, end: numbe
 
 export function RouletteWheel({ playerColors, rotation, size }: Props) {
 	const r = size / 2
-	const sector = 360 / playerColors.length
+	const total = playerColors.length * wheelRepeats(playerColors.length)
+	const sector = 360 / total
 	const style = useAnimatedStyle(() => ({ transform: [{ rotateZ: `${rotation.value}deg` }] }))
 
 	return (
@@ -30,11 +32,11 @@ export function RouletteWheel({ playerColors, rotation, size }: Props) {
 			<Animated.View style={[StyleSheet.absoluteFill, style]}>
 				<Svg width={size} height={size}>
 					<G>
-						{playerColors.map((color, i) => (
+						{Array.from({ length: total }, (_, i) => (
 							<Path
 								key={i}
 								d={sectorPath(r, r, r - 6, i * sector, (i + 1) * sector)}
-								fill={color}
+								fill={playerColors[i % playerColors.length]}
 								stroke={WWP.bg}
 								strokeWidth={2}
 							/>

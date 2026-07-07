@@ -16,3 +16,27 @@ export function sectorForAngle(angle: number, playerCount: number): number {
 	const atTop = ((-angle % 360) + 360) % 360
 	return Math.floor(atTop / sector) % playerCount
 }
+
+// 盤の細分割: 各プレイヤーの色を何回くり返して並べるか（最低2回）。
+// 目標総数 18 を人数で割って丸める。描画（roulette-wheel）と停止角
+// （use-digit-roulette）の両方がこの関数を単一の真実として参照する。
+export const WHEEL_TARGET_SEGMENTS = 18
+
+export function wheelRepeats(playerCount: number): number {
+	return Math.max(2, Math.round(WHEEL_TARGET_SEGMENTS / playerCount))
+}
+
+// 現在角 current から、対象セグメント中心を真上へ運ぶ「絶対」目標角を返す。
+// finalAngleForPlayer を累積値に加算するとドリフトするため、毎回 current を基準に
+// 「turns 回転ぶん前進 ＋ セグメント中心へ合わせる差分」で絶対角を作る。
+// 結果 mod 360 はセグメント中心に一致し、current より常に turns 回転以上大きい。
+export function nextAngleForSegment(
+	current: number,
+	segmentIndex: number,
+	segmentCount: number,
+	turns = 5,
+): number {
+	const base = finalAngleForPlayer(segmentIndex, segmentCount, 0) // 0..360 のセグメント中心角
+	const delta = (((base - (current % 360)) % 360) + 360) % 360
+	return current + turns * 360 + delta
+}
