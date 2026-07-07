@@ -3,7 +3,7 @@ import { Easing, useSharedValue, withTiming } from 'react-native-reanimated'
 import { haptics } from '@/lib/haptics'
 import { playSound } from '@/lib/sound'
 import { assignSlot, amountToSlots, needsSpin, pickPlayerIndex, type DigitSlot } from './payment'
-import { finalAngleForPlayer } from './spin'
+import { finalAngleForPlayer, wheelRepeats } from './spin'
 
 const SPIN_DURATION = 3500
 
@@ -44,13 +44,15 @@ export function useDigitRoulette(amount: number, playerCount: number) {
 		if (!pending) return
 
 		const { targetIndex, playerIndex } = pending
-		rotation.value = withTiming(
-			rotation.value + finalAngleForPlayer(playerIndex, playerCount),
-			{
-				duration: SPIN_DURATION,
-				easing: Easing.out(Easing.cubic),
-			},
-		)
+		// 当選プレイヤーが盤上に持つ repeats 個のセグメント（playerIndex, +playerCount, ...）
+		// から1つをランダムに選び、その中心で止める。描画と同じ wheelRepeats を参照。
+		const repeats = wheelRepeats(playerCount)
+		const total = playerCount * repeats
+		const segment = playerIndex + playerCount * Math.floor(Math.random() * repeats)
+		rotation.value = withTiming(rotation.value + finalAngleForPlayer(segment, total), {
+			duration: SPIN_DURATION,
+			easing: Easing.out(Easing.cubic),
+		})
 
 		timerRef.current = setTimeout(() => {
 			const updated = assignSlot(slotsRef.current, targetIndex, playerIndex)
