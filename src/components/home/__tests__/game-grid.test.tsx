@@ -13,11 +13,46 @@ jest.mock('expo-haptics', () => ({
 	NotificationFeedbackType: { Success: 'success' },
 	notificationAsync: jest.fn(),
 }))
+jest.mock('expo-audio', () => ({
+	createAudioPlayer: jest.fn(),
+}))
+jest.mock('@/lib/sound', () => ({
+	playSound: jest.fn(),
+	registerSound: jest.fn(),
+}))
 jest.mock('expo-router', () => ({ router: { push: jest.fn(), back: jest.fn() } }))
 jest.mock('expo-linear-gradient', () => {
 	// eslint-disable-next-line @typescript-eslint/no-require-imports
 	const { View } = require('react-native')
 	return { LinearGradient: View }
+})
+jest.mock('react-native-svg', () => {
+	// eslint-disable-next-line @typescript-eslint/no-require-imports
+	const { View } = require('react-native')
+	return {
+		__esModule: true,
+		default: View,
+		Svg: View,
+		G: View,
+		Path: View,
+		Circle: View,
+		Polygon: View,
+	}
+})
+jest.mock('react-native-reanimated', () => {
+	// eslint-disable-next-line @typescript-eslint/no-require-imports
+	const { View } = require('react-native')
+	return {
+		__esModule: true,
+		default: { View },
+		useSharedValue: jest.fn((initial: number) => ({ value: initial })),
+		useAnimatedStyle: jest.fn(() => ({})),
+		withTiming: jest.fn((toValue: number) => toValue),
+		withRepeat: jest.fn((toValue: number) => toValue),
+		withSequence: jest.fn((toValue: number) => toValue),
+		Easing: { out: jest.fn(() => jest.fn()), cubic: jest.fn() },
+		runOnJS: jest.fn((fn: (...args: unknown[]) => unknown) => fn),
+	}
 })
 
 it('レジストリの全ゲームがカード表示される', async () => {
