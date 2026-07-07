@@ -37,14 +37,14 @@ wheelRepeats(playerCount) = max(2, round(WHEEL_TARGET_SEGMENTS / playerCount))
 人数別の総セグメント数（各色のくり返し回数）:
 
 | 人数 | repeats | 総数 |
-|---|---|---|
-| 2 | 9 | 18 |
-| 3 | 6 | 18 |
-| 4 | 5 | 20 |
-| 5 | 4 | 20 |
-| 6 | 3 | 18 |
-| 7 | 3 | 21 |
-| 8 | 2 | 16 |
+| ---- | ------- | ---- |
+| 2    | 9       | 18   |
+| 3    | 6       | 18   |
+| 4    | 5       | 20   |
+| 5    | 4       | 20   |
+| 6    | 3       | 18   |
+| 7    | 3       | 21   |
+| 8    | 2       | 16   |
 
 各色は最低2回くり返す。総数は概ね16〜21に収まる。
 
@@ -59,10 +59,10 @@ wheelRepeats(playerCount) = max(2, round(WHEEL_TARGET_SEGMENTS / playerCount))
 
 - 当選プレイヤー決定は現状どおり `p = pickPlayerIndex(playerCount)`（挙動不変）。
 - 変更点は停止セグメントの選択のみ:
-  - `repeats = wheelRepeats(playerCount)`、`total = playerCount * repeats`
-  - `p` が持つセグメント index は `p, p + playerCount, p + 2*playerCount, …`（計 `repeats` 個）
-  - そのうち1つをランダムに選ぶ: `segment = p + playerCount * floor(random() * repeats)`
-  - `rotation.value += finalAngleForPlayer(segment, total)`（＝選んだセグメント中心を真上へ）
+    - `repeats = wheelRepeats(playerCount)`、`total = playerCount * repeats`
+    - `p` が持つセグメント index は `p, p + playerCount, p + 2*playerCount, …`（計 `repeats` 個）
+    - そのうち1つをランダムに選ぶ: `segment = p + playerCount * floor(random() * repeats)`
+    - `rotation.value += finalAngleForPlayer(segment, total)`（＝選んだセグメント中心を真上へ）
 - スロットへの担当割当は従来どおり `p`。盤の色と当選者は必ず一致する。
 
 ### 3. 整合性の担保

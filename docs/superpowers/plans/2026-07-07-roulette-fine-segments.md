@@ -28,10 +28,12 @@
 ### Task 1: 分割数の純粋関数 `wheelRepeats` ＋整合性テスト
 
 **Files:**
+
 - Modify: `src/games/who-will-pay/spin.ts`（既存の `finalAngleForPlayer` / `sectorForAngle` は不変。定数と関数を追加）
 - Test: `src/games/who-will-pay/__tests__/spin.test.ts`（既存2テストは不変。describe を追加）
 
 **Interfaces:**
+
 - Consumes: 既存 `finalAngleForPlayer(playerIndex, playerCount, turns?)`, `sectorForAngle(angle, playerCount)`
 - Produces:
     - `WHEEL_TARGET_SEGMENTS: number`（= 18）
@@ -125,9 +127,11 @@ Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>"
 ### Task 2: 盤の描画を総セグメント数ベースに（表示専用）
 
 **Files:**
+
 - Modify: `src/games/who-will-pay/roulette-wheel.tsx`
 
 **Interfaces:**
+
 - Consumes: Task 1 の `wheelRepeats(playerCount)`、既存 `WWP`（theme）
 - Produces: `<RouletteWheel playerColors={string[]} rotation={SharedValue<number>} size={number} />`（Props 不変。描画のみ変更）
 
@@ -221,9 +225,11 @@ Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>"
 ### Task 3: 停止角を当選プレイヤーのセグメント選択ベースに
 
 **Files:**
+
 - Modify: `src/games/who-will-pay/use-digit-roulette.ts`（`pending` を処理する `useEffect` 内の回転計算のみ）
 
 **Interfaces:**
+
 - Consumes: Task 1 の `wheelRepeats(playerCount)`、既存 `finalAngleForPlayer`、既存 `pickPlayerIndex`
 - Produces: 変更なし（`useDigitRoulette(amount, playerCount)` の返り値・当選挙動は不変）
 
@@ -232,11 +238,13 @@ Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>"
 `src/games/who-will-pay/use-digit-roulette.ts` の6行目を次に変更:
 
 変更前:
+
 ```ts
 import { finalAngleForPlayer } from './spin'
 ```
 
 変更後:
+
 ```ts
 import { finalAngleForPlayer, wheelRepeats } from './spin'
 ```
@@ -246,32 +254,28 @@ import { finalAngleForPlayer, wheelRepeats } from './spin'
 `pending` を処理する `useEffect` 内の先頭（`const { targetIndex, playerIndex } = pending` の直後、`rotation.value = withTiming(...)` の呼び出し）を次のように変更する。
 
 変更前:
+
 ```ts
-		const { targetIndex, playerIndex } = pending
-		rotation.value = withTiming(
-			rotation.value + finalAngleForPlayer(playerIndex, playerCount),
-			{
-				duration: SPIN_DURATION,
-				easing: Easing.out(Easing.cubic),
-			},
-		)
+const { targetIndex, playerIndex } = pending
+rotation.value = withTiming(rotation.value + finalAngleForPlayer(playerIndex, playerCount), {
+	duration: SPIN_DURATION,
+	easing: Easing.out(Easing.cubic),
+})
 ```
 
 変更後:
+
 ```ts
-		const { targetIndex, playerIndex } = pending
-		// 当選プレイヤーが盤上に持つ repeats 個のセグメント（playerIndex, +playerCount, ...）
-		// から1つをランダムに選び、その中心で止める。描画と同じ wheelRepeats を参照。
-		const repeats = wheelRepeats(playerCount)
-		const total = playerCount * repeats
-		const segment = playerIndex + playerCount * Math.floor(Math.random() * repeats)
-		rotation.value = withTiming(
-			rotation.value + finalAngleForPlayer(segment, total),
-			{
-				duration: SPIN_DURATION,
-				easing: Easing.out(Easing.cubic),
-			},
-		)
+const { targetIndex, playerIndex } = pending
+// 当選プレイヤーが盤上に持つ repeats 個のセグメント（playerIndex, +playerCount, ...）
+// から1つをランダムに選び、その中心で止める。描画と同じ wheelRepeats を参照。
+const repeats = wheelRepeats(playerCount)
+const total = playerCount * repeats
+const segment = playerIndex + playerCount * Math.floor(Math.random() * repeats)
+rotation.value = withTiming(rotation.value + finalAngleForPlayer(segment, total), {
+	duration: SPIN_DURATION,
+	easing: Easing.out(Easing.cubic),
+})
 ```
 
 （`timerRef.current = setTimeout(...)` 以降の reveal 処理は不変。スロットへの担当割当は従来どおり `playerIndex` = 当選プレイヤー。）
@@ -306,11 +310,13 @@ Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>"
 **背景:** 最終レビューで既存バグを検出。`use-digit-roulette.ts` は `rotation.value + finalAngleForPlayer(...)` と絶対角を累積回転値に加算しているため、2回目以降のスピンで前回の残り角がオフセットになり、ポインタが当選者と違う色のセグメントで止まって見える（当選＝スロット割当は正しいが、見た目の停止位置がズレる）。金額に非0桁が2つ以上あると必ず再現する。Task 3 の整合性テストは回転0のケースしか検証できず、これを検知できない。本タスクで停止角を「現在角を基準に対象セグメント中心へ正確に着地する絶対角（毎回 turns 回転以上前進）」に変え、複数スピンの回帰テストで守る。
 
 **Files:**
+
 - Modify: `src/games/who-will-pay/spin.ts`（純粋関数 `nextAngleForSegment` を追加。既存関数は不変）
 - Modify: `src/games/who-will-pay/use-digit-roulette.ts`（`pending` effect の回転計算を `nextAngleForSegment` 使用に変更、import 調整）
 - Test: `src/games/who-will-pay/__tests__/spin.test.ts`（複数スピンの回帰テストを追加）
 
 **Interfaces:**
+
 - Consumes: 既存 `finalAngleForPlayer(index, count, turns?)`, `sectorForAngle(angle, count)`, `wheelRepeats(playerCount)`
 - Produces:
     - `nextAngleForSegment(current: number, segmentIndex: number, segmentCount: number, turns?: number): number`（現在角 `current` から、対象セグメント中心を真上へ運ぶ絶対目標角を返す。結果 `mod 360` はセグメント中心に一致し、`current` より常に `turns` 回転以上大きい＝累積ドリフトなし）
@@ -388,11 +394,13 @@ Expected: PASS（既存＋新規すべて）
 6行目の import を次に変更（`finalAngleForPlayer` はフックから直接使わなくなるので除去し、`nextAngleForSegment` を追加）:
 
 変更前:
+
 ```ts
 import { finalAngleForPlayer, wheelRepeats } from './spin'
 ```
 
 変更後:
+
 ```ts
 import { nextAngleForSegment, wheelRepeats } from './spin'
 ```
@@ -400,29 +408,28 @@ import { nextAngleForSegment, wheelRepeats } from './spin'
 `pending` effect の回転計算を次に変更する。
 
 変更前:
+
 ```ts
-		const repeats = wheelRepeats(playerCount)
-		const total = playerCount * repeats
-		const segment = playerIndex + playerCount * Math.floor(Math.random() * repeats)
-		rotation.value = withTiming(
-			rotation.value + finalAngleForPlayer(segment, total),
-			{
-				duration: SPIN_DURATION,
-				easing: Easing.out(Easing.cubic),
-			},
-		)
+const repeats = wheelRepeats(playerCount)
+const total = playerCount * repeats
+const segment = playerIndex + playerCount * Math.floor(Math.random() * repeats)
+rotation.value = withTiming(rotation.value + finalAngleForPlayer(segment, total), {
+	duration: SPIN_DURATION,
+	easing: Easing.out(Easing.cubic),
+})
 ```
 
 変更後:
+
 ```ts
-		const repeats = wheelRepeats(playerCount)
-		const total = playerCount * repeats
-		const segment = playerIndex + playerCount * Math.floor(Math.random() * repeats)
-		// 累積値に足すのではなく、現在角を基準に絶対目標角を作る（複数スピンでもズレない）
-		rotation.value = withTiming(nextAngleForSegment(rotation.value, segment, total), {
-			duration: SPIN_DURATION,
-			easing: Easing.out(Easing.cubic),
-		})
+const repeats = wheelRepeats(playerCount)
+const total = playerCount * repeats
+const segment = playerIndex + playerCount * Math.floor(Math.random() * repeats)
+// 累積値に足すのではなく、現在角を基準に絶対目標角を作る（複数スピンでもズレない）
+rotation.value = withTiming(nextAngleForSegment(rotation.value, segment, total), {
+	duration: SPIN_DURATION,
+	easing: Easing.out(Easing.cubic),
+})
 ```
 
 （`timerRef.current = setTimeout(...)` 以降の reveal 処理・スロット割当は不変。当選は従来どおり `playerIndex`。）
