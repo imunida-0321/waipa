@@ -1,134 +1,152 @@
-import { Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native'
+import { useState } from 'react'
+import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { router } from 'expo-router'
 import { haptics } from '@/lib/haptics'
-import { MAX_PLAYERS, MIN_PLAYERS, playersStore, usePlayers } from '@/lib/players-store'
+import {
+	allNamesFilled,
+	MAX_PLAYERS,
+	MIN_PLAYERS,
+	playersStore,
+	usePlayers,
+} from '@/lib/players-store'
 import { playerColor } from '@/theme/player-colors'
 import { colors, radii, spacing, typography } from '@/theme/tokens'
 
 type Props = {
-	visible: boolean
-	onClose: () => void
+	onProceed: () => void
 	minPlayers?: number
 	maxPlayers?: number
 }
 
-// 参考UI準拠: プレイヤーカラー付きカード / ⊕追加 / 履歴 / 白い「つぎへ」
+// ゲーム開始前の必須ゲート。参考UI準拠: プレイヤーカラー付きカード / ⊕追加 / 履歴 / 白い「つぎへ」
 export function PlayerSetupSheet({
-	visible,
-	onClose,
+	onProceed,
 	minPlayers = MIN_PLAYERS,
 	maxPlayers = MAX_PLAYERS,
 }: Props) {
 	const insets = useSafeAreaInsets()
 	const players = usePlayers()
+	const [showError, setShowError] = useState(false)
 
-	const finish = async () => {
+	const proceed = async () => {
 		haptics.tap()
+		if (!allNamesFilled(players)) {
+			setShowError(true)
+			return
+		}
+		setShowError(false)
 		await playersStore.saveToHistory()
-		onClose()
+		onProceed()
 	}
 
 	return (
-		<Modal visible={visible} animationType="slide" onRequestClose={onClose}>
-			<View style={[styles.screen, { paddingTop: insets.top }]}>
-				<View style={styles.header}>
-					<Pressable
-						accessibilityRole="button"
-						accessibilityLabel="閉じる"
-						onPress={onClose}
-						style={styles.headerBtn}
-					>
-						<Text style={styles.headerIcon}>×</Text>
-					</Pressable>
-					<Text style={styles.headerTitle}>参加メンバー</Text>
-					<View style={styles.headerBtn} />
-				</View>
-
-				<ScrollView
-					contentContainerStyle={styles.content}
-					keyboardShouldPersistTaps="handled"
+		<View style={[styles.screen, { paddingTop: insets.top }]}>
+			<View style={styles.header}>
+				<Pressable
+					accessibilityRole="button"
+					accessibilityLabel="閉じる"
+					onPress={() => {
+						haptics.tap()
+						router.back()
+					}}
+					style={styles.headerBtn}
 				>
-					{Array.from({ length: players.count }, (_, i) => {
-						const color = playerColor(i)
-						return (
-							<View key={`${i}-${players.count}`} style={styles.card}>
-								<View style={[styles.colorBar, { backgroundColor: color.value }]} />
-								<View style={styles.cardBody}>
-									<Text style={[styles.colorLabel, { color: color.value }]}>
-										プレイヤーカラー：{color.name}
-									</Text>
-									<TextInput
-										style={styles.input}
-										placeholder="プレイヤー名を入力..."
-										placeholderTextColor={colors.textMuted}
-										value={players.names[i] ?? ''}
-										onChangeText={(t) => playersStore.setName(i, t)}
-										maxLength={10}
-									/>
-								</View>
-								{players.count > minPlayers && (
-									<Pressable
-										accessibilityRole="button"
-										accessibilityLabel="プレイヤーを削除"
-										onPress={() => {
-											haptics.tap()
-											playersStore.removePlayer(i)
-										}}
-										style={styles.removeBtn}
-									>
-										<Text style={styles.removeIcon}>×</Text>
-									</Pressable>
-								)}
-							</View>
-						)
-					})}
+					<Text style={styles.headerIcon}>×</Text>
+				</Pressable>
+				<Text style={styles.headerTitle}>参加メンバー</Text>
+				<View style={styles.headerBtn} />
+			</View>
 
-					{players.count < maxPlayers && (
-						<Pressable
-							accessibilityRole="button"
-							onPress={() => {
-								haptics.tap()
-								playersStore.addPlayer()
-							}}
-							style={styles.addBtn}
+			{showError && (
+				<View style={styles.banner}>
+					<Text style={styles.bannerText}>名前が入力されていないものがあります</Text>
+				</View>
+			)}
+
+			<ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
+				{Array.from({ length: players.count }, (_, i) => {
+					const color = playerColor(i)
+					const empty = !players.names[i]?.trim()
+					return (
+						<View
+							key={`${i}-${players.count}`}
+							style={[styles.card, showError && empty && styles.cardError]}
 						>
-							<Text style={styles.addLabel}>⊕ 追加</Text>
-						</Pressable>
-					)}
-
-					<Text style={styles.sectionTitle}>履歴</Text>
-					<View style={styles.historyBox}>
-						{players.history.length === 0 ? (
-							<Text style={styles.historyEmpty}>履歴がまだありません。</Text>
-						) : (
-							players.history.map((set, i) => (
+							<View style={[styles.colorBar, { backgroundColor: color.value }]} />
+							<View style={styles.cardBody}>
+								<Text style={[styles.colorLabel, { color: color.value }]}>
+									プレイヤーカラー：{color.name}
+								</Text>
+								<TextInput
+									style={styles.input}
+									placeholder="プレイヤー名を入力..."
+									placeholderTextColor={colors.textMuted}
+									value={players.names[i] ?? ''}
+									onChangeText={(t) => playersStore.setName(i, t)}
+									maxLength={10}
+								/>
+							</View>
+							{players.count > minPlayers && (
 								<Pressable
 									accessibilityRole="button"
-									key={i}
+									accessibilityLabel="プレイヤーを削除"
 									onPress={() => {
 										haptics.tap()
-										playersStore.applyHistory(i)
+										playersStore.removePlayer(i)
 									}}
-									style={styles.historyRow}
+									style={styles.removeBtn}
 								>
-									<Text style={styles.historyText} numberOfLines={1}>
-										{set
-											.map((n, j) => (n.trim() ? n : `${j + 1}番`))
-											.join('、')}
-									</Text>
+									<Text style={styles.removeIcon}>×</Text>
 								</Pressable>
-							))
-						)}
-					</View>
-				</ScrollView>
+							)}
+						</View>
+					)
+				})}
 
-				<View style={[styles.footer, { paddingBottom: insets.bottom + spacing.md }]}>
-					<Pressable accessibilityRole="button" onPress={finish} style={styles.nextBtn}>
-						<Text style={styles.nextLabel}>つぎへ</Text>
+				{players.count < maxPlayers && (
+					<Pressable
+						accessibilityRole="button"
+						onPress={() => {
+							haptics.tap()
+							playersStore.addPlayer()
+						}}
+						style={styles.addBtn}
+					>
+						<Text style={styles.addLabel}>⊕ 追加</Text>
 					</Pressable>
+				)}
+
+				<Text style={styles.sectionTitle}>履歴</Text>
+				<View style={styles.historyBox}>
+					{players.history.length === 0 ? (
+						<Text style={styles.historyEmpty}>履歴がまだありません。</Text>
+					) : (
+						players.history.map((set, i) => (
+							<Pressable
+								accessibilityRole="button"
+								key={i}
+								onPress={() => {
+									haptics.tap()
+									playersStore.applyHistory(i)
+								}}
+								style={styles.historyRow}
+							>
+								<Text style={styles.historyText} numberOfLines={1}>
+									{set.map((n, j) => (n.trim() ? n : `${j + 1}番`)).join('、')}
+								</Text>
+							</Pressable>
+						))
+					)}
 				</View>
+			</ScrollView>
+
+			<View style={[styles.footer, { paddingBottom: insets.bottom + spacing.md }]}>
+				<Pressable accessibilityRole="button" onPress={proceed} style={styles.nextBtn}>
+					<Text style={styles.nextLabel}>つぎへ</Text>
+				</Pressable>
 			</View>
-		</Modal>
+		</View>
 	)
 }
 
@@ -143,6 +161,15 @@ const styles = StyleSheet.create({
 	headerBtn: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center' },
 	headerIcon: { fontSize: 28, color: colors.text },
 	headerTitle: { ...typography.title, flex: 1, textAlign: 'center' },
+	banner: {
+		marginHorizontal: spacing.md,
+		marginBottom: spacing.sm,
+		backgroundColor: colors.danger,
+		borderRadius: radii.md,
+		paddingVertical: spacing.sm,
+		paddingHorizontal: spacing.md,
+	},
+	bannerText: { ...typography.body, fontWeight: '700', textAlign: 'center' },
 	content: { padding: spacing.md, gap: spacing.md },
 	card: {
 		flexDirection: 'row',
@@ -152,6 +179,7 @@ const styles = StyleSheet.create({
 		borderColor: colors.surfaceBorder,
 		overflow: 'hidden',
 	},
+	cardError: { borderColor: colors.danger },
 	colorBar: { width: 5 },
 	cardBody: { flex: 1, padding: spacing.md, gap: spacing.sm },
 	colorLabel: { fontSize: 13, fontWeight: '700' },
