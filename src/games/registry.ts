@@ -1,5 +1,6 @@
 import type { ComponentType } from 'react'
 import { ComingSoonGame } from './coming-soon'
+import { WhoWillPayGame } from './who-will-pay/who-will-pay-game'
 
 export type GameMeta = {
 	id: string
@@ -22,12 +23,14 @@ export const games: readonly GameMeta[] = [
 		emoji: '💸',
 		gradient: ['#E85BF7', '#7B5CFA'],
 		minPlayers: 2,
-		maxPlayers: 12,
+		maxPlayers: 8,
 		howToPlay: [
-			'ルーレットを回して「支払う人」を決めます',
-			'止まった番号の人が今日の会計！結果には逆らえません',
+			'① 一緒に遊ぶメンバーを登録しよう！（2〜8名、各自に色がつきます）',
+			'② お会計の合計金額を入力しよう！',
+			'③ 「GO!」で桁ごとにルーレットを回そう！（点滅中の桁が対象）',
+			'④ 各桁の色と名前の人が、その桁の金額を支払おう！',
 		],
-		Component: ComingSoonGame,
+		Component: WhoWillPayGame,
 	},
 	{
 		id: 'bomb-2-16',
