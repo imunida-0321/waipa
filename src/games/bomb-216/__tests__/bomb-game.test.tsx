@@ -89,39 +89,41 @@ const press = async (element: Parameters<typeof fireEvent.press>[0]) => {
 }
 
 describe('BombGame', () => {
-	it('16タイルと残数・確率を表示する', async () => {
-		const { getByText, getByTestId } = await render(<BombGame />)
-		expect(getByText('1')).toBeTruthy()
-		expect(getByText('16')).toBeTruthy()
+	it('16タイル（番号表記なし）と残数・確率を表示する', async () => {
+		const { getByText, queryByText, getByTestId } = await render(<BombGame />)
+		expect(getByTestId('tile-0')).toBeTruthy()
+		expect(getByTestId('tile-15')).toBeTruthy()
+		expect(queryByText('1')).toBeNull()
+		expect(queryByText('16')).toBeNull()
 		expect(getByText(/のこり 16/)).toBeTruthy()
 		expect(getByText(/💣 2\/16/)).toBeTruthy()
 		expect(getByTestId('hazard-panel')).toBeTruthy()
 		expect(getByTestId('fence-overlay')).toBeTruthy()
 	})
 
-	it('セーフ開封で残数が減りリアクションが出る', async () => {
-		const { getByText } = await render(<BombGame />)
-		await press(getByText('6')) // index 5 = セーフ
+	it('セーフ開封で残数が減りリアクションが出る（絵文字は出ない）', async () => {
+		const { getByText, queryByText, getByTestId } = await render(<BombGame />)
+		await press(getByTestId('tile-5')) // セーフ
 		expect(getByText(/のこり 15/)).toBeTruthy()
 		expect(getByText(/💣 2\/15/)).toBeTruthy()
-		expect(getByText('🍀')).toBeTruthy()
+		expect(queryByText('🍀')).toBeNull()
 	})
 
 	it('爆弾タップで爆発オーバーレイが出る（セーフでは出ない）', async () => {
 		jest.useFakeTimers()
-		const { getByText, queryByTestId } = await render(<BombGame />)
+		const { getByTestId, queryByTestId } = await render(<BombGame />)
 		expect(queryByTestId('explosion-overlay')).toBeNull()
-		await press(getByText('6')) // セーフ
+		await press(getByTestId('tile-5')) // セーフ
 		expect(queryByTestId('explosion-overlay')).toBeNull()
-		await press(getByText('1')) // solo 爆弾
+		await press(getByTestId('tile-0')) // solo 爆弾
 		expect(queryByTestId('explosion-overlay')).toBeTruthy()
 		jest.useRealTimers()
 	})
 
 	it('1人負け爆弾でリザルト（1人負け）が表示される', async () => {
 		jest.useFakeTimers()
-		const { getByText } = await render(<BombGame />)
-		await press(getByText('1')) // index 0 = solo
+		const { getByText, getByTestId } = await render(<BombGame />)
+		await press(getByTestId('tile-0')) // solo
 		await act(async () => {
 			jest.runAllTimers()
 		})
@@ -131,8 +133,8 @@ describe('BombGame', () => {
 
 	it('全員負け爆弾でリザルト（全員負け）が表示される', async () => {
 		jest.useFakeTimers()
-		const { getByText } = await render(<BombGame />)
-		await press(getByText('2')) // index 1 = all
+		const { getByText, getByTestId } = await render(<BombGame />)
+		await press(getByTestId('tile-1')) // all
 		await act(async () => {
 			jest.runAllTimers()
 		})
@@ -142,8 +144,8 @@ describe('BombGame', () => {
 
 	it('「もう一回」で盤面がリセットされる', async () => {
 		jest.useFakeTimers()
-		const { getByText, queryByText } = await render(<BombGame />)
-		await press(getByText('1'))
+		const { getByText, queryByText, getByTestId } = await render(<BombGame />)
+		await press(getByTestId('tile-0'))
 		await act(async () => {
 			jest.runAllTimers()
 		})

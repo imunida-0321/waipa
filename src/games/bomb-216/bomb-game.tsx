@@ -128,8 +128,8 @@ export function BombGame() {
 					</Text>
 					<Text style={styles.resultHint}>
 						{board.exploded === 'all'
-							? `💣（1人負け）は ${board.soloIndex + 1} 番だった`
-							: `💥（全員負け）は ${board.allIndex + 1} 番だった…あぶなかった！`}
+							? '💣（1人負け）も盤面に隠れていた'
+							: '💥（全員負け）はまだ盤面に隠れていた…あぶなかった！'}
 					</Text>
 				</View>
 			</ResultOverlay>
@@ -139,7 +139,14 @@ export function BombGame() {
 
 const styles = StyleSheet.create({
 	container: { flex: 1, backgroundColor: BOMB.bg },
-	scrim: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(10,8,20,0.45)' },
+	scrim: {
+		position: 'absolute',
+		top: 0,
+		left: 0,
+		right: 0,
+		bottom: 0,
+		backgroundColor: 'rgba(10,8,20,0.45)',
+	},
 	status: { alignItems: 'center', paddingVertical: spacing.lg, gap: spacing.xs },
 	message: { ...typography.title },
 	counter: { ...typography.caption, color: colors.textMuted },

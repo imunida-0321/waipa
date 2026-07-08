@@ -18,50 +18,52 @@ type Props = {
 	onPress: (index: number) => void
 }
 
-const FACE: Record<Exclude<TileState, 'hidden'>, string> = {
-	safe: '🍀',
-	solo: '💣',
-	all: '💥',
-}
+// リザルト全公開時に未開封の爆弾マスへ表示（開封演出は Lottie が担当）
+const GHOST_FACE = { solo: '💣', all: '💥' } as const
 
-// 1タイル。未開封はグロッシーな赤ボタン、開封後はくぼみ＋絵文字。
-// 開封時にポップ（縮んで戻る）アニメ、爆弾は拡大フラッシュ
+// 1タイル。未開封はグロッシーな赤ボタン、開封後は無地のくぼみ。
+// 開封時にポップ＋小刻みな揺れ、爆弾は拡大フラッシュ
 export function Tile({ index, state, revealed, bombKind = null, onPress }: Props) {
 	const scale = useSharedValue(1)
+	const shift = useSharedValue(0)
 	const opened = state !== 'hidden'
 	const isBombFace = state === 'solo' || state === 'all'
 
 	useEffect(() => {
 		if (!opened) return
 		scale.value = withSequence(
-			withTiming(isBombFace ? 1.25 : 0.8, { duration: 90 }),
+			withTiming(isBombFace ? 1.25 : 0.85, { duration: 90 }),
 			withTiming(1, { duration: 160 }),
 		)
-	}, [opened, isBombFace, scale])
+		// 押した瞬間の小刻みな揺れ
+		shift.value = withSequence(
+			withTiming(-3, { duration: 40 }),
+			withTiming(3, { duration: 40 }),
+			withTiming(-2, { duration: 40 }),
+			withTiming(0, { duration: 40 }),
+		)
+	}, [opened, isBombFace, scale, shift])
 
-	const animatedStyle = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }))
+	const animatedStyle = useAnimatedStyle(() => ({
+		transform: [{ scale: scale.value }, { translateX: shift.value }],
+	}))
 
-	// リザルト全公開: 未開封マスの中身を薄く見せる
-	const ghostFace = revealed && !opened ? FACE[bombKind ?? 'safe'] : null
+	// リザルト全公開: 未開封の爆弾マスだけ場所を見せる
+	const ghostFace = revealed && !opened && bombKind !== null ? GHOST_FACE[bombKind] : null
 	const disabled = opened || revealed
 
 	return (
 		<Animated.View style={[styles.wrap, animatedStyle]}>
 			<Pressable
 				accessibilityRole="button"
+				testID={`tile-${index}`}
 				disabled={disabled}
 				onPress={() => onPress(index)}
 				style={styles.press}
 			>
-				{ghostFace !== null ? (
-					<View style={[styles.socket, styles.ghost]}>
-						<Text style={styles.face}>{ghostFace}</Text>
-					</View>
-				) : opened ? (
+				{opened || ghostFace !== null ? (
 					<View style={[styles.socket, isBombFace && styles.bombSocket]}>
-						<Text style={styles.face}>
-							{FACE[state as Exclude<TileState, 'hidden'>]}
-						</Text>
+						{ghostFace !== null && <Text style={styles.face}>{ghostFace}</Text>}
 					</View>
 				) : (
 					<View style={styles.btnEdge}>
@@ -70,7 +72,6 @@ export function Tile({ index, state, revealed, bombKind = null, onPress }: Props
 							style={styles.btnFace}
 						>
 							<View style={styles.gloss} />
-							<Text style={styles.number}>{index + 1}</Text>
 						</LinearGradient>
 					</View>
 				)}
@@ -108,7 +109,6 @@ const styles = StyleSheet.create({
 		borderRadius: 8,
 		backgroundColor: BOMB.btnGloss,
 	},
-	number: { fontSize: 13, fontWeight: '700', color: 'rgba(255,235,230,0.65)' },
 	// 開封後のくぼみ
 	socket: {
 		flex: 1,
@@ -118,6 +118,5 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 	},
 	bombSocket: { backgroundColor: BOMB.accentDeep },
-	ghost: { opacity: 0.5 },
 	face: { fontSize: 26 },
 })

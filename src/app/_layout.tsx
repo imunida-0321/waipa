@@ -6,6 +6,7 @@ import { useColorScheme } from 'react-native'
 import { AnimatedSplashOverlay } from '@/components/animated-icon'
 import { playersStore } from '@/lib/players-store'
 import { settingsStore } from '@/lib/settings-store'
+import { registerSound } from '@/lib/sound'
 import { topicsStore } from '@/lib/topics-store'
 import { colors } from '@/theme/tokens'
 
@@ -20,6 +21,10 @@ export default function RootLayout() {
 		topicsStore.hydrate().then(() => {
 			topicsStore.refresh()
 		})
+		// 効果音（暫定生成音。フリー素材に同名上書きで差し替え可）
+		// SSR 環境に Audio API がないため、クライアントマウント後に登録する
+		registerSound('tap', require('@/assets/sounds/tap.wav'))
+		registerSound('explosion', require('@/assets/sounds/explosion.wav'))
 	}, [])
 
 	return (
