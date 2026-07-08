@@ -24,6 +24,18 @@ describe('haptics', () => {
 		expect(ExpoHaptics.impactAsync).toHaveBeenCalledWith('light')
 	})
 
+	it('設定 ON のとき heavy が Heavy スタイルで impactAsync を呼ぶ', async () => {
+		await settingsStore.setHapticsEnabled(true)
+		await haptics.heavy()
+		expect(ExpoHaptics.impactAsync).toHaveBeenCalledWith('heavy')
+	})
+
+	it('設定 ON のとき success が notificationAsync を呼ぶ', async () => {
+		await settingsStore.setHapticsEnabled(true)
+		await haptics.success()
+		expect(ExpoHaptics.notificationAsync).toHaveBeenCalledWith('success')
+	})
+
 	it('設定 OFF のとき何も呼ばない', async () => {
 		await settingsStore.setHapticsEnabled(false)
 		await haptics.tap()
