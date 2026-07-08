@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { getDisplayNames, playersStore } from '../players-store'
+import { allNamesFilled, getDisplayNames, playersStore } from '../players-store'
 
 jest.mock('@react-native-async-storage/async-storage', () =>
 	// eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -82,5 +82,27 @@ describe('addPlayer / removePlayer / history', () => {
 		await playersStore.applyHistory(0)
 		expect(playersStore.getState().count).toBe(2)
 		expect(playersStore.getState().names[0]).toBe('ひろ')
+	})
+})
+
+describe('allNamesFilled', () => {
+	it('全員名前が入力されていれば true', () => {
+		const s = { count: 2, names: ['ひろ', 'たろう'], history: [] }
+		expect(allNamesFilled(s)).toBe(true)
+	})
+
+	it('誰か1人でも未入力なら false', () => {
+		const s = { count: 3, names: ['ひろ', '', 'たろう'], history: [] }
+		expect(allNamesFilled(s)).toBe(false)
+	})
+
+	it('空白のみの名前は未入力扱いで false', () => {
+		const s = { count: 2, names: ['ひろ', '   '], history: [] }
+		expect(allNamesFilled(s)).toBe(false)
+	})
+
+	it('names 配列が count より短い場合も false', () => {
+		const s = { count: 2, names: ['ひろ'], history: [] }
+		expect(allNamesFilled(s)).toBe(false)
 	})
 })
