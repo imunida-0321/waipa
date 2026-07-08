@@ -44,4 +44,14 @@ describe('settingsStore', () => {
 		await expect(settingsStore.hydrate()).resolves.toBeUndefined()
 		expect(settingsStore.getState()).toEqual({ soundEnabled: true, hapticsEnabled: true })
 	})
+
+	it('AsyncStorage.getItem の失敗でも throw せずデフォルトに戻る', async () => {
+		await settingsStore.setSoundEnabled(false)
+		const spy = jest
+			.spyOn(AsyncStorage, 'getItem')
+			.mockRejectedValueOnce(new Error('read error'))
+		await expect(settingsStore.hydrate()).resolves.toBeUndefined()
+		expect(settingsStore.getState()).toEqual({ soundEnabled: true, hapticsEnabled: true })
+		spy.mockRestore()
+	})
 })
