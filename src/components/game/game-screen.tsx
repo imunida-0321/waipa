@@ -1,7 +1,7 @@
-import { router } from 'expo-router'
 import { useEffect, useState } from 'react'
 import { Pressable, StyleSheet, Text, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { router } from 'expo-router'
 import { haptics } from '@/lib/haptics'
 import { hasSeenHowTo, markHowToSeen } from '@/lib/first-visit'
 import type { GameMeta } from '@/games/registry'
@@ -9,21 +9,35 @@ import { colors, spacing, typography } from '@/theme/tokens'
 import { HowToPlayModal } from './how-to-play-modal'
 import { PlayerSetupSheet } from './player-setup-sheet'
 
-// 全ゲーム共通の画面枠: ヘッダー（戻る/タイトル/👥/？）＋初回の遊び方自動表示
+// 全ゲーム共通の画面枠: requiresPlayers なら開始前にプレイヤー設定ゲート→
+// ヘッダー（戻る/タイトル/？）＋初回の遊び方自動表示
 export function GameScreen({ meta }: { meta: GameMeta }) {
 	const insets = useSafeAreaInsets()
 	const [howToVisible, setHowToVisible] = useState(false)
-	const [playersVisible, setPlayersVisible] = useState(false)
+	const [setupDone, setSetupDone] = useState(!meta.requiresPlayers)
 
 	useEffect(() => {
+		if (!setupDone) return
 		hasSeenHowTo(meta.id).then((seen) => {
 			if (!seen) setHowToVisible(true)
 		})
-	}, [meta.id])
+	}, [meta.id, setupDone])
 
 	const closeHowTo = () => {
 		setHowToVisible(false)
 		markHowToSeen(meta.id)
+	}
+
+	if (!setupDone) {
+		return (
+			<View style={[styles.screen, { paddingTop: insets.top }]}>
+				<PlayerSetupSheet
+					onProceed={() => setSetupDone(true)}
+					minPlayers={meta.minPlayers}
+					maxPlayers={meta.maxPlayers}
+				/>
+			</View>
+		)
 	}
 
 	return (
@@ -45,13 +59,6 @@ export function GameScreen({ meta }: { meta: GameMeta }) {
 				<View style={styles.headerRight}>
 					<Pressable
 						accessibilityRole="button"
-						onPress={() => setPlayersVisible(true)}
-						style={styles.headerBtn}
-					>
-						<Text style={styles.headerIcon}>👥</Text>
-					</Pressable>
-					<Pressable
-						accessibilityRole="button"
 						onPress={() => setHowToVisible(true)}
 						style={styles.headerBtn}
 					>
@@ -69,12 +76,6 @@ export function GameScreen({ meta }: { meta: GameMeta }) {
 				title={`${meta.emoji} ${meta.title}`}
 				pages={meta.howToPlay}
 				onClose={closeHowTo}
-			/>
-			<PlayerSetupSheet
-				visible={playersVisible}
-				onClose={() => setPlayersVisible(false)}
-				minPlayers={meta.minPlayers}
-				maxPlayers={meta.maxPlayers}
 			/>
 		</View>
 	)
