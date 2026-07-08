@@ -80,11 +80,9 @@ export function BombGame() {
 		i === board.soloIndex ? 'solo' : i === board.allIndex ? 'all' : null
 
 	return (
-		<ImageBackground
-			// 本番のサイバーパンク写真は同名上書きで差し替え
-			source={require('@/assets/images/bomb/bg.png')}
-			style={styles.container}
-		>
+		<ImageBackground source={require('@/assets/images/bomb/bg.jpg')} style={styles.container}>
+			{/* 文字とパネルの視認性を保つ暗めスクリム */}
+			<View style={styles.scrim} />
 			<View style={styles.status}>
 				<Text style={styles.message}>{message}</Text>
 				<Text style={styles.counter}>
@@ -141,6 +139,7 @@ export function BombGame() {
 
 const styles = StyleSheet.create({
 	container: { flex: 1, backgroundColor: BOMB.bg },
+	scrim: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(10,8,20,0.45)' },
 	status: { alignItems: 'center', paddingVertical: spacing.lg, gap: spacing.xs },
 	message: { ...typography.title },
 	counter: { ...typography.caption, color: colors.textMuted },
