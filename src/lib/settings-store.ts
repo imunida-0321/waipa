@@ -17,6 +17,7 @@ function emit() {
 	listeners.forEach((fn) => fn())
 }
 
+// setter は emit（UI更新）を先に、persist（永続化）を後に行う楽観更新。保存失敗してもUIは進む
 async function persist() {
 	await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(state))
 }
@@ -31,7 +32,12 @@ export const settingsStore = {
 	},
 	async hydrate() {
 		const raw = await AsyncStorage.getItem(STORAGE_KEY)
-		state = raw ? { ...DEFAULTS, ...JSON.parse(raw) } : { ...DEFAULTS }
+		try {
+			state = raw ? { ...DEFAULTS, ...JSON.parse(raw) } : { ...DEFAULTS }
+		} catch {
+			// 破損データはメモリ上だけデフォルトへ（次回の persist で正常値に上書きされる）
+			state = { ...DEFAULTS }
+		}
 		emit()
 	},
 	async setSoundEnabled(v: boolean) {
