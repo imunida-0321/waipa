@@ -38,4 +38,10 @@ describe('settingsStore', () => {
 		expect(listener).toHaveBeenCalled()
 		unsubscribe()
 	})
+
+	it('破損した保存データでも throw せずデフォルトに戻る', async () => {
+		await AsyncStorage.setItem('waipa.settings', '{broken json')
+		await expect(settingsStore.hydrate()).resolves.toBeUndefined()
+		expect(settingsStore.getState()).toEqual({ soundEnabled: true, hapticsEnabled: true })
+	})
 })
