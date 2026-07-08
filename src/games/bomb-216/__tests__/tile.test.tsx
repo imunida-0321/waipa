@@ -16,34 +16,34 @@ jest.mock('react-native-reanimated', () => {
 })
 
 describe('Tile', () => {
-	it('hidden タイルは番号を表示しタップで onPress(index) を呼ぶ', () => {
+	it('hidden タイルは番号を表示しタップで onPress(index) を呼ぶ', async () => {
 		const onPress = jest.fn()
-		const { getByText } = render(
+		const { getByText } = await render(
 			<Tile index={4} state="hidden" revealed={false} onPress={onPress} />,
 		)
 		fireEvent.press(getByText('5'))
 		expect(onPress).toHaveBeenCalledWith(4)
 	})
 
-	it('safe 開封済みは 🍀 を表示しタップ不能', () => {
+	it('safe 開封済みは 🍀 を表示しタップ不能', async () => {
 		const onPress = jest.fn()
-		const { getByText } = render(
+		const { getByText } = await render(
 			<Tile index={0} state="safe" revealed={false} onPress={onPress} />,
 		)
 		fireEvent.press(getByText('🍀'))
 		expect(onPress).not.toHaveBeenCalled()
 	})
 
-	it('solo は 💣、all は 💥 を表示する', () => {
-		const a = render(<Tile index={0} state="solo" revealed={false} onPress={jest.fn()} />)
+	it('solo は 💣、all は 💥 を表示する', async () => {
+		const a = await render(<Tile index={0} state="solo" revealed={false} onPress={jest.fn()} />)
 		expect(a.getByText('💣')).toBeTruthy()
-		const b = render(<Tile index={0} state="all" revealed={false} onPress={jest.fn()} />)
+		const b = await render(<Tile index={0} state="all" revealed={false} onPress={jest.fn()} />)
 		expect(b.getByText('💥')).toBeTruthy()
 	})
 
-	it('revealed 時は hidden でも中身を表示しタップ不能', () => {
+	it('revealed 時は hidden でも中身を表示しタップ不能', async () => {
 		const onPress = jest.fn()
-		const { getByText, queryByText } = render(
+		const { getByText, queryByText } = await render(
 			<Tile index={2} state="hidden" revealed={true} bombKind="solo" onPress={onPress} />,
 		)
 		expect(queryByText('3')).toBeNull()
