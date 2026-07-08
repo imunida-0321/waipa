@@ -33,8 +33,13 @@ export const playersStore = {
 		return () => listeners.delete(fn)
 	},
 	async hydrate() {
-		const raw = await AsyncStorage.getItem(STORAGE_KEY)
-		state = raw ? { ...DEFAULTS, ...JSON.parse(raw) } : { ...DEFAULTS }
+		try {
+			const raw = await AsyncStorage.getItem(STORAGE_KEY)
+			state = raw ? { ...DEFAULTS, ...JSON.parse(raw) } : { ...DEFAULTS }
+		} catch {
+			// 読み取り失敗・破損データはメモリ上だけデフォルトへ（次回の persist で正常値に上書きされる）
+			state = { ...DEFAULTS }
+		}
 		emit()
 	},
 	async setCount(n: number) {

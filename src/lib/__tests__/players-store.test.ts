@@ -41,6 +41,22 @@ describe('playersStore', () => {
 		expect(playersStore.getState().count).toBe(6)
 		expect(playersStore.getState().names[0]).toBe('A')
 	})
+
+	it('破損した保存データでも throw せずデフォルトに戻る', async () => {
+		await AsyncStorage.setItem('waipa.players', '{broken json')
+		await expect(playersStore.hydrate()).resolves.toBeUndefined()
+		expect(playersStore.getState()).toEqual({ count: 4, names: [], history: [] })
+	})
+
+	it('AsyncStorage.getItem の失敗でも throw せずデフォルトに戻る', async () => {
+		await playersStore.setCount(6)
+		const spy = jest
+			.spyOn(AsyncStorage, 'getItem')
+			.mockRejectedValueOnce(new Error('read error'))
+		await expect(playersStore.hydrate()).resolves.toBeUndefined()
+		expect(playersStore.getState()).toEqual({ count: 4, names: [], history: [] })
+		spy.mockRestore()
+	})
 })
 
 describe('addPlayer / removePlayer / history', () => {
