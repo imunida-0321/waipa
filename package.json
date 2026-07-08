@@ -21,6 +21,7 @@
 		"expo-symbols": "~57.0.0",
 		"expo-system-ui": "~57.0.0",
 		"expo-web-browser": "~57.0.0",
+		"lottie-react-native": "~7.3.8",
 		"react": "19.2.3",
 		"react-dom": "19.2.3",
 		"react-native": "0.86.0",
@@ -57,6 +58,10 @@
 	},
 	"jest": {
 		"preset": "jest-expo",
+		"moduleNameMapper": {
+			"^@/assets/(.*)$": "<rootDir>/assets/$1",
+			"^@/(.*)$": "<rootDir>/src/$1"
+		},
 		"transformIgnorePatterns": [
 			"node_modules/(?!((jest-)?react-native|@react-native(-community)?|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|expo-router|expo-modules-core|react-native-reanimated|react-native-worklets)/)"
 		]
