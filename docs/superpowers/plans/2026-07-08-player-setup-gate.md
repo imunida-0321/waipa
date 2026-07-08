@@ -24,10 +24,12 @@
 ### Task 1: 名前検証の純粋関数 `allNamesFilled`
 
 **Files:**
+
 - Modify: `src/lib/players-store.ts`（末尾に関数を追加。既存のエクスポート・実装は不変）
 - Test: `src/lib/__tests__/players-store.test.ts`（既存テストは不変。describe を追加）
 
 **Interfaces:**
+
 - Consumes: 既存 `PlayersState`（`{ count: number; names: string[]; history: string[][] }`）
 - Produces: `allNamesFilled(s: PlayersState): boolean`（`count` 人ぶんの `names[i]` が全員 trim 後 非空なら true）
 
@@ -36,11 +38,13 @@
 `src/lib/__tests__/players-store.test.ts` の末尾（ファイル末尾）に追加。まず import 行（2行目）を次に変更:
 
 変更前:
+
 ```ts
 import { getDisplayNames, playersStore } from '../players-store'
 ```
 
 変更後:
+
 ```ts
 import { allNamesFilled, getDisplayNames, playersStore } from '../players-store'
 ```
@@ -109,9 +113,11 @@ Co-Authored-By: Claude Sonnet 5 <noreply@anthropic.com>"
 ### Task 2: `registry.ts` に `requiresPlayers` フラグを追加
 
 **Files:**
+
 - Modify: `src/games/registry.ts`（`GameMeta` 型に1フィールド追加、`who-will-pay` エントリに1行追加。他エントリは無変更）
 
 **Interfaces:**
+
 - Produces: `GameMeta.requiresPlayers?: boolean`（省略時 `undefined` は「不要」= falsy として扱われる。Task 4 の `GameScreen` は `meta.requiresPlayers` を真偽判定で使う）
 
 - [ ] **Step 1: `GameMeta` 型にフィールドを追加**
@@ -119,6 +125,7 @@ Co-Authored-By: Claude Sonnet 5 <noreply@anthropic.com>"
 `src/games/registry.ts` の型定義（`export type GameMeta = { ... }`）内、`maxPlayers: number` の下に1行追加:
 
 変更前:
+
 ```ts
 export type GameMeta = {
 	id: string
@@ -134,6 +141,7 @@ export type GameMeta = {
 ```
 
 変更後:
+
 ```ts
 export type GameMeta = {
 	id: string
@@ -154,6 +162,7 @@ export type GameMeta = {
 `who-will-pay` エントリの `maxPlayers: 8,` の直後に1行追加:
 
 変更前:
+
 ```ts
 		minPlayers: 2,
 		maxPlayers: 8,
@@ -162,6 +171,7 @@ export type GameMeta = {
 ```
 
 変更後:
+
 ```ts
 		minPlayers: 2,
 		maxPlayers: 8,
@@ -194,10 +204,12 @@ Co-Authored-By: Claude Sonnet 5 <noreply@anthropic.com>"
 ### Task 3: `PlayerSetupSheet` をゲート専用に書き換え
 
 **Files:**
+
 - Modify: `src/components/game/player-setup-sheet.tsx`（全面書き換え）
 - Modify: `src/components/game/__tests__/player-setup-sheet.test.tsx`（全面書き換え）
 
 **Interfaces:**
+
 - Consumes: Task 1 の `allNamesFilled(s: PlayersState): boolean`、既存 `playersStore` / `usePlayers` / `MIN_PLAYERS` / `MAX_PLAYERS` / `playerColor`、`expo-router` の `router`
 - Produces: `<PlayerSetupSheet onProceed={() => void} minPlayers?: number maxPlayers?: number />`（`visible`/`onClose` Props は廃止。常に全画面表示。`Modal` ラッパー廃止）
 
@@ -224,7 +236,9 @@ jest.mock('expo-haptics', () => ({
 	NotificationFeedbackType: { Success: 'success' },
 	notificationAsync: jest.fn(),
 }))
-jest.mock('expo-router', () => ({ router: { push: jest.fn(), back: jest.fn(), replace: jest.fn() } }))
+jest.mock('expo-router', () => ({
+	router: { push: jest.fn(), back: jest.fn(), replace: jest.fn() },
+}))
 jest.mock('@/theme/player-colors', () => ({
 	playerColor: (index: number) => ({ name: `色${index}`, value: '#FF0000' }),
 }))
@@ -574,10 +588,12 @@ Co-Authored-By: Claude Sonnet 5 <noreply@anthropic.com>"
 ### Task 4: `GameScreen` にゲート分岐を実装し👥を撤去
 
 **Files:**
+
 - Modify: `src/components/game/game-screen.tsx`（全面書き換え）
 - Test: `src/components/game/__tests__/game-screen.test.tsx`（新規）
 
 **Interfaces:**
+
 - Consumes: Task 3 の `<PlayerSetupSheet onProceed={() => void} />`、既存 `GameMeta`（Task 2 で `requiresPlayers?: boolean` 追加済み）、既存 `hasSeenHowTo`/`markHowToSeen`/`HowToPlayModal`
 - Produces: `<GameScreen meta={GameMeta} />`（外部シグネチャ不変。内部に `setupDone` 分岐を追加）
 
@@ -602,7 +618,9 @@ jest.mock('expo-haptics', () => ({
 	NotificationFeedbackType: { Success: 'success' },
 	notificationAsync: jest.fn(),
 }))
-jest.mock('expo-router', () => ({ router: { push: jest.fn(), back: jest.fn(), replace: jest.fn() } }))
+jest.mock('expo-router', () => ({
+	router: { push: jest.fn(), back: jest.fn(), replace: jest.fn() },
+}))
 jest.mock('@/theme/player-colors', () => ({
 	playerColor: (index: number) => ({ name: `色${index}`, value: '#FF0000' }),
 }))
