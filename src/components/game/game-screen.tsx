@@ -30,13 +30,11 @@ export function GameScreen({ meta }: { meta: GameMeta }) {
 
 	if (!setupDone) {
 		return (
-			<View style={[styles.screen, { paddingTop: insets.top }]}>
-				<PlayerSetupSheet
-					onProceed={() => setSetupDone(true)}
-					minPlayers={meta.minPlayers}
-					maxPlayers={meta.maxPlayers}
-				/>
-			</View>
+			<PlayerSetupSheet
+				onProceed={() => setSetupDone(true)}
+				minPlayers={meta.minPlayers}
+				maxPlayers={meta.maxPlayers}
+			/>
 		)
 	}
 
