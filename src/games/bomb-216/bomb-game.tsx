@@ -1,6 +1,6 @@
 import { router } from 'expo-router'
 import { useRef, useState } from 'react'
-import { StyleSheet, Text, View } from 'react-native'
+import { ImageBackground, StyleSheet, Text, View } from 'react-native'
 import Animated, {
 	useAnimatedStyle,
 	useSharedValue,
@@ -13,6 +13,8 @@ import { playSound } from '@/lib/sound'
 import { colors, spacing, typography } from '@/theme/tokens'
 import { createBoard, hiddenCount, revealTile, type Board } from './board'
 import { ExplosionOverlay } from './explosion-overlay'
+import { FenceOverlay } from './fence-overlay'
+import { HazardPanel } from './hazard-panel'
 import { BOMB } from './theme'
 import { Tile } from './tile'
 
@@ -78,26 +80,35 @@ export function BombGame() {
 		i === board.soloIndex ? 'solo' : i === board.allIndex ? 'all' : null
 
 	return (
-		<View style={styles.container}>
+		<ImageBackground source={require('@/assets/images/bomb/bg.jpg')} style={styles.container}>
+			{/* 文字とパネルの視認性を保つ暗めスクリム */}
+			<View style={styles.scrim} />
 			<View style={styles.status}>
 				<Text style={styles.message}>{message}</Text>
 				<Text style={styles.counter}>
 					のこり {remaining}マス ／ 💣 2/{remaining}
 				</Text>
 			</View>
-			<Animated.View style={[styles.grid, shakeStyle]}>
-				{board.tiles.map((state, i) => (
-					<Tile
-						key={i}
-						index={i}
-						state={state}
-						revealed={revealed}
-						bombKind={bombKindAt(i)}
-						onPress={handlePress}
-					/>
-				))}
-			</Animated.View>
+			<View style={styles.panelArea}>
+				<Animated.View style={shakeStyle}>
+					<HazardPanel>
+						<View style={styles.grid}>
+							{board.tiles.map((state, i) => (
+								<Tile
+									key={i}
+									index={i}
+									state={state}
+									revealed={revealed}
+									bombKind={bombKindAt(i)}
+									onPress={handlePress}
+								/>
+							))}
+						</View>
+					</HazardPanel>
+				</Animated.View>
+			</View>
 
+			<FenceOverlay />
 			{board.exploded !== null && <ExplosionOverlay />}
 
 			<ResultOverlay
@@ -117,26 +128,37 @@ export function BombGame() {
 					</Text>
 					<Text style={styles.resultHint}>
 						{board.exploded === 'all'
-							? `💣（1人負け）は ${board.soloIndex + 1} 番だった`
-							: `💥（全員負け）は ${board.allIndex + 1} 番だった…あぶなかった！`}
+							? '💣（1人負け）も盤面に隠れていた'
+							: '💥（全員負け）はまだ盤面に隠れていた…あぶなかった！'}
 					</Text>
 				</View>
 			</ResultOverlay>
-		</View>
+		</ImageBackground>
 	)
 }
 
 const styles = StyleSheet.create({
 	container: { flex: 1, backgroundColor: BOMB.bg },
+	scrim: {
+		position: 'absolute',
+		top: 0,
+		left: 0,
+		right: 0,
+		bottom: 0,
+		backgroundColor: 'rgba(10,8,20,0.45)',
+	},
 	status: { alignItems: 'center', paddingVertical: spacing.lg, gap: spacing.xs },
 	message: { ...typography.title },
 	counter: { ...typography.caption, color: colors.textMuted },
+	panelArea: {
+		flex: 1,
+		justifyContent: 'center',
+		paddingHorizontal: spacing.md,
+		paddingBottom: spacing.xl,
+	},
 	grid: {
 		flexDirection: 'row',
 		flexWrap: 'wrap',
-		paddingHorizontal: spacing.md,
-		alignContent: 'center',
-		flex: 1,
 	},
 	result: { alignItems: 'center', gap: spacing.md },
 	resultEmoji: { fontSize: 72 },
