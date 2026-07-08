@@ -26,10 +26,7 @@ export function createBoard(rng: () => number = Math.random): Board {
 export type RevealOutcome = 'safe' | 'solo' | 'all' | 'ignored'
 
 // 開封。爆発後・開封済みは ignored を返し board をそのまま返す（冪等）
-export function revealTile(
-	board: Board,
-	index: number,
-): { board: Board; outcome: RevealOutcome } {
+export function revealTile(board: Board, index: number): { board: Board; outcome: RevealOutcome } {
 	if (board.exploded !== null || board.tiles[index] !== 'hidden') {
 		return { board, outcome: 'ignored' }
 	}

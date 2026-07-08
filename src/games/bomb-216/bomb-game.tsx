@@ -15,7 +15,13 @@ import { createBoard, hiddenCount, revealTile, type Board } from './board'
 import { BOMB } from './theme'
 import { Tile } from './tile'
 
-const SAFE_REACTIONS = ['セーフ！', 'あぶな〜い！', 'まだまだいける！', 'つぎ、どうぞ！', 'ドキドキ…']
+const SAFE_REACTIONS = [
+	'セーフ！',
+	'あぶな〜い！',
+	'まだまだいける！',
+	'つぎ、どうぞ！',
+	'ドキドキ…',
+]
 const INITIAL_MESSAGE = 'だれから開ける？'
 const RESULT_DELAY_MS = 900
 
@@ -45,12 +51,14 @@ export function BombGame() {
 		haptics.heavy()
 		playSound('explosion')
 		setMessage(outcome === 'solo' ? '💣 ドカン！' : '💥 大爆発！！')
-		shakeX.value = withSequence(
-			withTiming(-12, { duration: 40 }),
-			withTiming(12, { duration: 40 }),
-			withTiming(-8, { duration: 40 }),
-			withTiming(8, { duration: 40 }),
-			withTiming(0, { duration: 40 }),
+		shakeX.set(
+			withSequence(
+				withTiming(-12, { duration: 40 }),
+				withTiming(12, { duration: 40 }),
+				withTiming(-8, { duration: 40 }),
+				withTiming(8, { duration: 40 }),
+				withTiming(0, { duration: 40 }),
+			),
 		)
 		timerRef.current = setTimeout(() => setPhase('result'), RESULT_DELAY_MS)
 	}

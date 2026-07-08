@@ -38,7 +38,16 @@ jest.mock('react-native-reanimated', () => {
 	return {
 		__esModule: true,
 		default: { View, Text },
-		useSharedValue: jest.fn((initial: number) => ({ value: initial })),
+		useSharedValue: jest.fn((initial: number) => {
+			const sv = {
+				value: initial,
+				set: (v: number) => {
+					sv.value = v
+				},
+				get: () => sv.value,
+			}
+			return sv
+		}),
 		useAnimatedStyle: jest.fn(() => ({})),
 		withTiming: jest.fn((toValue: number) => toValue),
 		withSequence: jest.fn((toValue: number) => toValue),
@@ -52,7 +61,7 @@ jest.mock('../board', () => {
 	return { ...actual, createBoard: () => actual.createBoard(() => 0) }
 })
 
-const press = async (element: unknown) => {
+const press = async (element: Parameters<typeof fireEvent.press>[0]) => {
 	await act(async () => {
 		fireEvent.press(element)
 	})
