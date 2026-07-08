@@ -12,6 +12,7 @@ import { haptics } from '@/lib/haptics'
 import { playSound } from '@/lib/sound'
 import { colors, spacing, typography } from '@/theme/tokens'
 import { createBoard, hiddenCount, revealTile, type Board } from './board'
+import { ExplosionOverlay } from './explosion-overlay'
 import { BOMB } from './theme'
 import { Tile } from './tile'
 
@@ -96,6 +97,8 @@ export function BombGame() {
 					/>
 				))}
 			</Animated.View>
+
+			{board.exploded !== null && <ExplosionOverlay />}
 
 			<ResultOverlay
 				visible={phase === 'result'}

@@ -55,6 +55,12 @@ jest.mock('react-native-reanimated', () => {
 	}
 })
 
+jest.mock('lottie-react-native', () => {
+	// eslint-disable-next-line @typescript-eslint/no-require-imports
+	const { View } = require('react-native')
+	return { __esModule: true, default: View }
+})
+
 // createBoard を固定盤面（solo=0, all=1）に差し替え
 jest.mock('../board', () => {
 	const actual = jest.requireActual('../board')
@@ -82,6 +88,17 @@ describe('BombGame', () => {
 		expect(getByText(/のこり 15/)).toBeTruthy()
 		expect(getByText(/💣 2\/15/)).toBeTruthy()
 		expect(getByText('🍀')).toBeTruthy()
+	})
+
+	it('爆弾タップで爆発オーバーレイが出る（セーフでは出ない）', async () => {
+		jest.useFakeTimers()
+		const { getByText, queryByTestId } = await render(<BombGame />)
+		expect(queryByTestId('explosion-overlay')).toBeNull()
+		await press(getByText('6')) // セーフ
+		expect(queryByTestId('explosion-overlay')).toBeNull()
+		await press(getByText('1')) // solo 爆弾
+		expect(queryByTestId('explosion-overlay')).toBeTruthy()
+		jest.useRealTimers()
 	})
 
 	it('1人負け爆弾でリザルト（1人負け）が表示される', async () => {
