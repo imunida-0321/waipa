@@ -55,6 +55,21 @@ jest.mock('react-native-reanimated', () => {
 	}
 })
 
+jest.mock('react-native-svg', () => {
+	// eslint-disable-next-line @typescript-eslint/no-require-imports
+	const { View } = require('react-native')
+	return {
+		__esModule: true,
+		default: View,
+		Svg: View,
+		G: View,
+		Path: View,
+		Circle: View,
+		Polygon: View,
+		Rect: View,
+		Line: View,
+	}
+})
 jest.mock('lottie-react-native', () => {
 	// eslint-disable-next-line @typescript-eslint/no-require-imports
 	const { View } = require('react-native')
@@ -75,11 +90,13 @@ const press = async (element: Parameters<typeof fireEvent.press>[0]) => {
 
 describe('BombGame', () => {
 	it('16タイルと残数・確率を表示する', async () => {
-		const { getByText } = await render(<BombGame />)
+		const { getByText, getByTestId } = await render(<BombGame />)
 		expect(getByText('1')).toBeTruthy()
 		expect(getByText('16')).toBeTruthy()
 		expect(getByText(/のこり 16/)).toBeTruthy()
 		expect(getByText(/💣 2\/16/)).toBeTruthy()
+		expect(getByTestId('hazard-panel')).toBeTruthy()
+		expect(getByTestId('fence-overlay')).toBeTruthy()
 	})
 
 	it('セーフ開封で残数が減りリアクションが出る', async () => {
