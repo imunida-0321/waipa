@@ -1,4 +1,5 @@
 import type { ComponentType } from 'react'
+import { BombGame } from './bomb-216/bomb-game'
 import { ComingSoonGame } from './coming-soon'
 import { WhoWillPayGame } from './who-will-pay/who-will-pay-game'
 
@@ -43,11 +44,12 @@ export const games: readonly GameMeta[] = [
 		minPlayers: 2,
 		maxPlayers: 12,
 		howToPlay: [
-			'16個のボタンの中に爆弾が2つ隠れています',
-			'順番にタップしていき、爆弾を引いた人が負け！',
-			'「全員負け爆弾」を引いたら…全員アウト！',
+			'① 16個のボタンのどこかに爆弾が2個…（💣1人負け ＋ 💥全員負け）',
+			'② スマホを回して、1人1個ずつタップ！セーフ🍀なら次の人へ',
+			'③ 爆弾を引いた瞬間ゲーム終了！💣なら引いた人だけ負け、💥なら全員負け！',
+			'④ 開けるほど爆弾の確率アップ。どこまで攻める？',
 		],
-		Component: ComingSoonGame,
+		Component: BombGame,
 	},
 	{
 		id: 'five-sec-stop',
