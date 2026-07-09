@@ -30,6 +30,8 @@ export default function RootLayout() {
 		registerSound('reveal', require('@/assets/sounds/reveal.m4a'))
 		registerSound('spin', require('@/assets/sounds/spin.m4a'))
 		registerSound('event', require('@/assets/sounds/event.m4a'))
+		registerSound('diceRoll1', require('@/assets/sounds/chinchiro1.mp3'))
+		registerSound('diceRoll2', require('@/assets/sounds/chinchiro2.mp3'))
 	}, [])
 
 	return (

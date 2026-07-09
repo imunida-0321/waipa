@@ -71,7 +71,7 @@ it('2人が順番に計測し、リザルトで敗者が発表される', async 
 	await act(async () => fireEvent.press(getByText('結果発表へ')))
 
 	// リザルト: 1位めくり → ドラムロール → 敗者発表
-	expect(getByText('けっか はっぴょう')).toBeTruthy()
+	expect(getByText('結果発表')).toBeTruthy()
 	await act(async () => jest.advanceTimersByTime(REVEAL_INTERVAL_MS + DRUMROLL_MS))
 	expect(getByText('ユウタ')).toBeTruthy()
 	expect(getByText(/敗者/)).toBeTruthy()

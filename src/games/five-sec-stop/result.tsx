@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import { useDrumroll } from '@/components/game/use-drumroll'
 import { GradientButton } from '@/components/ui/gradient-button'
-import { PillButton } from '@/components/ui/pill-button'
+import { SecondaryButton } from '@/components/ui/secondary-button'
 import { playerColor } from '@/theme/player-colors'
 import { colors, radii, spacing, typography } from '@/theme/tokens'
 import { formatDeviation, formatSeconds, rankRecords, type Ranked } from './judge'
@@ -55,7 +55,7 @@ export function FiveSecResult({ records, playerNames, onRetry, onHome }: Props) 
 
 	return (
 		<ScrollView contentContainerStyle={styles.container}>
-			<Text style={styles.title}>けっか はっぴょう</Text>
+			<Text style={styles.title}>結果発表</Text>
 
 			{ranked.map((entry, rankIndex) => {
 				const isShown = entry.isLoser ? losersRevealed : rankIndex < revealed
@@ -74,7 +74,7 @@ export function FiveSecResult({ records, playerNames, onRetry, onHome }: Props) 
 				<View style={styles.actions}>
 					<GradientButton title="もう一回" onPress={onRetry} />
 					<View style={styles.actionGap} />
-					<PillButton title="ホームへ" onPress={onHome} />
+					<SecondaryButton title="ホームへ" onPress={onHome} />
 				</View>
 			)}
 		</ScrollView>

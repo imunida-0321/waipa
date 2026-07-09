@@ -7,13 +7,12 @@ import Animated, {
 	withTiming,
 } from 'react-native-reanimated'
 import { colors } from '@/theme/tokens'
-import { FSS } from './theme'
 
-const PIECE_COLORS = [colors.gold, colors.accentFrom, colors.accentTo, FSS.accent]
+const PIECE_COLORS = [colors.gold, colors.accentFrom, colors.accentTo, '#4ECDC4']
 const PIECE_COUNT = 12
 const FALL_MS = 1200
 
-// ぴったり賞の紙吹雪。index 由来の決定的な配置（乱数なし）でテストしやすくする
+// 祝福演出の紙吹雪。ぴったり賞・ピンゾロ等の当たり演出で使う
 function Piece({ index }: { index: number }) {
 	const progress = useSharedValue(0)
 
@@ -44,9 +43,9 @@ function Piece({ index }: { index: number }) {
 	)
 }
 
-export function PittariBurst() {
+export function ConfettiBurst() {
 	return (
-		<View pointerEvents="none" style={StyleSheet.absoluteFill} testID="pittari-burst">
+		<View pointerEvents="none" style={StyleSheet.absoluteFill} testID="confetti-burst">
 			{Array.from({ length: PIECE_COUNT }, (_, i) => (
 				<Piece key={i} index={i} />
 			))}

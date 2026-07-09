@@ -1,7 +1,7 @@
 import type { PropsWithChildren } from 'react'
 import { Modal, StyleSheet, View } from 'react-native'
 import { GradientButton } from '@/components/ui/gradient-button'
-import { PillButton } from '@/components/ui/pill-button'
+import { SecondaryButton } from '@/components/ui/secondary-button'
 import { spacing } from '@/theme/tokens'
 
 type Props = PropsWithChildren<{
@@ -18,7 +18,7 @@ export function ResultOverlay({ visible, onRetry, onHome, children }: Props) {
 				<View style={styles.content}>{children}</View>
 				<View style={styles.actions}>
 					<GradientButton title="もう一回" onPress={onRetry} />
-					<PillButton title="ホームへ" onPress={onHome} />
+					<SecondaryButton title="ホームへ" onPress={onHome} />
 				</View>
 			</View>
 		</Modal>

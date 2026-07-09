@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Pressable, StyleSheet, Text, View } from 'react-native'
+import { ConfettiBurst } from '@/components/game/confetti-burst'
 import { DrumrollReveal } from '@/components/game/drumroll-reveal'
 import { GradientButton } from '@/components/ui/gradient-button'
 import { haptics } from '@/lib/haptics'
@@ -7,7 +8,6 @@ import { playSound } from '@/lib/sound'
 import { playerColor } from '@/theme/player-colors'
 import { colors, radii, spacing, typography } from '@/theme/tokens'
 import { formatDeviation, formatSeconds, tierOf } from './judge'
-import { PittariBurst } from './pittari-burst'
 import { FSS } from './theme'
 import { HIDE_END_MS, HIDE_START_MS, useStopwatch } from './use-stopwatch'
 
@@ -103,7 +103,7 @@ export function StopwatchPlay({ playerIndex, playerName, orderLabel, doneLabel, 
 
 	return (
 		<View style={styles.container}>
-			{pittari && <PittariBurst />}
+			{pittari && <ConfettiBurst />}
 			<Text style={styles.orderLabel}>{playerName} さんの記録</Text>
 			{pittari && <Text style={styles.pittariTitle}>＼ ぴったり賞 ／</Text>}
 			<View style={styles.timerArea}>

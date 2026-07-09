@@ -53,6 +53,8 @@ jest.mock('react-native-reanimated', () => {
 		runOnJS: jest.fn((fn: (...args: unknown[]) => unknown) => fn),
 	}
 })
+// expo-gl / @react-three/fiber は jest 環境でロードできないため 3D 表示はモック
+jest.mock('@/games/chinchiro/dice-3d', () => ({ Dice3D: jest.fn() }))
 
 describe('ゲームレジストリ', () => {
 	it('MVP の8ゲームが登録されている', () => {
