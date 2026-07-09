@@ -58,6 +58,10 @@
 	},
 	"jest": {
 		"preset": "jest-expo",
+		"testPathIgnorePatterns": [
+			"/node_modules/",
+			"<rootDir>/.claude/"
+		],
 		"moduleNameMapper": {
 			"^@/assets/(.*)$": "<rootDir>/assets/$1",
 			"^@/(.*)$": "<rootDir>/src/$1"
