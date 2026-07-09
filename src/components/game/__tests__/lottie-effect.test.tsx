@@ -36,6 +36,12 @@ it('source があれば LottieView を描画し、loop が渡る', async () => {
 	expect(queryByText('代替演出')).toBeNull()
 	expect(lastLottieProps?.loop).toBe(true)
 	expect(lastLottieProps?.source).toEqual({ uri: 'test' })
+	// 演出は装飾専用。下の UI（ボタン等）のタップを遮らない
+	// eslint-disable-next-line @typescript-eslint/no-require-imports
+	const { StyleSheet } = require('react-native')
+	expect(StyleSheet.flatten(lastLottieProps?.style)).toMatchObject({ pointerEvents: 'none' })
+	// Web 実装は style を無視して webStyle しか見ないため、同内容を両方に渡す
+	expect(lastLottieProps?.webStyle).toMatchObject({ pointerEvents: 'none' })
 })
 
 it('fallback 省略時に source が null なら何も描画しない', async () => {

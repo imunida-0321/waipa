@@ -1,5 +1,5 @@
 import type { PropsWithChildren } from 'react'
-import { StyleSheet, Text, View } from 'react-native'
+import { Dimensions, StyleSheet, Text, View } from 'react-native'
 import Animated, {
 	useAnimatedStyle,
 	useSharedValue,
@@ -82,6 +82,13 @@ const styles = StyleSheet.create({
 	center: { alignItems: 'center', justifyContent: 'center', minHeight: 120 },
 	question: { ...typography.hero, fontSize: 48 },
 	effect: { width: 160, height: 120 },
-	// 紙吹雪はテキストより大きく広げる（縦長素材が小箱に収まって見えなくなるのを防ぐ）
-	celebrate: { position: 'absolute', width: 320, height: 480, alignSelf: 'center' },
+	// 紙吹雪は画面全体に降らせる。DrumrollReveal は画面中央付近に置かれる前提で
+	// ウィンドウサイズ分を上方向へ広げて重ねる（タップは LottieEffect 側で透過）
+	celebrate: {
+		position: 'absolute',
+		alignSelf: 'center',
+		width: Dimensions.get('window').width,
+		height: Dimensions.get('window').height,
+		top: -Dimensions.get('window').height / 2 + 60,
+	},
 })

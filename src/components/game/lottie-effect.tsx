@@ -1,5 +1,5 @@
-import { useState, type ComponentProps, type ReactNode } from 'react'
-import type { StyleProp, ViewStyle } from 'react-native'
+import { useState, type ComponentProps, type CSSProperties, type ReactNode } from 'react'
+import { StyleSheet, type StyleProp, type ViewStyle } from 'react-native'
 import LottieView from 'lottie-react-native'
 
 export type LottieSource = ComponentProps<typeof LottieView>['source']
@@ -20,12 +20,17 @@ export function LottieEffect({ source, loop = false, fallback = null, style }: P
 
 	if (source === null || failed) return <>{fallback}</>
 
+	// 装飾専用。下の UI（ボタン等）のタップを遮らない。
+	// Web 版 LottieView は style を無視して webStyle しか見ないため、同内容を両方に渡す
+	const flat = StyleSheet.flatten([style, { pointerEvents: 'none' as const }])
+
 	return (
 		<LottieView
 			source={source}
 			autoPlay
 			loop={loop}
-			style={style}
+			style={flat}
+			webStyle={flat as CSSProperties}
 			onAnimationFailure={() => setFailed(true)}
 		/>
 	)
