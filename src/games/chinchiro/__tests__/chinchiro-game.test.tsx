@@ -1,5 +1,5 @@
 import { act, fireEvent, render } from '@testing-library/react-native'
-import { ROLL_DURATION_MS } from '../dice-roll'
+import { ROLL_DURATION_MS } from '../chinchiro-play'
 import { REVEAL_INTERVAL_MS } from '../result'
 import { ChinchiroGame } from '../chinchiro-game'
 
@@ -77,24 +77,24 @@ afterEach(() => {
 })
 
 it('2人が順番に振り、リザルトで敗者が発表される', async () => {
-	const { getByText } = await render(<ChinchiroGame />)
+	const { getByText, getByTestId } = await render(<ChinchiroGame />)
 
 	// 1人目: アオイ（アラシ6）
 	expect(getByText('1人目 / 2人')).toBeTruthy()
 	expect(getByText('アオイ さんの番')).toBeTruthy()
-	await act(async () => fireEvent.press(getByText('タップで振る！')))
+	await act(async () => fireEvent.press(getByTestId('roll-button')))
 	await act(async () => jest.advanceTimersByTime(ROLL_DURATION_MS))
 	expect(getByText('アラシ（6）！')).toBeTruthy()
-	await act(async () => fireEvent.press(getByText('つぎの人へ')))
 
-	// 2人目: ユウタ（ヒフミ）
-	expect(getByText('2人目 / 2人')).toBeTruthy()
-	await act(async () => fireEvent.press(getByText('タップで振る！')))
+	// 丸ボタンで次プレイヤーの投擲が即開始 → 2人目: ユウタ（ヒフミ）
+	await act(async () => fireEvent.press(getByTestId('roll-button')))
+	expect(getByText(/2人目/)).toBeTruthy()
+	expect(getByText('ユウタ さんの番')).toBeTruthy()
 	await act(async () => jest.advanceTimersByTime(ROLL_DURATION_MS))
 	expect(getByText('ヒフミ…')).toBeTruthy()
-	await act(async () => fireEvent.press(getByText('結果発表へ')))
 
-	// リザルト
+	// 最終プレイヤーの settled 後の押下でリザルトへ
+	await act(async () => fireEvent.press(getByTestId('roll-button')))
 	expect(getByText('けっか はっぴょう')).toBeTruthy()
 	await act(async () => jest.advanceTimersByTime(REVEAL_INTERVAL_MS + DRUMROLL_MS))
 	expect(getByText('ユウタ')).toBeTruthy()
@@ -102,13 +102,14 @@ it('2人が順番に振り、リザルトで敗者が発表される', async () 
 })
 
 it('「もう一回」で1人目からやり直せる', async () => {
-	const { getByText } = await render(<ChinchiroGame />)
+	const { getByText, getByTestId } = await render(<ChinchiroGame />)
 
-	for (const label of ['つぎの人へ', '結果発表へ']) {
-		await act(async () => fireEvent.press(getByText('タップで振る！')))
-		await act(async () => jest.advanceTimersByTime(ROLL_DURATION_MS))
-		await act(async () => fireEvent.press(getByText(label)))
-	}
+	// 1人目 → 2人目 → リザルト（すべて同じ丸ボタン）
+	await act(async () => fireEvent.press(getByTestId('roll-button')))
+	await act(async () => jest.advanceTimersByTime(ROLL_DURATION_MS))
+	await act(async () => fireEvent.press(getByTestId('roll-button')))
+	await act(async () => jest.advanceTimersByTime(ROLL_DURATION_MS))
+	await act(async () => fireEvent.press(getByTestId('roll-button')))
 	await act(async () => jest.advanceTimersByTime(REVEAL_INTERVAL_MS + DRUMROLL_MS))
 
 	await act(async () => fireEvent.press(getByText('もう一回')))

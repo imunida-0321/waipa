@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { StyleSheet, View } from 'react-native'
 import { getDisplayNames, usePlayers } from '@/lib/players-store'
 import type { Hand } from './dice'
-import { DiceRoll } from './dice-roll'
+import { ChinchiroPlay } from './chinchiro-play'
 import { ChinchiroResult } from './result'
 import { CHIN } from './theme'
 
@@ -14,8 +14,7 @@ export function ChinchiroGame() {
 	const [hands, setHands] = useState<Hand[]>([])
 	const [round, setRound] = useState(0)
 
-	const current = hands.length
-	const finished = current >= players.count
+	const finished = hands.length >= players.count
 
 	return (
 		<View style={styles.container}>
@@ -30,14 +29,7 @@ export function ChinchiroGame() {
 					onHome={() => router.replace('/')}
 				/>
 			) : (
-				<DiceRoll
-					key={`${round}-${current}`}
-					playerIndex={current}
-					playerName={names[current]}
-					orderLabel={`${current + 1}人目 / ${players.count}人`}
-					doneLabel={current === players.count - 1 ? '結果発表へ' : 'つぎの人へ'}
-					onDone={(hand) => setHands((prev) => [...prev, hand])}
-				/>
+				<ChinchiroPlay key={round} playerNames={names} onFinish={(h) => setHands(h)} />
 			)}
 		</View>
 	)

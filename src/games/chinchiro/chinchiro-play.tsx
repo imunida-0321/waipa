@@ -1,0 +1,275 @@
+import { useEffect, useRef, useState } from 'react'
+import { Pressable, StyleSheet, Text, View } from 'react-native'
+import { ConfettiBurst } from '@/components/game/confetti-burst'
+import { DrumrollReveal } from '@/components/game/drumroll-reveal'
+import { haptics } from '@/lib/haptics'
+import { playSound } from '@/lib/sound'
+import { playerColor } from '@/theme/player-colors'
+import { colors, radii, spacing, typography } from '@/theme/tokens'
+import {
+	evaluateDice,
+	handLabel,
+	resolveThrows,
+	rollThrow,
+	MAX_THROWS,
+	type Hand,
+	type Throw,
+} from './dice'
+import { Dice3D } from './dice-3d'
+import { CHIN } from './theme'
+
+export const ROLL_DURATION_MS = 1200
+
+type Props = {
+	playerNames: string[]
+	onFinish: (hands: Hand[]) => void
+	rng?: () => number
+}
+
+type Status = 'idle' | 'rolling' | 'open' | 'settled'
+
+// 1ラウンド全体を管理する。3D シーンは常設で、画面下の丸ボタンを押すたびに現在プレイヤーが振る。
+// 役確定/3投終了で settled になり、次の人が同じ丸ボタンを押すとそのまま次の投擲が始まる。
+export function ChinchiroPlay({ playerNames, onFinish, rng = Math.random }: Props) {
+	const [playerIndex, setPlayerIndex] = useState(0)
+	const [throws, setThrows] = useState<Throw[]>([])
+	const [hands, setHands] = useState<Hand[]>([])
+	const [status, setStatus] = useState<Status>('idle')
+	// Dice3D に渡す現在の表示投。null の間は 3D 未表示（初回投擲でマウントし以降は保持）
+	const [displayThrow, setDisplayThrow] = useState<Throw | null>(null)
+	// ラウンド通算の投数カウンタ。投ごとに +1 して Dice3D のアニメをリスタートさせる
+	const [rollId, setRollId] = useState(0)
+	const timer = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+	const playerCount = playerNames.length
+	const playerName = playerNames[playerIndex] ?? ''
+	const color = playerColor(playerIndex).value
+	const throwsLeft = MAX_THROWS - throws.length
+	const isLastPlayer = playerIndex + 1 >= playerCount
+
+	useEffect(
+		() => () => {
+			if (timer.current) clearTimeout(timer.current)
+		},
+		[],
+	)
+
+	// 1投ぶんの実行: rollThrow → 転がり(1.2秒) → 役判定で open/settled へ。
+	// prevThrows は現在プレイヤーの既存投列（次プレイヤーへ進む際は空配列を渡す）。
+	const roll = (prevThrows: Throw[]) => {
+		playSound('tap')
+		haptics.tap()
+		const t = rollThrow(rng)
+		const nextThrows = [...prevThrows, t]
+		setDisplayThrow(t)
+		setThrows(nextThrows)
+		setRollId((id) => id + 1)
+		setStatus('rolling')
+		timer.current = setTimeout(() => {
+			const hand = t.shonben ? null : evaluateDice(t.dice)
+			const isLast = nextThrows.length >= MAX_THROWS
+			if (hand || isLast) {
+				if (hand?.type === 'pinzoro') {
+					haptics.success()
+					playSound('reveal')
+				} else if (t.shonben) {
+					haptics.heavy()
+					playSound('event')
+				} else {
+					haptics.heavy()
+				}
+				setStatus('settled')
+			} else {
+				if (t.shonben) {
+					haptics.heavy()
+					playSound('event')
+				}
+				setStatus('open')
+			}
+		}, ROLL_DURATION_MS)
+	}
+
+	// settled で丼ボタンを押したとき: 確定役を積んで次プレイヤーへ。最後なら全員分で onFinish。
+	const advance = () => {
+		const finalHand = resolveThrows(throws)
+		const nextHands = [...hands, finalHand]
+		if (isLastPlayer) {
+			onFinish(nextHands)
+			return
+		}
+		setHands(nextHands)
+		setPlayerIndex(playerIndex + 1)
+		setThrows([])
+		roll([])
+	}
+
+	const onButtonPress = () => {
+		if (status === 'rolling') return
+		if (status === 'settled') {
+			advance()
+			return
+		}
+		// idle（未投）or open（残投あり）→ 振る
+		roll(throws)
+	}
+
+	const finalHand = status === 'settled' ? resolveThrows(throws) : null
+	const shonben = displayThrow?.shonben ?? false
+	const orderLabel =
+		`${playerIndex + 1}人目 / ${playerCount}人` +
+		(throws.length > 0 ? `・${throws.length}投目` : '')
+
+	return (
+		<View style={styles.container}>
+			{finalHand?.type === 'pinzoro' && <ConfettiBurst />}
+			<Text style={styles.orderLabel}>{orderLabel}</Text>
+			<View style={styles.nameRow}>
+				<View style={[styles.colorDot, { backgroundColor: color }]} />
+				<Text style={styles.name}>{playerName} さんの番</Text>
+			</View>
+
+			<View style={styles.stage}>
+				{displayThrow && (
+					<Dice3D
+						dice={displayThrow.dice}
+						shonben={displayThrow.shonben}
+						rolling={status === 'rolling'}
+						rollId={rollId}
+						durationMs={ROLL_DURATION_MS}
+					/>
+				)}
+			</View>
+
+			<View style={styles.statusArea}>
+				{status === 'rolling' && <Text style={styles.statusText}>コロコロコロ…</Text>}
+				{status === 'open' && (
+					<Text style={[styles.statusText, shonben && { color: CHIN.handColors.hifumi }]}>
+						{shonben ? 'ションベン！' : '役なし…'}
+					</Text>
+				)}
+				{status === 'settled' && finalHand && (
+					<DrumrollReveal phase="revealed">
+						<Text
+							style={[styles.handLabel, { color: CHIN.handColors[finalHand.type] }]}
+						>
+							{handLabel(finalHand)}
+						</Text>
+					</DrumrollReveal>
+				)}
+			</View>
+
+			<View style={styles.bottom}>
+				<Pressable
+					testID="roll-button"
+					accessibilityRole="button"
+					disabled={status === 'rolling'}
+					onPress={onButtonPress}
+					style={({ pressed }) => [
+						styles.rollButton,
+						pressed && styles.rollButtonPressed,
+						status === 'rolling' && styles.rollButtonDisabled,
+					]}
+				/>
+				<Text style={styles.hint}>
+					{hintText(
+						status,
+						shonben,
+						throwsLeft,
+						isLastPlayer,
+						playerNames[playerIndex + 1],
+					)}
+				</Text>
+			</View>
+		</View>
+	)
+}
+
+// 丸ボタン下の小さなヒント文言
+function hintText(
+	status: Status,
+	shonben: boolean,
+	throwsLeft: number,
+	isLastPlayer: boolean,
+	nextName: string | undefined,
+): string {
+	switch (status) {
+		case 'idle':
+			return 'ボタンを押して振ろう！'
+		case 'rolling':
+			return '　'
+		case 'open':
+			return `${shonben ? '丼から飛び出た！ ' : ''}のこり${throwsLeft}投！`
+		case 'settled':
+			return isLastPlayer
+				? 'けっか はっぴょうへ'
+				: `つぎ: ${nextName ?? ''} さん ▶ ボタンで振る`
+	}
+}
+
+const styles = StyleSheet.create({
+	container: {
+		flex: 1,
+		backgroundColor: CHIN.bg,
+		padding: spacing.lg,
+		alignItems: 'center',
+	},
+	orderLabel: {
+		...typography.caption,
+		marginBottom: spacing.sm,
+	},
+	nameRow: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		gap: spacing.sm,
+		marginBottom: spacing.md,
+	},
+	colorDot: {
+		width: 14,
+		height: 14,
+		borderRadius: radii.pill,
+	},
+	name: {
+		...typography.title,
+	},
+	stage: {
+		flex: 1,
+		alignSelf: 'stretch',
+		alignItems: 'center',
+		justifyContent: 'center',
+	},
+	statusArea: {
+		minHeight: 72,
+		alignItems: 'center',
+		justifyContent: 'center',
+	},
+	statusText: {
+		...typography.title,
+	},
+	handLabel: {
+		...typography.hero,
+		fontSize: 44,
+	},
+	bottom: {
+		alignItems: 'center',
+		marginTop: spacing.md,
+	},
+	rollButton: {
+		width: 72,
+		height: 72,
+		borderRadius: 36,
+		backgroundColor: '#D8D8DC',
+		borderWidth: 2,
+		borderColor: '#F2F2F5',
+	},
+	rollButtonPressed: {
+		backgroundColor: '#A9A9AE',
+	},
+	rollButtonDisabled: {
+		opacity: 0.4,
+	},
+	hint: {
+		...typography.body,
+		color: colors.textMuted,
+		marginTop: spacing.sm,
+	},
+})
