@@ -30,7 +30,6 @@ export function StopwatchPlay({ playerIndex, playerName, orderLabel, doneLabel, 
 	const color = playerColor(playerIndex).value
 
 	const handleStart = () => {
-		haptics.tap()
 		playSound('tap')
 		sw.start()
 		setPhase('measuring')
