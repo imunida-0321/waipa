@@ -10,7 +10,8 @@ type Props = {
 	onClose: () => void
 }
 
-// 全ゲーム共通の遊び方解説モーダル。初回は自動表示、ヘッダー「？」で随時表示
+// 全ゲーム共通の遊び方解説モーダル。イントロ画面の「詳しい遊び方を見る」と
+// ヘッダー「？」から表示。最終ページは「閉じる」で閉じる
 export function HowToPlayModal({ visible, title, pages, onClose }: Props) {
 	const [page, setPage] = useState(0)
 	const isLast = page >= pages.length - 1
@@ -34,7 +35,7 @@ export function HowToPlayModal({ visible, title, pages, onClose }: Props) {
 						))}
 					</View>
 					<GradientButton
-						title={isLast ? 'はじめる' : '次へ'}
+						title={isLast ? '閉じる' : '次へ'}
 						onPress={() => (isLast ? onClose() : setPage((p) => p + 1))}
 					/>
 				</View>

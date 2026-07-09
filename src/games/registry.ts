@@ -13,6 +13,12 @@ export type GameMeta = {
 	minPlayers: number
 	maxPlayers: number
 	requiresPlayers?: boolean
+	/** イントロ画面のキャッチコピー（\n 可）。未指定なら tagline */
+	catchCopy?: string
+	/** イントロ画面の遊び方ダイジェスト。未指定なら howToPlay を連結 */
+	summary?: string
+	/** イントロ画面のサムネイル画像（require）。未指定なら絵文字＋グラデ */
+	thumbnail?: number
 	howToPlay: readonly string[]
 	Component: ComponentType
 }
@@ -44,6 +50,11 @@ export const games: readonly GameMeta[] = [
 		gradient: ['#FF6B6B', '#C0392B'],
 		minPlayers: 2,
 		maxPlayers: 12,
+		catchCopy: '16個のボタンにハズレが2つ！\n勝敗は完全運ゲームで決まる！',
+		summary:
+			'このゲームは、16個のボタンから1つを選ぶだけ！中には「全員アウト」と「あなただけアウト」の2つのハズレが潜んでいる、完全運ゲーです！',
+		// eslint-disable-next-line @typescript-eslint/no-require-imports
+		thumbnail: require('@/assets/images/bomb/bg.jpg'),
 		howToPlay: [
 			'① 16個のボタンのどこかに爆弾が2個…（💣1人負け ＋ 💥全員負け）',
 			'② スマホを回して、1人1個ずつタップ！セーフなら次の人へ',

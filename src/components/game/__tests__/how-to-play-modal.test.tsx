@@ -33,7 +33,7 @@ it('最初のページが表示される', async () => {
 	expect(queryByText('ページ2の説明')).toBeNull()
 })
 
-it('「次へ」で2ページ目、最終ページの「はじめる」で onClose', async () => {
+it('「次へ」で2ページ目、最終ページの「閉じる」で onClose', async () => {
 	const onClose = jest.fn()
 	const { getByText } = await render(
 		<HowToPlayModal visible title="テストゲーム" pages={pages} onClose={onClose} />,
@@ -42,6 +42,6 @@ it('「次へ」で2ページ目、最終ページの「はじめる」で onClo
 	await waitFor(() => {
 		expect(getByText('ページ2の説明')).toBeTruthy()
 	})
-	fireEvent.press(getByText('はじめる'))
+	fireEvent.press(getByText('閉じる'))
 	expect(onClose).toHaveBeenCalledTimes(1)
 })

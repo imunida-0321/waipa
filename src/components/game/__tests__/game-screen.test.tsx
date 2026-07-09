@@ -61,6 +61,11 @@ jest.mock('react-native-worklets', () => ({
 	__esModule: true,
 	Worklets: { defaultContext: {} },
 }))
+jest.mock('expo-linear-gradient', () => {
+	// eslint-disable-next-line @typescript-eslint/no-require-imports
+	const { View } = require('react-native')
+	return { LinearGradient: View }
+})
 
 function DummyGame() {
 	return null
@@ -86,18 +91,33 @@ beforeEach(async () => {
 	await playersStore.setName(1, 'たろう')
 })
 
-it('requiresPlayers が true のゲームは最初にゲート画面を表示し、本体は表示しない', async () => {
+it('最初は毎回イントロ画面を表示し、本体もゲートも表示しない', async () => {
 	const { getByText, queryByText } = await render(
 		<GameScreen meta={{ ...baseMeta, requiresPlayers: true }} />,
 	)
-	expect(getByText('参加メンバー')).toBeTruthy()
-	expect(queryByText('？')).toBeNull()
+	expect(getByText('ゲームスタート')).toBeTruthy()
+	expect(getByText('テスト用')).toBeTruthy() // catchCopy 未指定時は tagline
+	expect(getByText('詳しい遊び方を見る')).toBeTruthy()
+	expect(queryByText('参加メンバー')).toBeNull()
+	expect(queryByText('‹')).toBeNull() // 本体ヘッダーは未表示
 })
 
-it('requiresPlayers が true のゲートを通過すると本体ヘッダーと Component が表示される', async () => {
+it('catchCopy と summary が指定されていればイントロに表示する', async () => {
+	const { getByText } = await render(
+		<GameScreen meta={{ ...baseMeta, catchCopy: 'キャッチ！', summary: 'ダイジェスト説明' }} />,
+	)
+	expect(getByText('キャッチ！')).toBeTruthy()
+	expect(getByText('ダイジェスト説明')).toBeTruthy()
+})
+
+it('requiresPlayers: ゲームスタートでゲート→つぎへで本体ヘッダー表示', async () => {
 	const { getByText, queryByText } = await render(
 		<GameScreen meta={{ ...baseMeta, requiresPlayers: true }} />,
 	)
+	await act(async () => {
+		fireEvent.press(getByText('ゲームスタート'))
+	})
+	expect(getByText('参加メンバー')).toBeTruthy()
 	await act(async () => {
 		fireEvent.press(getByText('つぎへ'))
 	})
@@ -108,13 +128,39 @@ it('requiresPlayers が true のゲートを通過すると本体ヘッダーと
 	expect(queryByText('👥')).toBeNull()
 })
 
-it('requiresPlayers が未指定のゲームは最初から本体を表示する（ゲートなし）', async () => {
+it('requiresPlayers 未指定: ゲームスタートで直接本体を表示する', async () => {
 	const { getByText, queryByText } = await render(<GameScreen meta={baseMeta} />)
+	await act(async () => {
+		fireEvent.press(getByText('ゲームスタート'))
+	})
 	expect(queryByText('参加メンバー')).toBeNull()
 	expect(getByText('？')).toBeTruthy()
+	expect(queryByText('👥')).toBeNull()
 })
 
-it('👥ボタンはどのゲームでも表示されない', async () => {
-	const { queryByText } = await render(<GameScreen meta={baseMeta} />)
-	expect(queryByText('👥')).toBeNull()
+it('「詳しい遊び方を見る」でモーダルが開き、最終ページの「閉じる」で閉じる', async () => {
+	const { getByText, queryByText } = await render(
+		<GameScreen meta={{ ...baseMeta, summary: '概要テキスト' }} />,
+	)
+	await act(async () => {
+		fireEvent.press(getByText('詳しい遊び方を見る'))
+	})
+	expect(getByText('あそびかた1')).toBeTruthy()
+	await act(async () => {
+		fireEvent.press(getByText('閉じる')) // 1ページなので最終ページ
+	})
+	await waitFor(() => {
+		expect(queryByText('あそびかた1')).toBeNull()
+	})
+	expect(getByText('ゲームスタート')).toBeTruthy() // イントロに留まる
+})
+
+it('イントロの×で router.back が呼ばれる', async () => {
+	// eslint-disable-next-line @typescript-eslint/no-require-imports
+	const { router } = require('expo-router')
+	const { getByLabelText } = await render(<GameScreen meta={baseMeta} />)
+	await act(async () => {
+		fireEvent.press(getByLabelText('とじる'))
+	})
+	expect(router.back).toHaveBeenCalled()
 })
