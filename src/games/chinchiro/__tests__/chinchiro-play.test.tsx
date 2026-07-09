@@ -196,3 +196,20 @@ it('最終プレイヤー settled 後のボタン押下で onFinish が全員分
 		expect.objectContaining({ type: 'hifumi' }),
 	])
 })
+
+it('役の早見表を開閉できる', async () => {
+	const { getByTestId, getByText, queryByText } = await setup(
+		[0.9, die(4), die(5), die(6)],
+		['アオイ', 'ユウタ'],
+	)
+
+	expect(queryByText('チンチロの役（強い順）')).toBeNull()
+	await act(async () => fireEvent.press(getByTestId('rules-button')))
+	expect(getByText('チンチロの役（強い順）')).toBeTruthy()
+	expect(getByText('ピンゾロ')).toBeTruthy()
+	expect(getByText('ヒフミ')).toBeTruthy()
+	expect(getByText(/2つが同じ目のとき/)).toBeTruthy()
+
+	await act(async () => fireEvent.press(getByText('とじる')))
+	expect(queryByText('チンチロの役（強い順）')).toBeNull()
+})
