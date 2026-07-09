@@ -39,6 +39,7 @@ export const games: readonly GameMeta[] = [
 		catchCopy: 'お会計の金額を一桁ずつルーレットで回し、\n誰が支払うかを決定します！',
 		summary:
 			'このゲームは、合計金額の各桁（千の位、百の位、十の位、一の位）を1桁ずつルーレットで決定し、その桁の金額を誰が支払うかをランダムに決めるゲームです！',
+		thumbnail: require('@/assets/images/who-will-pay/thumb.jpg'),
 		howToPlay: [
 			'① 一緒に遊ぶメンバーを登録しよう！（2〜8名、各自に色がつきます）',
 			'② お会計の合計金額を入力しよう！',
