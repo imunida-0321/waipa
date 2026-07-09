@@ -71,6 +71,10 @@ describe('tap', () => {
 		expect(s.turn).toBe('o')
 		expect(s.extraMoves).toBe(0)
 	})
+	it('カットイン中の tap は無視される', () => {
+		const base = playing({ phase: 'cutin', pendingEvent: 'double' })
+		expect(reduce(base, { type: 'tap', index: 0, rng: noEvent })).toBe(base)
+	})
 	it('3手目以降の着手後にイベント抽選され cutin へ（効果は未適用）', () => {
 		const s = reduce(playing({ board: B('ox.x.....'), turn: 'o', moveCount: 3 }), {
 			type: 'tap',
@@ -108,5 +112,17 @@ describe('cutinDone', () => {
 		)
 		expect(s.phase).toBe('finished')
 		expect(s.winner).toBe('o')
+	})
+	it('シャッフルで両者同時に3並びになったら引き分け', () => {
+		const s = reduce(
+			playing({ board: B('xooooxxx.'), pendingEvent: 'shuffle', phase: 'cutin' }),
+			{ type: 'cutinDone', rng: () => 0 }, // 配置先が1つずれ '.xooooxxx' → o の横 [3,4,5] と x の横 [6,7,8]
+		)
+		expect(s.phase).toBe('finished')
+		expect(s.winner).toBe('draw')
+	})
+	it('pendingEvent がなければ cutinDone は何も起きない', () => {
+		const base = playing({ phase: 'cutin', pendingEvent: null })
+		expect(reduce(base, { type: 'cutinDone', rng: noEvent })).toBe(base)
 	})
 })
