@@ -248,49 +248,49 @@ afterEach(() => {
 	jest.useRealTimers()
 })
 
-it('start から stop までの経過 ms を返す', () => {
+it('start から stop までの経過 ms を返す', async () => {
 	const { result } = renderHook(() => useStopwatch())
-	act(() => result.current.start())
-	act(() => jest.advanceTimersByTime(5320))
+	await act(async () => result.current.start())
+	await act(async () => jest.advanceTimersByTime(5320))
 	let ms: number | null = null
-	act(() => {
+	await act(async () => {
 		ms = result.current.stop()
 	})
 	expect(ms).toBe(5320)
 	expect(result.current.running).toBe(false)
 })
 
-it('displayMs が計測中に更新される', () => {
+it('displayMs が計測中に更新される', async () => {
 	const { result } = renderHook(() => useStopwatch())
-	act(() => result.current.start())
-	act(() => jest.advanceTimersByTime(1000))
+	await act(async () => result.current.start())
+	await act(async () => jest.advanceTimersByTime(1000))
 	expect(result.current.displayMs).toBeGreaterThanOrEqual(984)
 	expect(result.current.displayMs).toBeLessThanOrEqual(1000)
 })
 
 it(`start 後 ${STOP_GUARD_MS}ms 未満の stop は無効（null を返し計測継続）`, () => {
 	const { result } = renderHook(() => useStopwatch())
-	act(() => result.current.start())
-	act(() => jest.advanceTimersByTime(STOP_GUARD_MS - 1))
+	await act(async () => result.current.start())
+	await act(async () => jest.advanceTimersByTime(STOP_GUARD_MS - 1))
 	let ms: number | null = 0
-	act(() => {
+	await act(async () => {
 		ms = result.current.stop()
 	})
 	expect(ms).toBeNull()
 	expect(result.current.running).toBe(true)
 	// ガードを越えれば止められる
-	act(() => jest.advanceTimersByTime(5000))
-	act(() => {
+	await act(async () => jest.advanceTimersByTime(5000))
+	await act(async () => {
 		ms = result.current.stop()
 	})
 	expect(ms).toBe(STOP_GUARD_MS - 1 + 5000)
 })
 
-it('reset で初期状態に戻る', () => {
+it('reset で初期状態に戻る', async () => {
 	const { result } = renderHook(() => useStopwatch())
-	act(() => result.current.start())
-	act(() => jest.advanceTimersByTime(2000))
-	act(() => result.current.reset())
+	await act(async () => result.current.start())
+	await act(async () => jest.advanceTimersByTime(2000))
+	await act(async () => result.current.reset())
 	expect(result.current.displayMs).toBe(0)
 	expect(result.current.running).toBe(false)
 })
@@ -428,8 +428,8 @@ afterEach(() => {
 	jest.useRealTimers()
 })
 
-function setup(onDone = jest.fn()) {
-	const utils = render(
+async function setup(onDone = jest.fn()) {
+	const utils = await render(
 		<StopwatchPlay
 			playerIndex={0}
 			playerName="アオイ"
@@ -441,52 +441,52 @@ function setup(onDone = jest.fn()) {
 	return { onDone, ...utils }
 }
 
-it('スタンバイ→スタート→ストップ→記録表示→onDone の順に進む', () => {
-	const { onDone, getByText, getByTestId } = setup()
+it('スタンバイ→スタート→ストップ→記録表示→onDone の順に進む', async () => {
+	const { onDone, getByText, getByTestId } = await setup()
 
 	expect(getByText('アオイ さんの番')).toBeTruthy()
-	act(() => fireEvent.press(getByText('タップでスタート')))
+	await act(async () => fireEvent.press(getByText('タップでスタート')))
 
-	act(() => jest.advanceTimersByTime(5320))
-	act(() => fireEvent.press(getByTestId('stop-area')))
+	await act(async () => jest.advanceTimersByTime(5320))
+	await act(async () => fireEvent.press(getByTestId('stop-area')))
 
 	expect(getByText('5.32')).toBeTruthy()
 	expect(getByText('+0.32 ズレ')).toBeTruthy()
 
-	act(() => fireEvent.press(getByText('つぎの人へ')))
+	await act(async () => fireEvent.press(getByText('つぎの人へ')))
 	expect(onDone).toHaveBeenCalledWith(5320)
 })
 
-it('3秒未満は数字が見え、3秒以降は「？？？」になる', () => {
-	const { getByText, getByTestId, queryByText } = setup()
-	act(() => fireEvent.press(getByText('タップでスタート')))
+it('3秒未満は数字が見え、3秒以降は「？？？」になる', async () => {
+	const { getByText, getByTestId, queryByText } = await setup()
+	await act(async () => fireEvent.press(getByText('タップでスタート')))
 
-	act(() => jest.advanceTimersByTime(1000))
+	await act(async () => jest.advanceTimersByTime(1000))
 	expect(getByTestId('timer-digits')).toBeTruthy()
 
-	act(() => jest.advanceTimersByTime(2100)) // 3.1秒経過
+	await act(async () => jest.advanceTimersByTime(2100)) // 3.1秒経過
 	expect(queryByText('？？？')).toBeTruthy()
 })
 
-it('スタート直後300ms未満のタップでは止まらない', () => {
-	const { getByText, getByTestId, queryByText } = setup()
-	act(() => fireEvent.press(getByText('タップでスタート')))
+it('スタート直後300ms未満のタップでは止まらない', async () => {
+	const { getByText, getByTestId, queryByText } = await setup()
+	await act(async () => fireEvent.press(getByText('タップでスタート')))
 
-	act(() => jest.advanceTimersByTime(100))
-	act(() => fireEvent.press(getByTestId('stop-area')))
+	await act(async () => jest.advanceTimersByTime(100))
+	await act(async () => fireEvent.press(getByTestId('stop-area')))
 	expect(queryByText('つぎの人へ')).toBeNull() // まだ record フェーズに進まない
 
-	act(() => jest.advanceTimersByTime(5000))
-	act(() => fireEvent.press(getByTestId('stop-area')))
+	await act(async () => jest.advanceTimersByTime(5000))
+	await act(async () => fireEvent.press(getByTestId('stop-area')))
 	expect(getByText('5.10')).toBeTruthy()
 })
 
-it('±0.05秒以内はぴったり賞の演出が出る', () => {
-	const { getByText, getByTestId } = setup()
-	act(() => fireEvent.press(getByText('タップでスタート')))
+it('±0.05秒以内はぴったり賞の演出が出る', async () => {
+	const { getByText, getByTestId } = await setup()
+	await act(async () => fireEvent.press(getByText('タップでスタート')))
 
-	act(() => jest.advanceTimersByTime(4980))
-	act(() => fireEvent.press(getByTestId('stop-area')))
+	await act(async () => jest.advanceTimersByTime(4980))
+	await act(async () => fireEvent.press(getByTestId('stop-area')))
 
 	expect(getByText(/ぴったり賞/)).toBeTruthy()
 	expect(getByText('4.98')).toBeTruthy()
@@ -854,19 +854,19 @@ afterEach(() => {
 const records = [4710, 4980, 5170, 5820] // 敗者: index 3（ユウタ）
 const names = ['アオイ', 'ミキ', 'ケン', 'ユウタ']
 
-it('1位から順にカードがめくれ、敗者はドラムロール後に発表される', () => {
-	const { getByText, queryByText } = render(
+it('1位から順にカードがめくれ、敗者はドラムロール後に発表される', async () => {
+	const { getByText, queryByText } = await render(
 		<FiveSecResult records={records} playerNames={names} onRetry={jest.fn()} onHome={jest.fn()} />,
 	)
 
 	// 最初は誰もめくれていない
 	expect(queryByText('ミキ')).toBeNull()
 
-	act(() => jest.advanceTimersByTime(REVEAL_INTERVAL_MS))
+	await act(async () => jest.advanceTimersByTime(REVEAL_INTERVAL_MS))
 	expect(getByText('ミキ')).toBeTruthy() // 1位: 4.98
 	expect(getByText('4.98')).toBeTruthy()
 
-	act(() => jest.advanceTimersByTime(REVEAL_INTERVAL_MS * 2))
+	await act(async () => jest.advanceTimersByTime(REVEAL_INTERVAL_MS * 2))
 	expect(getByText('ケン')).toBeTruthy()
 	expect(getByText('アオイ')).toBeTruthy()
 
@@ -874,22 +874,22 @@ it('1位から順にカードがめくれ、敗者はドラムロール後に発
 	expect(queryByText('ユウタ')).toBeNull()
 
 	// ドラムロール終了で敗者発表
-	act(() => jest.advanceTimersByTime(DRUMROLL_MS))
+	await act(async () => jest.advanceTimersByTime(DRUMROLL_MS))
 	expect(getByText('ユウタ')).toBeTruthy()
 	expect(getByText('5.82')).toBeTruthy()
 	expect(getByText(/敗者/)).toBeTruthy()
 })
 
-it('ぴったり賞のバッジが1位カードに出る', () => {
-	const { getByText } = render(
+it('ぴったり賞のバッジが1位カードに出る', async () => {
+	const { getByText } = await render(
 		<FiveSecResult records={records} playerNames={names} onRetry={jest.fn()} onHome={jest.fn()} />,
 	)
-	act(() => jest.advanceTimersByTime(REVEAL_INTERVAL_MS * 3 + DRUMROLL_MS))
+	await act(async () => jest.advanceTimersByTime(REVEAL_INTERVAL_MS * 3 + DRUMROLL_MS))
 	expect(getByText('ぴったり賞')).toBeTruthy()
 })
 
-it('同率最下位は複数人まとめて発表される', () => {
-	const { getByText, getAllByText } = render(
+it('同率最下位は複数人まとめて発表される', async () => {
+	const { getByText, getAllByText } = await render(
 		<FiveSecResult
 			records={[5300, 4700, 5000]}
 			playerNames={['A', 'B', 'C']}
@@ -897,21 +897,21 @@ it('同率最下位は複数人まとめて発表される', () => {
 			onHome={jest.fn()}
 		/>,
 	)
-	act(() => jest.advanceTimersByTime(REVEAL_INTERVAL_MS * 1 + DRUMROLL_MS))
+	await act(async () => jest.advanceTimersByTime(REVEAL_INTERVAL_MS * 1 + DRUMROLL_MS))
 	expect(getByText('A')).toBeTruthy()
 	expect(getByText('B')).toBeTruthy()
 	expect(getAllByText(/敗者/).length).toBeGreaterThanOrEqual(2)
 })
 
-it('発表完了後に「もう一回」でonRetryが呼ばれる', () => {
+it('発表完了後に「もう一回」でonRetryが呼ばれる', async () => {
 	const onRetry = jest.fn()
-	const { getByText, queryByText } = render(
+	const { getByText, queryByText } = await render(
 		<FiveSecResult records={records} playerNames={names} onRetry={onRetry} onHome={jest.fn()} />,
 	)
 	// 発表が終わるまでボタンは出ない
 	expect(queryByText('もう一回')).toBeNull()
-	act(() => jest.advanceTimersByTime(REVEAL_INTERVAL_MS * 3 + DRUMROLL_MS))
-	act(() => fireEvent.press(getByText('もう一回')))
+	await act(async () => jest.advanceTimersByTime(REVEAL_INTERVAL_MS * 3 + DRUMROLL_MS))
+	await act(async () => fireEvent.press(getByText('もう一回')))
 	expect(onRetry).toHaveBeenCalled()
 })
 ```
@@ -1195,46 +1195,46 @@ afterEach(() => {
 	jest.useRealTimers()
 })
 
-it('2人が順番に計測し、リザルトで敗者が発表される', () => {
-	const { getByText, getByTestId } = render(<FiveSecStopGame />)
+it('2人が順番に計測し、リザルトで敗者が発表される', async () => {
+	const { getByText, getByTestId } = await render(<FiveSecStopGame />)
 
 	// 1人目: アオイ（ぴったり賞）
 	expect(getByText('1人目 / 2人')).toBeTruthy()
 	expect(getByText('アオイ さんの番')).toBeTruthy()
-	act(() => fireEvent.press(getByText('タップでスタート')))
-	act(() => jest.advanceTimersByTime(4980))
-	act(() => fireEvent.press(getByTestId('stop-area')))
+	await act(async () => fireEvent.press(getByText('タップでスタート')))
+	await act(async () => jest.advanceTimersByTime(4980))
+	await act(async () => fireEvent.press(getByTestId('stop-area')))
 	expect(getByText(/ぴったり賞/)).toBeTruthy()
-	act(() => fireEvent.press(getByText('つぎの人へ')))
+	await act(async () => fireEvent.press(getByText('つぎの人へ')))
 
 	// 2人目: ユウタ（大きくズレて敗者）
 	expect(getByText('2人目 / 2人')).toBeTruthy()
-	act(() => fireEvent.press(getByText('タップでスタート')))
-	act(() => jest.advanceTimersByTime(5820))
-	act(() => fireEvent.press(getByTestId('stop-area')))
-	act(() => fireEvent.press(getByText('結果発表へ')))
+	await act(async () => fireEvent.press(getByText('タップでスタート')))
+	await act(async () => jest.advanceTimersByTime(5820))
+	await act(async () => fireEvent.press(getByTestId('stop-area')))
+	await act(async () => fireEvent.press(getByText('結果発表へ')))
 
 	// リザルト: 1位めくり → ドラムロール → 敗者発表
 	expect(getByText('けっか はっぴょう')).toBeTruthy()
-	act(() => jest.advanceTimersByTime(REVEAL_INTERVAL_MS + DRUMROLL_MS))
+	await act(async () => jest.advanceTimersByTime(REVEAL_INTERVAL_MS + DRUMROLL_MS))
 	expect(getByText('ユウタ')).toBeTruthy()
 	expect(getByText(/敗者/)).toBeTruthy()
 })
 
-it('「もう一回」で1人目からやり直せる', () => {
-	const { getByText, getByTestId } = render(<FiveSecStopGame />)
+it('「もう一回」で1人目からやり直せる', async () => {
+	const { getByText, getByTestId } = await render(<FiveSecStopGame />)
 
-	act(() => fireEvent.press(getByText('タップでスタート')))
-	act(() => jest.advanceTimersByTime(5100))
-	act(() => fireEvent.press(getByTestId('stop-area')))
-	act(() => fireEvent.press(getByText('つぎの人へ')))
-	act(() => fireEvent.press(getByText('タップでスタート')))
-	act(() => jest.advanceTimersByTime(5200))
-	act(() => fireEvent.press(getByTestId('stop-area')))
-	act(() => fireEvent.press(getByText('結果発表へ')))
-	act(() => jest.advanceTimersByTime(REVEAL_INTERVAL_MS + 2000))
+	await act(async () => fireEvent.press(getByText('タップでスタート')))
+	await act(async () => jest.advanceTimersByTime(5100))
+	await act(async () => fireEvent.press(getByTestId('stop-area')))
+	await act(async () => fireEvent.press(getByText('つぎの人へ')))
+	await act(async () => fireEvent.press(getByText('タップでスタート')))
+	await act(async () => jest.advanceTimersByTime(5200))
+	await act(async () => fireEvent.press(getByTestId('stop-area')))
+	await act(async () => fireEvent.press(getByText('結果発表へ')))
+	await act(async () => jest.advanceTimersByTime(REVEAL_INTERVAL_MS + 2000))
 
-	act(() => fireEvent.press(getByText('もう一回')))
+	await act(async () => fireEvent.press(getByText('もう一回')))
 	expect(getByText('1人目 / 2人')).toBeTruthy()
 	expect(getByText('アオイ さんの番')).toBeTruthy()
 })
