@@ -36,6 +36,12 @@ export function GradientButton({ title, onPress, disabled = false }: Props) {
 const styles = StyleSheet.create({
 	pressable: { borderRadius: radii.md, overflow: 'hidden' },
 	dimmed: { opacity: 0.6 },
-	gradient: { paddingVertical: spacing.md, alignItems: 'center', borderRadius: radii.md },
+	// paddingHorizontal: 幅詰めで使われた場合も文字が縁に張り付かないよう確保（PillButton と同じ spacing.md）
+	gradient: {
+		paddingVertical: spacing.md,
+		paddingHorizontal: spacing.md,
+		alignItems: 'center',
+		borderRadius: radii.md,
+	},
 	title: { ...typography.body, fontWeight: '700' },
 })
