@@ -6,10 +6,10 @@
 import type { LottieSource } from './lottie-effect'
 
 export const lottieAssets = {
-	/** ドラムロールのタメ（ループ再生） */
-	drumrollLoop: null as LottieSource | null,
-	/** 発表瞬間の紙吹雪・キラキラ（1回再生） */
-	celebrate: null as LottieSource | null,
+	/** ドラムロールのタメ（ループ再生）。素材ページに「Free to use under the Lottie Simple License」表記を確認済み */
+	drumrollLoop: require('@/assets/lottie/drumroll-loop.json') as LottieSource,
+	/** 発表瞬間の紙吹雪・キラキラ（1回再生）。素材ページに「Free to use under the Lottie Simple License」表記を確認済み */
+	celebrate: require('@/assets/lottie/celebrate.json') as LottieSource,
 	/** きまぐれ◯×カットインの背景（1回再生） */
 	cutinFlash: null as LottieSource | null,
 }

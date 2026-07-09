@@ -58,6 +58,11 @@ export const lottieAssets = {
 - `rolling`: `LottieEffect(drumrollLoop, loop)`。fallback = 現行の「？？？」パルス
 - `revealed`: `LottieEffect(celebrate)` を背面レイヤーで1回再生し、前面に children（「◯番！」ポップ）を現行のまま重ねる。fallback = 紙吹雪なし（現行と同一の見た目）
 
+**DrumrollReveal の `lottie` プロップ（2026-07-09 追記）**
+
+- `lottie={false}` で素材があっても reanimated 演出のみにするオプトアウトを用意
+- 5秒STOP の隠しタイマーは DrumrollReveal の「？？？」を流用しており、タイミング集中を妨げないよう `lottie={false}` で現状維持とする（ユーザー決定）
+
 **EventCutin**
 
 - `cutinFlash` を背面に1回再生。「きまぐれ発動！」＋イベント名テキストは現行のスケールインのまま前面。fallback = 現行と同一
