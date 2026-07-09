@@ -125,7 +125,7 @@ const styles = StyleSheet.create({
 	},
 	qMark: { fontSize: 16, fontWeight: '800', color: '#FFFFFF' },
 	howtoTitle: { ...typography.title },
-	summary: { ...typography.body, lineHeight: 26 },
+	summary: { ...typography.body, fontSize: 14, lineHeight: 22 },
 	detailBtn: {
 		borderWidth: 1,
 		borderColor: 'rgba(255,255,255,0.6)',
