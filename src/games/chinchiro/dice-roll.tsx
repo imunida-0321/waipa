@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import Animated, {
 	useAnimatedStyle,
@@ -7,7 +7,6 @@ import Animated, {
 	withSequence,
 	withTiming,
 } from 'react-native-reanimated'
-import { useEffect } from 'react'
 import { ConfettiBurst } from '@/components/game/confetti-burst'
 import { DrumrollReveal } from '@/components/game/drumroll-reveal'
 import { LottieEffect } from '@/components/game/lottie-effect'
@@ -57,7 +56,6 @@ export function DiceRoll({
 
 	const color = playerColor(playerIndex).value
 	const lastThrow = throws[throws.length - 1]
-	const lastHand = lastThrow && !lastThrow.shonben ? evaluateDice(lastThrow.dice) : null
 	const throwsLeft = MAX_THROWS - throws.length
 
 	useEffect(
@@ -69,7 +67,6 @@ export function DiceRoll({
 
 	const roll = () => {
 		playSound('tap')
-		haptics.tap()
 		const t = rollThrow(rng)
 		setPhase('rolling')
 		timer.current = setTimeout(() => {
@@ -156,25 +153,17 @@ export function DiceRoll({
 		)
 	}
 
-	// record: 最終役の確定表示
+	// record: 最終役の確定表示（確定役はその投の出目、ションベンは飛び出し表現）
 	const finalHand = resolveThrows(throws)
 	const handColor = CHIN.handColors[finalHand.type]
-	const lastDice = lastThrow?.dice
-	const showDice = lastHand !== null && lastDice // 確定役はその投の出目を見せる
 
 	return (
 		<View style={styles.container}>
 			{finalHand.type === 'pinzoro' && <ConfettiBurst />}
 			<Text style={styles.orderLabel}>{playerName} さんの記録</Text>
-			{showDice ? (
-				<Bowl>
-					<DiceRow dice={lastDice} />
-				</Bowl>
-			) : (
-				<Bowl shonben={lastThrow?.shonben} dice={lastThrow?.dice}>
-					{lastThrow && !lastThrow.shonben && <DiceRow dice={lastThrow.dice} />}
-				</Bowl>
-			)}
+			<Bowl shonben={lastThrow?.shonben} dice={lastThrow?.dice}>
+				{lastThrow && !lastThrow.shonben && <DiceRow dice={lastThrow.dice} />}
+			</Bowl>
 			<DrumrollReveal phase="revealed">
 				<Text style={[styles.handLabel, { color: handColor }]}>{handLabel(finalHand)}</Text>
 			</DrumrollReveal>
