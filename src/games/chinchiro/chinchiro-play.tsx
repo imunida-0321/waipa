@@ -129,15 +129,14 @@ export function ChinchiroPlay({ playerNames, onFinish, rng = Math.random }: Prop
 			</View>
 
 			<View style={styles.stage}>
-				{displayThrow && (
-					<Dice3D
-						dice={displayThrow.dice}
-						shonben={displayThrow.shonben}
-						rolling={status === 'rolling'}
-						rollId={rollId}
-						durationMs={ROLL_DURATION_MS}
-					/>
-				)}
+				{/* 初回投擲前もステージを見せる（待機中のサイコロを静止表示） */}
+				<Dice3D
+					dice={displayThrow ? displayThrow.dice : [2, 5, 3]}
+					shonben={displayThrow?.shonben ?? false}
+					rolling={status === 'rolling'}
+					rollId={rollId}
+					durationMs={ROLL_DURATION_MS}
+				/>
 			</View>
 
 			<View style={styles.statusArea}>
