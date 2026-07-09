@@ -41,7 +41,6 @@ jest.mock('@react-native-async-storage/async-storage', () =>
 	require('@react-native-async-storage/async-storage/jest/async-storage-mock'),
 )
 jest.mock('@/lib/players-store', () => {
-	// eslint-disable-next-line @typescript-eslint/no-require-imports
 	const actual = jest.requireActual('@/lib/players-store')
 	return {
 		...actual,
