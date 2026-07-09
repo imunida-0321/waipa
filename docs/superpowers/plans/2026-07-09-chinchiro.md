@@ -774,7 +774,6 @@ export function DiceRoll({
 
 	const roll = () => {
 		playSound('tap')
-		haptics.tap()
 		const t = rollThrow(rng)
 		setPhase('rolling')
 		timer.current = setTimeout(() => {
