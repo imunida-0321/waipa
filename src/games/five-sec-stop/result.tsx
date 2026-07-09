@@ -23,16 +23,33 @@ export function FiveSecResult({ records, playerNames, onRetry, onHome }: Props) 
 	const safeCount = ranked.filter((r) => !r.isLoser).length
 	const [revealed, setRevealed] = useState(0)
 	const drum = useDrumroll()
+	// drum.start は useDrumroll 内で useCallback(..., [durationMs]) により
+	// メモ化されており、durationMs は呼び出し側で固定値のため実質的に安定した参照。
+	const { start: drumStart } = drum
 
 	useEffect(() => {
-		if (revealed < safeCount) {
-			const t = setTimeout(() => setRevealed((n) => n + 1), REVEAL_INTERVAL_MS)
-			return () => clearTimeout(t)
+		// setInterval を1度だけ登録し、コールバック内で直接 clearInterval → drumStart() まで
+		// 完結させる。revealed の更新を見てから別の effect で drumStart を呼ぶ構成にすると、
+		// テスト環境の fake timer では 1 回の advanceTimersByTime あたり 1 hop しか
+		// 連鎖処理されない（次の setTimeout が登録されるのは effect の再実行後＝非同期の
+		// マイクロタスクフラッシュ後になるため）ため、複数区間をまたぐ待機を検証できない。
+		// タイマーコールバック内で直接次のタイマーを登録すればこの問題を回避できる。
+		if (safeCount === 0) {
+			drumStart()
+			return
 		}
-		drum.start()
-		// drum.start は revealed が safeCount に達した1回だけ呼ばれる
+		let count = 0
+		const id = setInterval(() => {
+			count += 1
+			setRevealed(count)
+			if (count >= safeCount) {
+				clearInterval(id)
+				drumStart()
+			}
+		}, REVEAL_INTERVAL_MS)
+		return () => clearInterval(id)
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [revealed, safeCount])
+	}, [safeCount])
 
 	const losersRevealed = drum.phase === 'revealed'
 
@@ -180,5 +197,11 @@ const styles = StyleSheet.create({
 		...typography.caption,
 		width: 48,
 		textAlign: 'right',
+	},
+	actions: {
+		marginTop: spacing.md,
+	},
+	actionGap: {
+		height: spacing.sm,
 	},
 })

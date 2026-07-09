@@ -39,8 +39,8 @@ afterEach(() => {
 const records = [4710, 4980, 5170, 5820] // 敗者: index 3（ユウタ）
 const names = ['アオイ', 'ミキ', 'ケン', 'ユウタ']
 
-it('ランキング結果が表示される', async () => {
-	const { getByText } = await render(
+it('1位から順にカードがめくれ、敗者はドラムロール後に発表される', async () => {
+	const { getByText, queryByText } = await render(
 		<FiveSecResult
 			records={records}
 			playerNames={names}
@@ -49,11 +49,28 @@ it('ランキング結果が表示される', async () => {
 		/>,
 	)
 
-	// タイトルが表示される
-	expect(getByText('けっか はっぴょう')).toBeTruthy()
+	// 最初は誰もめくれていない
+	expect(queryByText('ミキ')).toBeNull()
+
+	await act(async () => jest.advanceTimersByTime(REVEAL_INTERVAL_MS))
+	expect(getByText('ミキ')).toBeTruthy() // 1位: 4.98
+	expect(getByText('4.98')).toBeTruthy()
+
+	await act(async () => jest.advanceTimersByTime(REVEAL_INTERVAL_MS * 2))
+	expect(getByText('ケン')).toBeTruthy()
+	expect(getByText('アオイ')).toBeTruthy()
+
+	// 敗者はまだ伏せられている
+	expect(queryByText('ユウタ')).toBeNull()
+
+	// ドラムロール終了で敗者発表
+	await act(async () => jest.advanceTimersByTime(DRUMROLL_MS))
+	expect(getByText('ユウタ')).toBeTruthy()
+	expect(getByText('5.82')).toBeTruthy()
+	expect(getByText(/敗者/)).toBeTruthy()
 })
 
-it('ぴったり賞のバッジが最初の人に出る', async () => {
+it('ぴったり賞のバッジが1位カードに出る', async () => {
 	const { getByText } = await render(
 		<FiveSecResult
 			records={records}
@@ -62,29 +79,38 @@ it('ぴったり賞のバッジが最初の人に出る', async () => {
 			onHome={jest.fn()}
 		/>,
 	)
-	await act(async () => jest.runAllTimers())
+	await act(async () => jest.advanceTimersByTime(REVEAL_INTERVAL_MS * 3 + DRUMROLL_MS))
 	expect(getByText('ぴったり賞')).toBeTruthy()
 })
 
-it('レコード数分のカードが表示される', async () => {
-	const { queryByText } = await render(
+it('同率最下位は複数人まとめて発表される', async () => {
+	const { getByText, getAllByText } = await render(
 		<FiveSecResult
-			records={records}
-			playerNames={names}
+			records={[5300, 4700, 5000]}
+			playerNames={['A', 'B', 'C']}
 			onRetry={jest.fn()}
 			onHome={jest.fn()}
 		/>,
 	)
-	// 4つのカードがレンダリングされる（最初は全て隠れている）
-	expect(queryByText('けっか はっぴょう')).toBeTruthy()
+	await act(async () => jest.advanceTimersByTime(REVEAL_INTERVAL_MS * 1 + DRUMROLL_MS))
+	expect(getByText('A')).toBeTruthy()
+	expect(getByText('B')).toBeTruthy()
+	expect(getAllByText(/敗者/).length).toBeGreaterThanOrEqual(2)
 })
 
-it('Retry/Home ボタンのコールバックを受け取る', async () => {
+it('発表完了後に「もう一回」でonRetryが呼ばれる', async () => {
 	const onRetry = jest.fn()
-	const onHome = jest.fn()
 	const { getByText, queryByText } = await render(
-		<FiveSecResult records={records} playerNames={names} onRetry={onRetry} onHome={onHome} />,
+		<FiveSecResult
+			records={records}
+			playerNames={names}
+			onRetry={onRetry}
+			onHome={jest.fn()}
+		/>,
 	)
-	// ボタンは非表示（ゲーム中）
+	// 発表が終わるまでボタンは出ない
 	expect(queryByText('もう一回')).toBeNull()
+	await act(async () => jest.advanceTimersByTime(REVEAL_INTERVAL_MS * 3 + DRUMROLL_MS))
+	await act(async () => fireEvent.press(getByText('もう一回')))
+	expect(onRetry).toHaveBeenCalled()
 })
