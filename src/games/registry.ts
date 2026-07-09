@@ -34,6 +34,9 @@ export const games: readonly GameMeta[] = [
 		minPlayers: 2,
 		maxPlayers: 8,
 		requiresPlayers: true,
+		catchCopy: 'お会計の金額を一桁ずつルーレットで回し、\n誰が支払うかを決定します！',
+		summary:
+			'このゲームは、合計金額の各桁（千の位、百の位、十の位、一の位）を1桁ずつルーレットで決定し、その桁の金額を誰が支払うかをランダムに決めるゲームです！',
 		howToPlay: [
 			'① 一緒に遊ぶメンバーを登録しよう！（2〜8名、各自に色がつきます）',
 			'② お会計の合計金額を入力しよう！',
@@ -53,7 +56,6 @@ export const games: readonly GameMeta[] = [
 		catchCopy: '16個のボタンにハズレが2つ！\n勝敗は完全運ゲームで決まる！',
 		summary:
 			'このゲームは、16個のボタンから1つを選ぶだけ！中には「全員アウト」と「あなただけアウト」の2つのハズレが潜んでいる、完全運ゲーです！',
-		// eslint-disable-next-line @typescript-eslint/no-require-imports
 		thumbnail: require('@/assets/images/bomb/bg.jpg'),
 		howToPlay: [
 			'① 16個のボタンのどこかに爆弾が2個…（💣1人負け ＋ 💥全員負け）',
