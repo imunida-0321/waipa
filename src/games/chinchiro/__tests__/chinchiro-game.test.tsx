@@ -85,6 +85,8 @@ it('2人が順番に振り、リザルトで敗者が発表される', async () 
 	await act(async () => fireEvent.press(getByTestId('roll-button')))
 	await act(async () => jest.advanceTimersByTime(ROLL_DURATION_MS))
 	expect(getByText('アラシ（6）！')).toBeTruthy()
+	// アラシはピンゾロ以外の役なので「この役で確定」を選ぶ
+	await act(async () => fireEvent.press(getByText('この役で確定')))
 
 	// 丸ボタンで次プレイヤーの投擲が即開始 → 2人目: ユウタ（ヒフミ）
 	await act(async () => fireEvent.press(getByTestId('roll-button')))
@@ -92,6 +94,7 @@ it('2人が順番に振り、リザルトで敗者が発表される', async () 
 	expect(getByText('ユウタ さんの番')).toBeTruthy()
 	await act(async () => jest.advanceTimersByTime(ROLL_DURATION_MS))
 	expect(getByText('ヒフミ…')).toBeTruthy()
+	await act(async () => fireEvent.press(getByText('この役で確定')))
 
 	// 最終プレイヤーの settled 後の押下でリザルトへ
 	await act(async () => fireEvent.press(getByTestId('roll-button')))
@@ -104,11 +107,13 @@ it('2人が順番に振り、リザルトで敗者が発表される', async () 
 it('「もう一回」で1人目からやり直せる', async () => {
 	const { getByText, getByTestId } = await render(<ChinchiroGame />)
 
-	// 1人目 → 2人目 → リザルト（すべて同じ丸ボタン）
+	// 1人目 → 2人目 → リザルト（すべて同じ丸ボタン。役が出たら都度「この役で確定」を選ぶ）
 	await act(async () => fireEvent.press(getByTestId('roll-button')))
 	await act(async () => jest.advanceTimersByTime(ROLL_DURATION_MS))
+	await act(async () => fireEvent.press(getByText('この役で確定')))
 	await act(async () => fireEvent.press(getByTestId('roll-button')))
 	await act(async () => jest.advanceTimersByTime(ROLL_DURATION_MS))
+	await act(async () => fireEvent.press(getByText('この役で確定')))
 	await act(async () => fireEvent.press(getByTestId('roll-button')))
 	await act(async () => jest.advanceTimersByTime(REVEAL_INTERVAL_MS + DRUMROLL_MS))
 

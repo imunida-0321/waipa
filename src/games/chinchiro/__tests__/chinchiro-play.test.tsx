@@ -70,7 +70,7 @@ function pressRoll(getByTestId: (id: string) => unknown) {
 	fireEvent.press(getByTestId('roll-button') as never)
 }
 
-it('丸ボタンで振って役確定→settled→もう一度押すと次プレイヤーの投擲が即始まる', async () => {
+it('丸ボタンで振って役が出ると確定/振り直しを選べる→確定押下でsettled→もう一度押すと次プレイヤーの投擲が即始まる', async () => {
 	const { getByText, getByTestId, queryByText } = await setup([
 		0.9,
 		die(4),
@@ -90,8 +90,14 @@ it('丸ボタンで振って役確定→settled→もう一度押すと次プレ
 	expect(queryByText('シゴロ！')).toBeNull()
 	await act(async () => jest.advanceTimersByTime(ROLL_DURATION_MS))
 
-	// settled: シゴロ確定
+	// choice: シゴロが出て「この役で確定」か振り直しかを選べる
 	expect(getByText('シゴロ！')).toBeTruthy()
+	expect(getByText('この役で確定')).toBeTruthy()
+
+	// 確定押下 → settled（次プレイヤーへのヒント表示）
+	await act(async () => fireEvent.press(getByText('この役で確定')))
+	expect(queryByText('この役で確定')).toBeNull()
+	expect(getByText(/つぎ:/)).toBeTruthy()
 
 	// もう一度押すと次プレイヤーの投擲が即開始（2人目・rolling）
 	await act(async () => pressRoll(getByTestId))
@@ -100,8 +106,42 @@ it('丸ボタンで振って役確定→settled→もう一度押すと次プレ
 	expect(getByText('コロコロコロ…')).toBeTruthy()
 })
 
-it('役なし3投で目なし確定になる', async () => {
-	const { getByText, getByTestId } = await setup([
+it('役が出ても振り直すと前の役は捨てられ、最後の投の結果で確定する（上書きの検証）', async () => {
+	const { getByText, getByTestId } = await setup(
+		[
+			0.9,
+			die(4),
+			die(5),
+			die(6), // 1投目: シゴロ → choice
+			0.9,
+			die(2),
+			die(4),
+			die(6), // 2投目: 役なし（振り直し）
+			0.9,
+			die(1),
+			die(3),
+			die(5), // 3投目: 役なし → 目なし確定
+		],
+		['アオイ'],
+	)
+
+	await act(async () => pressRoll(getByTestId))
+	await act(async () => jest.advanceTimersByTime(ROLL_DURATION_MS))
+	expect(getByText('シゴロ！')).toBeTruthy()
+	expect(getByText('この役で確定')).toBeTruthy()
+
+	// 確定を押さず丸ボタンで振り直す
+	await act(async () => pressRoll(getByTestId))
+	await act(async () => jest.advanceTimersByTime(ROLL_DURATION_MS))
+	expect(getByText('役なし…')).toBeTruthy()
+
+	await act(async () => pressRoll(getByTestId))
+	await act(async () => jest.advanceTimersByTime(ROLL_DURATION_MS))
+	expect(getByText('目なし…')).toBeTruthy()
+})
+
+it('役なし3投で目なし確定になる（choice にならない）', async () => {
+	const { getByText, getByTestId, queryByText } = await setup([
 		0.9,
 		die(2),
 		die(4),
@@ -119,6 +159,8 @@ it('役なし3投で目なし確定になる', async () => {
 	await act(async () => pressRoll(getByTestId))
 	await act(async () => jest.advanceTimersByTime(ROLL_DURATION_MS))
 	expect(getByText('役なし…')).toBeTruthy()
+	// 役なしは choice にならない（確定ボタンが出ない）
+	expect(queryByText('この役で確定')).toBeNull()
 
 	await act(async () => pressRoll(getByTestId))
 	await act(async () => jest.advanceTimersByTime(ROLL_DURATION_MS))
@@ -152,14 +194,19 @@ it('ションベン表示と投数消費', async () => {
 	expect(getByText('5の目')).toBeTruthy()
 })
 
-it('ピンゾロで紙吹雪が出る', async () => {
-	const { getByText, getByTestId } = await setup([0.9, die(1), die(1), die(1)], ['アオイ'])
+it('ピンゾロは即確定（この役で確定は出ない）で紙吹雪が出る', async () => {
+	const { getByText, getByTestId, queryByText } = await setup(
+		[0.9, die(1), die(1), die(1)],
+		['アオイ'],
+	)
 
 	await act(async () => pressRoll(getByTestId))
 	await act(async () => jest.advanceTimersByTime(ROLL_DURATION_MS))
 
 	expect(getByText('ピンゾロ！')).toBeTruthy()
 	expect(getByTestId('confetti-burst')).toBeTruthy()
+	// ピンゾロは choice を経由せず自動確定する
+	expect(queryByText('この役で確定')).toBeNull()
 })
 
 it('最終プレイヤー settled 後のボタン押下で onFinish が全員分の Hand で呼ばれる', async () => {
@@ -177,15 +224,17 @@ it('最終プレイヤー settled 後のボタン押下で onFinish が全員分
 		['アオイ', 'ユウタ'],
 	)
 
-	// 1人目: シゴロ確定 → 次へ
+	// 1人目: シゴロ → 確定 → 次へ
 	await act(async () => pressRoll(getByTestId))
 	await act(async () => jest.advanceTimersByTime(ROLL_DURATION_MS))
 	expect(getByText('シゴロ！')).toBeTruthy()
+	await act(async () => fireEvent.press(getByText('この役で確定')))
 	await act(async () => pressRoll(getByTestId))
 
-	// 2人目（最終）: ヒフミ確定
+	// 2人目（最終）: ヒフミ → 確定
 	await act(async () => jest.advanceTimersByTime(ROLL_DURATION_MS))
 	expect(getByText('ヒフミ…')).toBeTruthy()
+	await act(async () => fireEvent.press(getByText('この役で確定')))
 	expect(onFinish).not.toHaveBeenCalled()
 
 	// 最終プレイヤーの settled 後にボタン → onFinish

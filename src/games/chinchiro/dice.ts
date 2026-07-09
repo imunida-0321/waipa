@@ -38,14 +38,11 @@ export function evaluateDice(dice: [number, number, number]): Hand | null {
 	return null
 }
 
-// 投列から最終役を決める。ションベン投は無効。確定役が出ていなければ目なし
+// 最終役は「最後の投」で決まる（振り直しは前の役を捨てる）。最後がションベン/役なしなら目なし
 export function resolveThrows(throws: Throw[]): Hand {
-	for (const t of throws) {
-		if (t.shonben) continue
-		const hand = evaluateDice(t.dice)
-		if (hand) return hand
-	}
-	return NOME
+	const last = throws[throws.length - 1]
+	if (!last || last.shonben) return NOME
+	return evaluateDice(last.dice) ?? NOME
 }
 
 export function handLabel(hand: Hand): string {

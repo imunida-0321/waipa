@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Pressable, StyleSheet, Text, View } from 'react-native'
 import { ConfettiBurst } from '@/components/game/confetti-burst'
 import { DrumrollReveal } from '@/components/game/drumroll-reveal'
+import { SecondaryButton } from '@/components/ui/secondary-button'
 import { haptics } from '@/lib/haptics'
 import { playSound } from '@/lib/sound'
 import { playerColor } from '@/theme/player-colors'
@@ -28,7 +29,7 @@ type Props = {
 	rng?: () => number
 }
 
-type Status = 'idle' | 'rolling' | 'open' | 'settled'
+type Status = 'idle' | 'rolling' | 'open' | 'choice' | 'settled'
 
 // 1ラウンド全体を管理する。3D シーンは常設で、画面下の丸ボタンを押すたびに現在プレイヤーが振る。
 // 役確定/3投終了で settled になり、次の人が同じ丸ボタンを押すとそのまま次の投擲が始まる。
@@ -78,17 +79,24 @@ export function ChinchiroPlay({ playerNames, onFinish, rng = Math.random }: Prop
 		timer.current = setTimeout(() => {
 			const hand = t.shonben ? null : evaluateDice(t.dice)
 			const isLast = nextThrows.length >= MAX_THROWS
-			if (hand || isLast) {
-				if (hand?.type === 'pinzoro') {
-					haptics.success()
-					playSound('reveal')
-				} else if (t.shonben) {
+			if (hand?.type === 'pinzoro') {
+				// ピンゾロのみ即確定
+				haptics.success()
+				playSound('reveal')
+				setStatus('settled')
+			} else if (isLast) {
+				// 3投目はションベン/役なし/役ありを問わず常にそこで確定
+				if (t.shonben) {
 					haptics.heavy()
 					playSound('event')
 				} else {
 					haptics.heavy()
 				}
 				setStatus('settled')
+			} else if (hand) {
+				// ピンゾロ以外の役は「この役で確定」or「もう一度振る」を選ばせる
+				haptics.heavy()
+				setStatus('choice')
 			} else {
 				if (t.shonben) {
 					haptics.heavy()
@@ -120,11 +128,17 @@ export function ChinchiroPlay({ playerNames, onFinish, rng = Math.random }: Prop
 			advance()
 			return
 		}
-		// idle（未投）or open（残投あり）→ 振る
+		// idle（未投）/ open（残投あり）/ choice（役を確定せず振り直し）→ 振る
 		roll(throws)
 	}
 
-	const finalHand = status === 'settled' ? resolveThrows(throws) : null
+	// choice で「この役で確定」を押したとき: 役は resolveThrows が最後の投から導く
+	const onConfirmHand = () => {
+		haptics.heavy()
+		setStatus('settled')
+	}
+
+	const finalHand = status === 'settled' || status === 'choice' ? resolveThrows(throws) : null
 	const shonben = displayThrow?.shonben ?? false
 	const orderLabel =
 		`${playerIndex + 1}人目 / ${playerCount}人` +
@@ -166,7 +180,7 @@ export function ChinchiroPlay({ playerNames, onFinish, rng = Math.random }: Prop
 						{shonben ? 'ションベン！' : '役なし…'}
 					</Text>
 				)}
-				{status === 'settled' && finalHand && (
+				{(status === 'settled' || status === 'choice') && finalHand && (
 					<DrumrollReveal phase="revealed">
 						<Text
 							style={[styles.handLabel, { color: CHIN.handColors[finalHand.type] }]}
@@ -178,6 +192,11 @@ export function ChinchiroPlay({ playerNames, onFinish, rng = Math.random }: Prop
 			</View>
 
 			<View style={styles.bottom}>
+				{status === 'choice' && (
+					<View style={styles.confirmButton}>
+						<SecondaryButton title="この役で確定" onPress={onConfirmHand} />
+					</View>
+				)}
 				<Pressable
 					testID="roll-button"
 					accessibilityRole="button"
@@ -218,6 +237,8 @@ function hintText(
 			return '　'
 		case 'open':
 			return `${shonben ? '丼から飛び出た！ ' : ''}のこり${throwsLeft}投！`
+		case 'choice':
+			return `もう一度振る？（のこり${throwsLeft}投）`
 		case 'settled':
 			return isLastPlayer ? '結果発表へ' : `つぎ: ${nextName ?? ''} さん ▶ ボタンで振る`
 	}
@@ -283,6 +304,10 @@ const styles = StyleSheet.create({
 	bottom: {
 		alignItems: 'center',
 		marginTop: spacing.md,
+	},
+	confirmButton: {
+		marginBottom: spacing.md,
+		minWidth: 200,
 	},
 	rollButton: {
 		width: 72,

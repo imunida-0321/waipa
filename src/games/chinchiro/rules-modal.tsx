@@ -114,7 +114,7 @@ export function RulesModal({ visible, onClose }: Props) {
 
 						<Text style={styles.footnote}>
 							※
-							このアプリでは賭けはありません。役なし・ションベンは3投まで振り直しでき、3投して役がなければ「目なし」。全員の役を比べて一番弱い人が負けです（同率はサドンデス）。
+							このアプリでは賭けはありません。ピンゾロは出た瞬間に確定。それ以外は3投まで振り直せます（振り直すと前の役は捨てて、最後の投の結果で確定。役がなければ「目なし」）。全員の役を比べて一番弱い人が負けです（同率はサドンデス）。
 						</Text>
 					</ScrollView>
 					<SecondaryButton title="とじる" onPress={onClose} />

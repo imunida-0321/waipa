@@ -62,9 +62,8 @@ describe('rollThrow', () => {
 describe('resolveThrows', () => {
 	const t = (dice: [number, number, number], shonben = false): Throw => ({ dice, shonben })
 
-	it('確定役が出た投の役を返す', () => {
+	it('単投で役が出ればその役を返す', () => {
 		expect(resolveThrows([t([4, 5, 6])]).type).toBe('shigoro')
-		expect(resolveThrows([t([2, 4, 6]), t([3, 3, 2])]).type).toBe('me')
 	})
 
 	it('3投役なしなら目なし', () => {
@@ -72,9 +71,21 @@ describe('resolveThrows', () => {
 		expect(hand).toEqual({ type: 'nome', value: 0, score: 10 })
 	})
 
-	it('ションベン投は無視される（3投目ションベンなら目なし）', () => {
-		const hand = resolveThrows([t([2, 4, 6]), t([1, 1, 1], true), t([2, 4, 6])])
-		expect(hand.type).toBe('nome') // ピンゾロが出た投はションベンなので無効
+	it('最後がションベンなら目なし', () => {
+		const hand = resolveThrows([t([2, 4, 6]), t([2, 4, 6]), t([1, 1, 1], true)])
+		expect(hand.type).toBe('nome')
+	})
+
+	it('役が出た後に振り直すと前の役は捨てられ、最後の投で上書きされる', () => {
+		// 1投目シゴロ → 振り直し → 2投目役なし。シゴロは捨てられ最終役は目なし
+		const hand = resolveThrows([t([4, 5, 6]), t([2, 4, 6])])
+		expect(hand).toEqual({ type: 'nome', value: 0, score: 10 })
+	})
+
+	it('役なしの後に目が出れば目で確定', () => {
+		const hand = resolveThrows([t([2, 4, 6]), t([3, 3, 5])])
+		expect(hand.type).toBe('me')
+		expect(hand.value).toBe(5)
 	})
 })
 
