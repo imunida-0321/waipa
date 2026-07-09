@@ -40,6 +40,12 @@ export function ChinchiroPlay({ playerNames, onFinish, rng = Math.random }: Prop
 	// ラウンド通算の投数カウンタ。投ごとに +1 して Dice3D のアニメをリスタートさせる
 	const [rollId, setRollId] = useState(0)
 	const timer = useRef<ReturnType<typeof setTimeout> | null>(null)
+	// 高速ダブルタップで advance/roll が二重実行されるのを防ぐ（state コミット前の再入ガード）
+	const pressGuard = useRef(false)
+
+	useEffect(() => {
+		pressGuard.current = false
+	}, [status, playerIndex])
 
 	const playerCount = playerNames.length
 	const playerName = playerNames[playerIndex] ?? ''
@@ -104,7 +110,8 @@ export function ChinchiroPlay({ playerNames, onFinish, rng = Math.random }: Prop
 	}
 
 	const onButtonPress = () => {
-		if (status === 'rolling') return
+		if (pressGuard.current || status === 'rolling') return
+		pressGuard.current = true
 		if (status === 'settled') {
 			advance()
 			return
