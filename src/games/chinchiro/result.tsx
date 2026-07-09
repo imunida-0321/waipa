@@ -12,6 +12,7 @@ import {
 	handLabel,
 	NOME,
 	rankPlayers,
+	rollSoundFor,
 	rollThrow,
 	type Hand,
 	type Ranked,
@@ -161,8 +162,8 @@ function SuddenDeath({
 	const currentPlayer = round[turn]
 
 	const roll = () => {
-		playSound('tap')
 		const t = rollThrow(rng)
+		playSound(rollSoundFor(t))
 		setRolling(true)
 		timer.current = setTimeout(() => {
 			const hand = t.shonben ? NOME : (evaluateDice(t.dice) ?? NOME)

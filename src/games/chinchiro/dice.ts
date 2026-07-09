@@ -74,3 +74,8 @@ export function rankPlayers(hands: Hand[]): Ranked[] {
 	const worst = sorted[sorted.length - 1]?.hand.score ?? 0
 	return sorted.map((e) => ({ ...e, isLoser: e.hand.score === worst }))
 }
+
+// 転がり効果音の選択。出目合計の偶奇で2種を切り替える（3個の合計の偶奇は50/50のランダム）
+export function rollSoundFor(t: Throw): 'diceRoll1' | 'diceRoll2' {
+	return (t.dice[0] + t.dice[1] + t.dice[2]) % 2 === 0 ? 'diceRoll1' : 'diceRoll2'
+}

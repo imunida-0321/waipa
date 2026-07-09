@@ -10,12 +10,14 @@ import {
 	evaluateDice,
 	handLabel,
 	resolveThrows,
+	rollSoundFor,
 	rollThrow,
 	MAX_THROWS,
 	type Hand,
 	type Throw,
 } from './dice'
 import { Dice3D } from './dice-3d'
+import { RulesModal } from './rules-modal'
 import { CHIN } from './theme'
 
 export const ROLL_DURATION_MS = 1200
@@ -39,6 +41,7 @@ export function ChinchiroPlay({ playerNames, onFinish, rng = Math.random }: Prop
 	const [displayThrow, setDisplayThrow] = useState<Throw | null>(null)
 	// ラウンド通算の投数カウンタ。投ごとに +1 して Dice3D のアニメをリスタートさせる
 	const [rollId, setRollId] = useState(0)
+	const [rulesOpen, setRulesOpen] = useState(false)
 	const timer = useRef<ReturnType<typeof setTimeout> | null>(null)
 	// 高速ダブルタップで advance/roll が二重実行されるのを防ぐ（state コミット前の再入ガード）
 	const pressGuard = useRef(false)
@@ -63,9 +66,10 @@ export function ChinchiroPlay({ playerNames, onFinish, rng = Math.random }: Prop
 	// 1投ぶんの実行: rollThrow → 転がり(1.2秒) → 役判定で open/settled へ。
 	// prevThrows は現在プレイヤーの既存投列（次プレイヤーへ進む際は空配列を渡す）。
 	const roll = (prevThrows: Throw[]) => {
-		playSound('tap')
 		haptics.tap()
 		const t = rollThrow(rng)
+		// 転がり音は2種をランダム再生。出目合計の偶奇で選ぶ（50/50。rng を余分に消費しない）
+		playSound(rollSoundFor(t))
 		const nextThrows = [...prevThrows, t]
 		setDisplayThrow(t)
 		setThrows(nextThrows)
@@ -134,6 +138,15 @@ export function ChinchiroPlay({ playerNames, onFinish, rng = Math.random }: Prop
 				<View style={[styles.colorDot, { backgroundColor: color }]} />
 				<Text style={styles.name}>{playerName} さんの番</Text>
 			</View>
+			<Pressable
+				accessibilityRole="button"
+				testID="rules-button"
+				style={({ pressed }) => [styles.rulesButton, pressed && styles.rulesButtonPressed]}
+				onPress={() => setRulesOpen(true)}
+			>
+				<Text style={styles.rulesButtonText}>🎲 役の早見表</Text>
+			</Pressable>
+			<RulesModal visible={rulesOpen} onClose={() => setRulesOpen(false)} />
 
 			<View style={styles.stage}>
 				{/* 初回投擲前もステージを見せる（待機中のサイコロを静止表示） */}
@@ -236,6 +249,20 @@ const styles = StyleSheet.create({
 	},
 	name: {
 		...typography.title,
+	},
+	rulesButton: {
+		borderWidth: 1,
+		borderColor: colors.surfaceBorder,
+		borderRadius: radii.pill,
+		paddingVertical: spacing.xs,
+		paddingHorizontal: spacing.md,
+	},
+	rulesButtonPressed: {
+		backgroundColor: colors.surface,
+	},
+	rulesButtonText: {
+		...typography.caption,
+		color: colors.text,
 	},
 	stage: {
 		flex: 1,
