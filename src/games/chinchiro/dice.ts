@@ -14,7 +14,7 @@ export type Throw = { dice: [number, number, number]; shonben: boolean }
 
 export type Ranked = { playerIndex: number; hand: Hand; isLoser: boolean }
 
-const NOME: Hand = { type: 'nome', value: 0, score: 10 }
+export const NOME: Hand = { type: 'nome', value: 0, score: 10 }
 
 // 1投ぶん: ションベン判定(5%) → 出目3個。rng は [0,1) を返す想定
 export function rollThrow(rng: () => number): Throw {

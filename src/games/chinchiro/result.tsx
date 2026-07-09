@@ -7,13 +7,20 @@ import { playSound } from '@/lib/sound'
 import { haptics } from '@/lib/haptics'
 import { playerColor } from '@/theme/player-colors'
 import { colors, radii, spacing, typography } from '@/theme/tokens'
-import { evaluateDice, handLabel, rankPlayers, rollThrow, type Hand, type Ranked } from './dice'
+import {
+	evaluateDice,
+	handLabel,
+	NOME,
+	rankPlayers,
+	rollThrow,
+	type Hand,
+	type Ranked,
+} from './dice'
 import { IsoDie } from './iso-die'
 import { CHIN } from './theme'
 
 export const REVEAL_INTERVAL_MS = 600
 const SUDDEN_ROLL_MS = 1200
-const NOME: Hand = { type: 'nome', value: 0, score: 10 }
 
 type Props = {
 	hands: Hand[]
@@ -110,7 +117,7 @@ export function ChinchiroResult({ hands, playerNames, onRetry, onHome, rng = Mat
 				<>
 					{/* 名前は各 RankCard の「敗者！」バッジで既に表示済みのため、ここでは repeat しない
 					   （同じ名前を持つ Text ノードが複数出来ると a11y クエリが曖昧になるのを避ける） */}
-					<Text style={styles.loserBanner}>負けが決定しました…</Text>
+					<Text style={styles.loserBanner}>＼ 罰ゲームけってい！ ／</Text>
 					<View style={styles.actions}>
 						<GradientButton title="もう一回" onPress={onRetry} />
 						<View style={styles.actionGap} />
@@ -138,7 +145,10 @@ function SuddenDeath({
 	const [turn, setTurn] = useState(0)
 	const [results, setResults] = useState<Hand[]>([])
 	const [rolling, setRolling] = useState(false)
-	const [lastDice, setLastDice] = useState<[number, number, number] | null>(null)
+	const [lastResult, setLastResult] = useState<{
+		name: string
+		dice: [number, number, number] | null
+	} | null>(null)
 	const timer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
 	useEffect(
@@ -156,7 +166,8 @@ function SuddenDeath({
 		setRolling(true)
 		timer.current = setTimeout(() => {
 			const hand = t.shonben ? NOME : (evaluateDice(t.dice) ?? NOME)
-			setLastDice(t.shonben ? null : t.dice)
+			setLastResult({ name: playerNames[currentPlayer], dice: t.shonben ? null : t.dice })
+			if (t.shonben) playSound('event')
 			setRolling(false)
 			const nextResults = [...results, hand]
 			if (turn + 1 < round.length) {
@@ -192,21 +203,30 @@ function SuddenDeath({
 				<Text style={styles.suddenRolling}>コロコロコロ…</Text>
 			) : (
 				<>
-					{lastDice && (
-						<View style={styles.suddenDice}>
-							<IsoDie
-								value={lastDice[0] as 1 | 2 | 3 | 4 | 5 | 6}
-								size={36}
-								tilt={-6}
-							/>
-							<IsoDie value={lastDice[1] as 1 | 2 | 3 | 4 | 5 | 6} size={40} />
-							<IsoDie
-								value={lastDice[2] as 1 | 2 | 3 | 4 | 5 | 6}
-								size={36}
-								tilt={8}
-							/>
-						</View>
-					)}
+					{lastResult &&
+						(lastResult.dice ? (
+							<View style={styles.suddenDice}>
+								<Text style={styles.suddenLastLabel}>{lastResult.name} さん:</Text>
+								<IsoDie
+									value={lastResult.dice[0] as 1 | 2 | 3 | 4 | 5 | 6}
+									size={36}
+									tilt={-6}
+								/>
+								<IsoDie
+									value={lastResult.dice[1] as 1 | 2 | 3 | 4 | 5 | 6}
+									size={40}
+								/>
+								<IsoDie
+									value={lastResult.dice[2] as 1 | 2 | 3 | 4 | 5 | 6}
+									size={36}
+									tilt={8}
+								/>
+							</View>
+						) : (
+							<Text style={styles.suddenShonben}>
+								{lastResult.name} さん: ションベン！（目なし扱い）
+							</Text>
+						))}
 					<Text style={styles.suddenName}>{playerNames[currentPlayer]} さんの番</Text>
 					<GradientButton title="タップで振る！" onPress={roll} />
 				</>
@@ -323,6 +343,15 @@ const styles = StyleSheet.create({
 	suddenRolling: {
 		...typography.body,
 		color: colors.textMuted,
+	},
+	suddenLastLabel: {
+		...typography.caption,
+		color: colors.textMuted,
+	},
+	suddenShonben: {
+		...typography.body,
+		color: CHIN.handColors.hifumi,
+		fontWeight: '700',
 	},
 	suddenDice: {
 		flexDirection: 'row',

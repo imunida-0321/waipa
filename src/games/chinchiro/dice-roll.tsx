@@ -86,7 +86,10 @@ export function DiceRoll({
 				}
 				setPhase('record')
 			} else {
-				if (t.shonben) playSound('event')
+				if (t.shonben) {
+					haptics.heavy()
+					playSound('event')
+				}
 				setPhase('open')
 			}
 		}, ROLL_DURATION_MS)
