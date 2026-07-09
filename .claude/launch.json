@@ -6,6 +6,15 @@
 			"runtimeExecutable": "bunx",
 			"runtimeArgs": ["expo", "start", "--web", "--port", "8090"],
 			"port": 8090
+		},
+		{
+			"name": "chinchiro-web",
+			"runtimeExecutable": "bash",
+			"runtimeArgs": [
+				"-c",
+				"cd /Users/hiro/Desktop/Waipa/.claude/worktrees/chinchiro && npx expo start --web --port 8095"
+			],
+			"port": 8095
 		}
 	]
 }

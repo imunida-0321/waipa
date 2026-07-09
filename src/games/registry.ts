@@ -19,8 +19,16 @@ export type GameMeta = {
 	catchCopy?: string
 	/** イントロ画面の遊び方ダイジェスト。未指定なら howToPlay を連結 */
 	summary?: string
-	/** イントロ画面のサムネイル画像（require）。未指定なら絵文字＋グラデ */
+	/**
+	 * イントロ画面のサムネイル画像（1:1・512px 推奨）。未指定なら絵文字＋グラデ。
+	 * 命名規則: assets/images/<ゲームID>/intro.jpg（ゲーム内背景と兼用する場合は bg.jpg 可）
+	 */
 	thumbnail?: number
+	/**
+	 * ホームカードのキービジュアル（1.3:1・1040x800 推奨、タイトル文字入り前提）。未指定なら絵文字＋グラデ。
+	 * 命名規則: assets/images/<ゲームID>/card.jpg
+	 */
+	cardThumbnail?: number
 	howToPlay: readonly string[]
 	Component: ComponentType
 }
@@ -39,7 +47,8 @@ export const games: readonly GameMeta[] = [
 		catchCopy: 'お会計の金額を一桁ずつルーレットで回し、\n誰が支払うかを決定します！',
 		summary:
 			'このゲームは、合計金額の各桁（千の位、百の位、十の位、一の位）を1桁ずつルーレットで決定し、その桁の金額を誰が支払うかをランダムに決めるゲームです！',
-		thumbnail: require('@/assets/images/who-will-pay/thumb.jpg'),
+		thumbnail: require('@/assets/images/who-will-pay/intro.jpg'),
+		cardThumbnail: require('@/assets/images/who-will-pay/card.jpg'),
 		howToPlay: [
 			'① 一緒に遊ぶメンバーを登録しよう！（2〜8名、各自に色がつきます）',
 			'② お会計の合計金額を入力しよう！',
