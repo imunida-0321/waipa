@@ -132,9 +132,9 @@ export function ChinchiroPlay({ playerNames, onFinish, rng = Math.random }: Prop
 		roll(throws)
 	}
 
-	// choice で「この役で確定」を押したとき: 役は resolveThrows が最後の投から導く
+	// choice で「この役で確定」を押したとき: 役は resolveThrows が最後の投から導く。
+	// haptics は SecondaryButton 内蔵の tap に任せる（明示呼び出しを重ねると二重発火する）
 	const onConfirmHand = () => {
-		haptics.heavy()
 		setStatus('settled')
 	}
 
