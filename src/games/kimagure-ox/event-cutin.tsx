@@ -52,7 +52,7 @@ export function EventCutin({ event, onDone }: Props) {
 
 const styles = StyleSheet.create({
 	backdrop: {
-		...StyleSheet.absoluteFillObject,
+		...StyleSheet.absoluteFill,
 		backgroundColor: 'rgba(10,8,24,0.85)',
 		alignItems: 'center',
 		justifyContent: 'center',
