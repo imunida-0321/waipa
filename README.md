@@ -21,7 +21,7 @@
 - Expo (React Native) — iOS / Android
 - Supabase — 認証・お題配信・課金検証
 - AdMob — 広告（収益の主軸）
-- RevenueCat — プレミアム課金（月額 ¥120 / 年額 ¥1,100）
+- RevenueCat — プレミアム課金（月額 ¥150 / 年額 ¥1,100）
 
 ## 開発フロー
 
