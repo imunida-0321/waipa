@@ -31,7 +31,7 @@ assets/lottie/
 
 ```ts
 type Props = {
-	source: number | null // lottie-assets.ts のエントリ。null なら fallback
+	source: LottieSource | null // lottie-assets.ts のエントリ（LottieView の source 型）。null なら fallback
 	loop?: boolean
 	fallback?: ReactNode // 素材なし・読み込み失敗時に表示（省略時は何も出さない）
 	style?: StyleProp<ViewStyle>
@@ -45,9 +45,9 @@ type Props = {
 ```ts
 // lottie-assets.ts — 素材を入手したら null を require に差し替える
 export const lottieAssets = {
-	drumrollLoop: null as number | null, // 例: require('@/assets/lottie/drumroll-loop.json')
-	celebrate: null as number | null,
-	cutinFlash: null as number | null,
+	drumrollLoop: null as LottieSource | null, // 例: require('@/assets/lottie/drumroll-loop.json')
+	celebrate: null as LottieSource | null,
+	cutinFlash: null as LottieSource | null,
 }
 ```
 

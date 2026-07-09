@@ -10,6 +10,8 @@ import Animated, {
 } from 'react-native-reanimated'
 import { useEffect } from 'react'
 import { typography } from '@/theme/tokens'
+import { lottieAssets } from './lottie-assets'
+import { LottieEffect } from './lottie-effect'
 import type { DrumrollPhase } from './use-drumroll'
 
 type Props = PropsWithChildren<{ phase: DrumrollPhase }>
@@ -43,13 +45,22 @@ export function DrumrollReveal({ phase, children }: Props) {
 	if (phase === 'rolling') {
 		return (
 			<View style={styles.center}>
-				<Animated.Text style={[styles.question, pulseStyle]}>？？？</Animated.Text>
+				<LottieEffect
+					source={lottieAssets.drumrollLoop}
+					loop
+					style={styles.effect}
+					fallback={
+						<Animated.Text style={[styles.question, pulseStyle]}>？？？</Animated.Text>
+					}
+				/>
 			</View>
 		)
 	}
 	if (phase === 'revealed') {
 		return (
 			<View style={styles.center}>
+				{/* 紙吹雪等は背面レイヤー。素材未登録なら何も出さず現行と同じ見た目 */}
+				<LottieEffect source={lottieAssets.celebrate} style={StyleSheet.absoluteFill} />
 				<Animated.View style={popStyle}>{children}</Animated.View>
 			</View>
 		)
@@ -64,4 +75,5 @@ export function DrumrollReveal({ phase, children }: Props) {
 const styles = StyleSheet.create({
 	center: { alignItems: 'center', justifyContent: 'center', minHeight: 120 },
 	question: { ...typography.hero, fontSize: 48 },
+	effect: { width: 160, height: 120 },
 })

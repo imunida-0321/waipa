@@ -7,6 +7,8 @@ import Animated, {
 	withSequence,
 	withTiming,
 } from 'react-native-reanimated'
+import { lottieAssets } from '@/components/game/lottie-assets'
+import { LottieEffect } from '@/components/game/lottie-effect'
 import { haptics } from '@/lib/haptics'
 import { playSound } from '@/lib/sound'
 import { colors, radii, spacing, typography } from '@/theme/tokens'
@@ -41,6 +43,8 @@ export function EventCutin({ event, onDone }: Props) {
 
 	return (
 		<View style={styles.backdrop}>
+			{/* カットイン背景素材（未登録なら何も出さず現行と同じ見た目） */}
+			<LottieEffect source={lottieAssets.cutinFlash} style={StyleSheet.absoluteFill} />
 			<Animated.View style={[styles.card, animatedStyle]}>
 				<Text style={styles.emoji}>{meta.emoji}</Text>
 				<Text style={styles.label}>きまぐれ発動！</Text>
