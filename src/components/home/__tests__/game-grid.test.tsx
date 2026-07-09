@@ -54,6 +54,12 @@ jest.mock('react-native-reanimated', () => {
 		runOnJS: jest.fn((fn: (...args: unknown[]) => unknown) => fn),
 	}
 })
+// expo-gl / @react-three/fiber は jest 環境でロードできないため 3D 表示はモック
+jest.mock('@/games/chinchiro/dice-3d', () => {
+	// eslint-disable-next-line @typescript-eslint/no-require-imports
+	const { View } = require('react-native')
+	return { Dice3D: () => <View testID="dice-3d" /> }
+})
 
 it('レジストリの全ゲームがカード表示される', async () => {
 	const { getByText } = await render(<GameGrid />)

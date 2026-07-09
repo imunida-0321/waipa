@@ -15,6 +15,12 @@ jest.mock('lottie-react-native', () => {
 	const { View } = require('react-native')
 	return { __esModule: true, default: View }
 })
+// expo-gl / @react-three/fiber は jest 環境でロードできないため 3D 表示はモック
+jest.mock('../dice-3d', () => {
+	// eslint-disable-next-line @typescript-eslint/no-require-imports
+	const { View } = require('react-native')
+	return { Dice3D: () => <View testID="dice-3d" /> }
+})
 jest.mock('react-native-reanimated', () => {
 	// eslint-disable-next-line @typescript-eslint/no-require-imports
 	const { View, Text } = require('react-native')

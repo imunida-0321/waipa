@@ -12,6 +12,4 @@ export const lottieAssets = {
 	celebrate: null as LottieSource | null,
 	/** きまぐれ◯×カットインの背景（1回再生） */
 	cutinFlash: null as LottieSource | null,
-	/** チンチロのサイコロ転がり（ループ再生）。素材要件: 転がり続けるループ / .json / 透過背景 */
-	diceRoll: null as LottieSource | null,
 }

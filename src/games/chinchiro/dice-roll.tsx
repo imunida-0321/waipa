@@ -1,16 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { StyleSheet, Text, View } from 'react-native'
-import Animated, {
-	useAnimatedStyle,
-	useSharedValue,
-	withRepeat,
-	withSequence,
-	withTiming,
-} from 'react-native-reanimated'
 import { ConfettiBurst } from '@/components/game/confetti-burst'
 import { DrumrollReveal } from '@/components/game/drumroll-reveal'
-import { LottieEffect } from '@/components/game/lottie-effect'
-import { lottieAssets } from '@/components/game/lottie-assets'
 import { GradientButton } from '@/components/ui/gradient-button'
 import { haptics } from '@/lib/haptics'
 import { playSound } from '@/lib/sound'
@@ -25,7 +16,7 @@ import {
 	type Hand,
 	type Throw,
 } from './dice'
-import { IsoDie } from './iso-die'
+import { Dice3D } from './dice-3d'
 import { CHIN } from './theme'
 
 export const ROLL_DURATION_MS = 1200
@@ -52,6 +43,7 @@ export function DiceRoll({
 }: Props) {
 	const [phase, setPhase] = useState<Phase>('standby')
 	const [throws, setThrows] = useState<Throw[]>([])
+	const [pending, setPending] = useState<Throw | null>(null)
 	const timer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
 	const color = playerColor(playerIndex).value
@@ -68,6 +60,7 @@ export function DiceRoll({
 	const roll = () => {
 		playSound('tap')
 		const t = rollThrow(rng)
+		setPending(t)
 		setPhase('rolling')
 		timer.current = setTimeout(() => {
 			setThrows((prev) => [...prev, t])
@@ -118,14 +111,15 @@ export function DiceRoll({
 					{orderLabel}・{throws.length + 1}投目
 				</Text>
 				<Text style={styles.nameCaption}>{playerName} さんの番</Text>
-				<Bowl>
-					<LottieEffect
-						source={lottieAssets.diceRoll}
-						loop
-						style={styles.lottie}
-						fallback={<TumbleDice />}
+				{pending && (
+					<Dice3D
+						dice={pending.dice}
+						shonben={pending.shonben}
+						rolling
+						rollId={throws.length + 1}
+						durationMs={ROLL_DURATION_MS}
 					/>
-				</Bowl>
+				)}
 				<Text style={styles.hint}>コロコロコロ…</Text>
 			</View>
 		)
@@ -140,9 +134,15 @@ export function DiceRoll({
 					{orderLabel}・{throws.length}投目
 				</Text>
 				<Text style={styles.nameCaption}>{playerName} さんの番</Text>
-				<Bowl shonben={shonben} dice={lastThrow?.dice}>
-					{!shonben && lastThrow && <DiceRow dice={lastThrow.dice} />}
-				</Bowl>
+				{lastThrow && (
+					<Dice3D
+						dice={lastThrow.dice}
+						shonben={shonben}
+						rolling={false}
+						rollId={throws.length}
+						durationMs={ROLL_DURATION_MS}
+					/>
+				)}
 				<Text style={[styles.openLabel, shonben && { color: CHIN.handColors.hifumi }]}>
 					{shonben ? 'ションベン！' : '役なし…'}
 				</Text>
@@ -164,9 +164,15 @@ export function DiceRoll({
 		<View style={styles.container}>
 			{finalHand.type === 'pinzoro' && <ConfettiBurst />}
 			<Text style={styles.orderLabel}>{playerName} さんの記録</Text>
-			<Bowl shonben={lastThrow?.shonben} dice={lastThrow?.dice}>
-				{lastThrow && !lastThrow.shonben && <DiceRow dice={lastThrow.dice} />}
-			</Bowl>
+			{lastThrow && (
+				<Dice3D
+					dice={lastThrow.dice}
+					shonben={lastThrow.shonben}
+					rolling={false}
+					rollId={throws.length}
+					durationMs={ROLL_DURATION_MS}
+				/>
+			)}
 			<DrumrollReveal phase="revealed">
 				<Text style={[styles.handLabel, { color: handColor }]}>{handLabel(finalHand)}</Text>
 			</DrumrollReveal>
@@ -174,73 +180,6 @@ export function DiceRoll({
 				<GradientButton title={doneLabel} onPress={() => onDone(finalHand)} />
 			</View>
 		</View>
-	)
-}
-
-// 丼。shonben 時はサイコロ1個が縁の外に出た表現
-function Bowl({
-	children,
-	shonben = false,
-	dice,
-}: {
-	children?: React.ReactNode
-	shonben?: boolean
-	dice?: [number, number, number]
-}) {
-	return (
-		<View style={styles.bowlWrap}>
-			<View style={styles.bowl} testID="dice-bowl">
-				{children}
-			</View>
-			{shonben && dice && (
-				<View style={styles.escapedDie}>
-					<IsoDie value={dice[0] as 1 | 2 | 3 | 4 | 5 | 6} size={36} tilt={24} />
-				</View>
-			)}
-		</View>
-	)
-}
-
-function DiceRow({ dice }: { dice: [number, number, number] }) {
-	return (
-		<View style={styles.diceRow}>
-			<IsoDie value={dice[0] as 1 | 2 | 3 | 4 | 5 | 6} size={52} tilt={-7} />
-			<IsoDie value={dice[1] as 1 | 2 | 3 | 4 | 5 | 6} size={58} />
-			<IsoDie value={dice[2] as 1 | 2 | 3 | 4 | 5 | 6} size={52} tilt={9} />
-		</View>
-	)
-}
-
-// Lottie 素材が無い間の疑似3Dタンブル: 3個の IsoDie が揺れながら出目を高速切替。
-// 出目の切替は決定的なサイクル（Math.random を使うとテストの乱数シーケンスを消費してしまうため）
-function TumbleDice() {
-	const [faces, setFaces] = useState<[number, number, number]>([1, 3, 5])
-	const wobble = useSharedValue(0)
-
-	useEffect(() => {
-		wobble.value = withRepeat(
-			withSequence(withTiming(1, { duration: 90 }), withTiming(-1, { duration: 90 })),
-			-1,
-		)
-		const id = setInterval(() => {
-			setFaces(([a, b, c]) => [(a % 6) + 1, ((b + 1) % 6) + 1, ((c + 2) % 6) + 1])
-		}, 100)
-		return () => clearInterval(id)
-	}, [wobble])
-
-	const style = useAnimatedStyle(() => ({
-		transform: [
-			{ perspective: 300 },
-			{ rotateX: `${wobble.value * 12}deg` },
-			{ rotateY: `${wobble.value * -10}deg` },
-			{ translateY: wobble.value * -6 },
-		],
-	}))
-
-	return (
-		<Animated.View style={style}>
-			<DiceRow dice={faces as [number, number, number]} />
-		</Animated.View>
 	)
 }
 
@@ -278,34 +217,6 @@ const styles = StyleSheet.create({
 		...typography.body,
 		color: colors.textMuted,
 		marginTop: spacing.md,
-	},
-	bowlWrap: {
-		marginVertical: spacing.md,
-	},
-	bowl: {
-		width: 220,
-		height: 170,
-		borderRadius: 110,
-		borderWidth: 4,
-		borderColor: CHIN.bowlRim,
-		backgroundColor: CHIN.bowlInner,
-		alignItems: 'center',
-		justifyContent: 'center',
-		overflow: 'hidden',
-	},
-	escapedDie: {
-		position: 'absolute',
-		right: -18,
-		bottom: -6,
-	},
-	diceRow: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		gap: spacing.xs,
-	},
-	lottie: {
-		width: 180,
-		height: 140,
 	},
 	openLabel: {
 		...typography.title,
