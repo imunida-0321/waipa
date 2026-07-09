@@ -1,37 +1,50 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Pressable, StyleSheet, Text, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { router } from 'expo-router'
 import { haptics } from '@/lib/haptics'
-import { hasSeenHowTo, markHowToSeen } from '@/lib/first-visit'
 import type { GameMeta } from '@/games/registry'
 import { colors, spacing, typography } from '@/theme/tokens'
+import { GameIntroScreen } from './game-intro-screen'
 import { HowToPlayModal } from './how-to-play-modal'
 import { PlayerSetupSheet } from './player-setup-sheet'
 
-// 全ゲーム共通の画面枠: requiresPlayers なら開始前にプレイヤー設定ゲート→
-// ヘッダー（戻る/タイトル/？）＋初回の遊び方自動表示
+type Stage = 'intro' | 'setup' | 'play'
+
+// 全ゲーム共通の画面枠: 毎回イントロ（キャッチコピー＋遊び方ダイジェスト）→
+// requiresPlayers ならプレイヤー設定ゲート → ヘッダー（戻る/タイトル/？）＋本体
 export function GameScreen({ meta }: { meta: GameMeta }) {
 	const insets = useSafeAreaInsets()
+	const [stage, setStage] = useState<Stage>('intro')
 	const [howToVisible, setHowToVisible] = useState(false)
-	const [setupDone, setSetupDone] = useState(!meta.requiresPlayers)
 
-	useEffect(() => {
-		if (!setupDone) return
-		hasSeenHowTo(meta.id).then((seen) => {
-			if (!seen) setHowToVisible(true)
-		})
-	}, [meta.id, setupDone])
+	const howToModal = (
+		<HowToPlayModal
+			visible={howToVisible}
+			title={`${meta.emoji} ${meta.title}`}
+			pages={meta.howToPlay}
+			onClose={() => setHowToVisible(false)}
+		/>
+	)
 
-	const closeHowTo = () => {
-		setHowToVisible(false)
-		markHowToSeen(meta.id)
+	if (stage === 'intro') {
+		return (
+			<>
+				<GameIntroScreen
+					meta={meta}
+					onStart={() => setStage(meta.requiresPlayers ? 'setup' : 'play')}
+					onShowHowTo={() => setHowToVisible(true)}
+					onClose={() => router.back()}
+				/>
+				{howToModal}
+			</>
+		)
 	}
 
-	if (!setupDone) {
+	if (stage === 'setup') {
 		return (
 			<PlayerSetupSheet
-				onProceed={() => setSetupDone(true)}
+				onProceed={() => setStage('play')}
 				minPlayers={meta.minPlayers}
 				maxPlayers={meta.maxPlayers}
 			/>
@@ -69,12 +82,7 @@ export function GameScreen({ meta }: { meta: GameMeta }) {
 				<meta.Component />
 			</View>
 
-			<HowToPlayModal
-				visible={howToVisible}
-				title={`${meta.emoji} ${meta.title}`}
-				pages={meta.howToPlay}
-				onClose={closeHowTo}
-			/>
+			{howToModal}
 		</View>
 	)
 }
