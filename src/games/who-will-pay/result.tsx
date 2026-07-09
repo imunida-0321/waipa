@@ -1,6 +1,6 @@
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import { GradientButton } from '@/components/ui/gradient-button'
-import { PillButton } from '@/components/ui/pill-button'
+import { SecondaryButton } from '@/components/ui/secondary-button'
 import { playerColor } from '@/theme/player-colors'
 import { colors, radii, spacing, typography } from '@/theme/tokens'
 import { playerTotals, type DigitSlot } from './payment'
@@ -60,7 +60,7 @@ export function Result({ slots, playerNames, onRetry, onHome }: Props) {
 			<View style={styles.actions}>
 				<GradientButton title="もう一度" onPress={onRetry} />
 				<View style={styles.actionGap} />
-				<PillButton title="ホームへ" onPress={onHome} />
+				<SecondaryButton title="ホームへ" onPress={onHome} />
 			</View>
 		</ScrollView>
 	)

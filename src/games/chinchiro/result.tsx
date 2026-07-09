@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import { useDrumroll } from '@/components/game/use-drumroll'
 import { GradientButton } from '@/components/ui/gradient-button'
-import { PillButton } from '@/components/ui/pill-button'
+import { SecondaryButton } from '@/components/ui/secondary-button'
 import { playSound } from '@/lib/sound'
 import { haptics } from '@/lib/haptics'
 import { playerColor } from '@/theme/player-colors'
@@ -88,7 +88,7 @@ export function ChinchiroResult({ hands, playerNames, onRetry, onHome, rng = Mat
 
 	return (
 		<ScrollView contentContainerStyle={styles.container}>
-			<Text style={styles.title}>けっか はっぴょう</Text>
+			<Text style={styles.title}>結果発表</Text>
 
 			{ranked.map((entry, rankIndex) => (
 				<RankCard
@@ -122,7 +122,7 @@ export function ChinchiroResult({ hands, playerNames, onRetry, onHome, rng = Mat
 					<View style={styles.actions}>
 						<GradientButton title="もう一回" onPress={onRetry} />
 						<View style={styles.actionGap} />
-						<PillButton title="ホームへ" onPress={onHome} />
+						<SecondaryButton title="ホームへ" onPress={onHome} />
 					</View>
 				</>
 			)}

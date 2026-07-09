@@ -95,7 +95,7 @@ it('2人が順番に振り、リザルトで敗者が発表される', async () 
 
 	// 最終プレイヤーの settled 後の押下でリザルトへ
 	await act(async () => fireEvent.press(getByTestId('roll-button')))
-	expect(getByText('けっか はっぴょう')).toBeTruthy()
+	expect(getByText('結果発表')).toBeTruthy()
 	await act(async () => jest.advanceTimersByTime(REVEAL_INTERVAL_MS + DRUMROLL_MS))
 	expect(getByText('ユウタ')).toBeTruthy()
 	expect(getByText(/敗者/)).toBeTruthy()

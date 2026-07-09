@@ -219,9 +219,7 @@ function hintText(
 		case 'open':
 			return `${shonben ? '丼から飛び出た！ ' : ''}のこり${throwsLeft}投！`
 		case 'settled':
-			return isLastPlayer
-				? 'けっか はっぴょうへ'
-				: `つぎ: ${nextName ?? ''} さん ▶ ボタンで振る`
+			return isLastPlayer ? '結果発表へ' : `つぎ: ${nextName ?? ''} さん ▶ ボタンで振る`
 	}
 }
 

@@ -1,5 +1,5 @@
 import { Modal, ScrollView, StyleSheet, Text, View } from 'react-native'
-import { PillButton } from '@/components/ui/pill-button'
+import { SecondaryButton } from '@/components/ui/secondary-button'
 import { colors, radii, spacing, typography } from '@/theme/tokens'
 import { CHIN } from './theme'
 
@@ -117,7 +117,7 @@ export function RulesModal({ visible, onClose }: Props) {
 							このアプリでは賭けはありません。役なし・ションベンは3投まで振り直しでき、3投して役がなければ「目なし」。全員の役を比べて一番弱い人が負けです（同率はサドンデス）。
 						</Text>
 					</ScrollView>
-					<PillButton title="とじる" onPress={onClose} />
+					<SecondaryButton title="とじる" onPress={onClose} />
 				</View>
 			</View>
 		</Modal>
