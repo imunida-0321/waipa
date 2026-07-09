@@ -1,6 +1,7 @@
 import type { ComponentType } from 'react'
 import { BombGame } from './bomb-216/bomb-game'
 import { ComingSoonGame } from './coming-soon'
+import { FiveSecStopGame } from './five-sec-stop/five-sec-stop-game'
 import { KimagureOxGame } from './kimagure-ox/kimagure-ox-game'
 import { NoKingGame } from './no-king-game/no-king-game'
 import { WhoWillPayGame } from './who-will-pay/who-will-pay-game'
@@ -74,12 +75,17 @@ export const games: readonly GameMeta[] = [
 		gradient: ['#4ECDC4', '#2C7A7B'],
 		minPlayers: 2,
 		maxPlayers: 12,
+		requiresPlayers: true,
+		catchCopy: '5.00秒ぴったりを狙ってストップ！\nでも途中から数字は見えない…！',
+		summary:
+			'このゲームは、タイマーを5.00秒ぴったりを狙って止めるゲームです！3秒をすぎると数字が見えなくなるので、最後は自分の体内時計だけが頼り。5.00秒から一番遠かった人が負けです！',
 		howToPlay: [
-			'タイマーを 5.00 秒ぴったりを狙って止めます',
-			'途中から数字は見えなくなります！',
-			'一番ズレた人が負け',
+			'① 一緒に遊ぶメンバーを登録しよう！（2〜12名）',
+			'② 自分の番が来たらタップでスタート！5.00秒ぴったりを狙ってもう一度タップ！',
+			'③ 3秒をすぎると数字が見えなくなる！感覚だけが頼り！',
+			'④ 全員の記録を発表！5.00秒から一番遠かった人が負け！（±0.05秒は「ぴったり賞」）',
 		],
-		Component: ComingSoonGame,
+		Component: FiveSecStopGame,
 	},
 	{
 		id: 'kimagure-ox',
