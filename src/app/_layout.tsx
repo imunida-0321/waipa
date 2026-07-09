@@ -12,6 +12,14 @@ import { colors } from '@/theme/tokens'
 
 SplashScreen.preventAutoHideAsync()
 
+// 効果音の登録（出典・ライセンスは assets/sounds/README.md 参照）
+registerSound('tap', require('@/assets/sounds/tap.m4a'))
+registerSound('explosion', require('@/assets/sounds/explosion.m4a'))
+registerSound('drumroll', require('@/assets/sounds/drumroll.m4a'))
+registerSound('reveal', require('@/assets/sounds/reveal.m4a'))
+registerSound('spin', require('@/assets/sounds/spin.m4a'))
+registerSound('event', require('@/assets/sounds/event.m4a'))
+
 export default function RootLayout() {
 	const colorScheme = useColorScheme()
 
