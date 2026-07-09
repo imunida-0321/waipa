@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { StyleSheet, Text, View } from 'react-native'
+import { Dimensions, StyleSheet, Text, View } from 'react-native'
 import Animated, {
 	Easing,
 	useAnimatedStyle,
@@ -43,8 +43,9 @@ export function EventCutin({ event, onDone }: Props) {
 
 	return (
 		<View style={styles.backdrop}>
-			{/* カットイン背景素材（未登録なら何も出さず現行と同じ見た目） */}
-			<LottieEffect source={lottieAssets.cutinFlash} style={StyleSheet.absoluteFill} />
+			{/* カットイン背景素材（未登録なら何も出さず現行と同じ見た目）。
+			    16:9 素材を縦画面に fit させるとカードの裏に隠れるため、カードより大きい正方形で再生する */}
+			<LottieEffect source={lottieAssets.cutinFlash} style={styles.burst} />
 			<Animated.View style={[styles.card, animatedStyle]}>
 				<Text style={styles.emoji}>{meta.emoji}</Text>
 				<Text style={styles.label}>きまぐれ発動！</Text>
@@ -75,4 +76,9 @@ const styles = StyleSheet.create({
 	emoji: { fontSize: 72 },
 	label: { ...typography.caption, color: colors.accentFrom },
 	name: { ...typography.hero },
+	burst: {
+		position: 'absolute',
+		width: Math.max(Dimensions.get('window').width, Dimensions.get('window').height) * 1.5,
+		height: Math.max(Dimensions.get('window').width, Dimensions.get('window').height) * 1.5,
+	},
 })
