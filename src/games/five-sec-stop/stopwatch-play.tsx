@@ -73,7 +73,12 @@ export function StopwatchPlay({ playerIndex, playerName, orderLabel, doneLabel, 
 			? 0
 			: Math.min(1, (HIDE_END_MS - sw.displayMs) / (HIDE_END_MS - HIDE_START_MS))
 		return (
-			<Pressable testID="stop-area" style={styles.container} onPress={handleStop}>
+			<Pressable
+				testID="stop-area"
+				accessibilityRole="button"
+				style={styles.container}
+				onPress={handleStop}
+			>
 				<Text style={styles.orderLabel}>{orderLabel}</Text>
 				<Text style={styles.nameCaption}>{playerName} さんの番</Text>
 				<View style={styles.timerArea}>
