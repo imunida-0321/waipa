@@ -1,6 +1,7 @@
 import type { ComponentType } from 'react'
 import { BombGame } from './bomb-216/bomb-game'
 import { ComingSoonGame } from './coming-soon'
+import { KimagureOxGame } from './kimagure-ox/kimagure-ox-game'
 import { WhoWillPayGame } from './who-will-pay/who-will-pay-game'
 
 export type GameMeta = {
@@ -75,10 +76,12 @@ export const games: readonly GameMeta[] = [
 		minPlayers: 2,
 		maxPlayers: 2,
 		howToPlay: [
-			'普通の◯×ゲーム…と思いきや、ターンの合間に「きまぐれイベント」が発生！',
-			'マスが入れ替わったり、駒が消えたり。最後に笑うのは誰だ',
+			'① 交互にマスをタップして、タテ・ヨコ・ナナメに3つ並べたら勝ち！',
+			'② ただしターンの合間に「きまぐれイベント」がランダム発生！',
+			'③ イベントは マスシャッフル / 1マス封鎖 / 駒消滅 / ダブル手番 の4種類',
+			'④ イベントで3つ並んでも勝ち。何が起きても恨みっこなし！',
 		],
-		Component: ComingSoonGame,
+		Component: KimagureOxGame,
 	},
 	{
 		id: 'no-king-game',
