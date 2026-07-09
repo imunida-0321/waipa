@@ -82,7 +82,7 @@ standby(次のプレイヤー表示) → measuring(計測中) → record(記録�
 
 ### record（記録ドン！）
 
-- DrumrollReveal は使わず withSpring のポップイン（即表示のため）で「5.32」を偏差色でドン！と表示。偏差ラベル（`+0.32 ズレ`）併記
+- DrumrollReveal を `phase="revealed"` で直接マウントし、待ちなしの withSpring ポップインで「5.32」を偏差色でドン！と表示。偏差ラベル（`+0.32 ズレ`）併記
 - **ぴったり賞**（deviation ≤ 50）: 金色表示＋紙吹雪調パーティクル＋`reveal` 音＋成功ハプティクス。「＼ ぴったり賞 ／」見出し
 - 「つぎの人へ」ボタンで standby へ（最終プレイヤーなら result へ）
 
