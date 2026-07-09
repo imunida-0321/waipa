@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 746" font-family="-apple-system, Helvetica, Arial, sans-serif">
+<defs><linearGradient id="g0" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#E85BF7"/><stop offset="1" stop-color="#7B5CFA"/></linearGradient><linearGradient id="g1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FF6B6B"/><stop offset="1" stop-color="#C0392B"/></linearGradient><linearGradient id="g2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4ECDC4"/><stop offset="1" stop-color="#2C7A7B"/></linearGradient><linearGradient id="g3" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F7B731"/><stop offset="1" stop-color="#E67E22"/></linearGradient><linearGradient id="g4" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F1C40F"/><stop offset="1" stop-color="#B7791F"/></linearGradient><linearGradient id="g5" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FF9F43"/><stop offset="1" stop-color="#EE5253"/></linearGradient><linearGradient id="g6" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#A55EEA"/><stop offset="1" stop-color="#8854D0"/></linearGradient><linearGradient id="g7" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#26DE81"/><stop offset="1" stop-color="#20BF6B"/></linearGradient></defs>
+<rect width="320" height="746" rx="24" fill="#17142A" stroke="#2E2A4D"/>
+<text x="16" y="36" font-size="19" font-weight="700" font-style="italic" fill="#FFFFFF">WaiPa</text>
+<rect x="196" y="20" width="86" height="24" rx="12" fill="#211D3A" stroke="#3A3560"/>
+<text x="239" y="36" font-size="10" fill="#FFFFFF" text-anchor="middle">👑 プレミアム</text>
+<text x="296" y="38" font-size="18" fill="#FFFFFF">≡</text>
+<rect x="12" y="56" width="76" height="76" rx="14" fill="url(#g0)"/>
+<clipPath id="c40"><rect x="12" y="56" width="76" height="76" rx="14"/></clipPath>
+<text clip-path="url(#c40)" x="72" y="82" font-size="26" opacity="0.6" text-anchor="middle">💸</text>
+<text x="19" y="122" font-size="9" font-weight="700" font-style="italic" fill="#FFFFFF">Who will pay</text>
+<text x="100" y="88" font-size="10" fill="#8A87A5">会計はルーレットで決めよう！</text>
+<rect x="100" y="96" width="45" height="16" rx="8" fill="#2E2A4D"/><text x="122.5" y="108" font-size="10" fill="#B8B4D9" text-anchor="middle">2〜8人</text><rect x="151" y="96" width="40" height="16" rx="8" fill="#2E2A4D"/><text x="171" y="108" font-size="10" fill="#B8B4D9" text-anchor="middle">約3分</text>
+<rect x="12" y="142" width="76" height="76" rx="14" fill="url(#g1)"/>
+<clipPath id="c41"><rect x="12" y="142" width="76" height="76" rx="14"/></clipPath>
+<text clip-path="url(#c41)" x="72" y="168" font-size="26" opacity="0.6" text-anchor="middle">💣</text>
+<text x="19" y="208" font-size="9" font-weight="700" font-style="italic" fill="#FFFFFF">BOMB!! 2/16</text>
+<text x="100" y="174" font-size="10" fill="#8A87A5">16個のボタンにハズレが2個！</text>
+<rect x="100" y="182" width="51" height="16" rx="8" fill="#2E2A4D"/><text x="125.5" y="194" font-size="10" fill="#B8B4D9" text-anchor="middle">2〜12人</text><rect x="157" y="182" width="40" height="16" rx="8" fill="#2E2A4D"/><text x="177" y="194" font-size="10" fill="#B8B4D9" text-anchor="middle">約2分</text>
+<rect x="12" y="228" width="76" height="76" rx="14" fill="url(#g2)"/>
+<clipPath id="c42"><rect x="12" y="228" width="76" height="76" rx="14"/></clipPath>
+<text clip-path="url(#c42)" x="72" y="254" font-size="26" opacity="0.6" text-anchor="middle">⏱️</text>
+<text x="19" y="294" font-size="9" font-weight="700" font-style="italic" fill="#FFFFFF">5秒STOP</text>
+<text x="100" y="260" font-size="10" fill="#8A87A5">5秒ぴったりで止めろ！</text>
+<rect x="100" y="268" width="51" height="16" rx="8" fill="#2E2A4D"/><text x="125.5" y="280" font-size="10" fill="#B8B4D9" text-anchor="middle">2〜12人</text><rect x="157" y="268" width="40" height="16" rx="8" fill="#2E2A4D"/><text x="177" y="280" font-size="10" fill="#B8B4D9" text-anchor="middle">約1分</text>
+<rect x="12" y="314" width="76" height="76" rx="14" fill="url(#g3)"/>
+<clipPath id="c43"><rect x="12" y="314" width="76" height="76" rx="14"/></clipPath>
+<text clip-path="url(#c43)" x="72" y="340" font-size="26" opacity="0.6" text-anchor="middle">⭕</text>
+<text x="19" y="380" font-size="9" font-weight="700" font-style="italic" fill="#FFFFFF">きまぐれ◯×</text>
+<text x="100" y="346" font-size="10" fill="#8A87A5">普通じゃない◯×ゲーム</text>
+<rect x="100" y="354" width="30" height="16" rx="8" fill="#2E2A4D"/><text x="115" y="366" font-size="10" fill="#B8B4D9" text-anchor="middle">2人</text><rect x="136" y="354" width="40" height="16" rx="8" fill="#2E2A4D"/><text x="156" y="366" font-size="10" fill="#B8B4D9" text-anchor="middle">約3分</text>
+<rect x="12" y="400" width="76" height="76" rx="14" fill="url(#g4)"/>
+<clipPath id="c44"><rect x="12" y="400" width="76" height="76" rx="14"/></clipPath>
+<text clip-path="url(#c44)" x="72" y="426" font-size="26" opacity="0.6" text-anchor="middle">👑</text>
+<text x="19" y="455" font-size="9" font-weight="700" font-style="italic" fill="#FFFFFF">王様のいない</text><text x="19" y="466" font-size="9" font-weight="700" font-style="italic" fill="#FFFFFF">王様ゲーム</text>
+<text x="100" y="432" font-size="10" fill="#8A87A5">お題も実行役もランダム！</text>
+<rect x="100" y="440" width="51" height="16" rx="8" fill="#2E2A4D"/><text x="125.5" y="452" font-size="10" fill="#B8B4D9" text-anchor="middle">3〜12人</text><rect x="157" y="440" width="40" height="16" rx="8" fill="#2E2A4D"/><text x="177" y="452" font-size="10" fill="#B8B4D9" text-anchor="middle">約2分</text>
+<rect x="12" y="486" width="76" height="76" rx="14" fill="url(#g5)"/>
+<clipPath id="c45"><rect x="12" y="486" width="76" height="76" rx="14"/></clipPath>
+<text clip-path="url(#c45)" x="72" y="512" font-size="26" opacity="0.6" text-anchor="middle">👉</text>
+<text x="19" y="541" font-size="9" font-weight="700" font-style="italic" fill="#FFFFFF">指差しヒート</text><text x="19" y="552" font-size="9" font-weight="700" font-style="italic" fill="#FFFFFF">アップ</text>
+<text x="100" y="518" font-size="10" fill="#8A87A5">せーので一斉に指差せ！</text>
+<rect x="100" y="526" width="51" height="16" rx="8" fill="#2E2A4D"/><text x="125.5" y="538" font-size="10" fill="#B8B4D9" text-anchor="middle">3〜12人</text><rect x="157" y="526" width="40" height="16" rx="8" fill="#2E2A4D"/><text x="177" y="538" font-size="10" fill="#B8B4D9" text-anchor="middle">約1分</text>
+<rect x="12" y="572" width="76" height="76" rx="14" fill="url(#g6)"/>
+<clipPath id="c46"><rect x="12" y="572" width="76" height="76" rx="14"/></clipPath>
+<text clip-path="url(#c46)" x="72" y="598" font-size="26" opacity="0.6" text-anchor="middle">🧨</text>
+<text x="19" y="627" font-size="9" font-weight="700" font-style="italic" fill="#FFFFFF">カウントダウ</text><text x="19" y="638" font-size="9" font-weight="700" font-style="italic" fill="#FFFFFF">ン爆弾リレー</text>
+<text x="100" y="604" font-size="10" fill="#8A87A5">爆発した時に持ってた人が負け</text>
+<rect x="100" y="612" width="51" height="16" rx="8" fill="#2E2A4D"/><text x="125.5" y="624" font-size="10" fill="#B8B4D9" text-anchor="middle">3〜12人</text><rect x="157" y="612" width="40" height="16" rx="8" fill="#2E2A4D"/><text x="177" y="624" font-size="10" fill="#B8B4D9" text-anchor="middle">約5分</text>
+<rect x="12" y="658" width="76" height="76" rx="14" fill="url(#g7)"/>
+<clipPath id="c47"><rect x="12" y="658" width="76" height="76" rx="14"/></clipPath>
+<text clip-path="url(#c47)" x="72" y="684" font-size="26" opacity="0.6" text-anchor="middle">🃏</text>
+<text x="19" y="713" font-size="9" font-weight="700" font-style="italic" fill="#FFFFFF">リアクション</text><text x="19" y="724" font-size="9" font-weight="700" font-style="italic" fill="#FFFFFF">神経衰弱</text>
+<text x="100" y="690" font-size="10" fill="#8A87A5">ペアが揃ったら罰ゲーム!?</text>
+<rect x="100" y="698" width="51" height="16" rx="8" fill="#2E2A4D"/><text x="125.5" y="710" font-size="10" fill="#B8B4D9" text-anchor="middle">2〜12人</text><rect x="157" y="698" width="40" height="16" rx="8" fill="#2E2A4D"/><text x="177" y="710" font-size="10" fill="#B8B4D9" text-anchor="middle">約5分</text>
+
+</svg>
