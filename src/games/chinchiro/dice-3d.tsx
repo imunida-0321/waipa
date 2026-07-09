@@ -1,7 +1,7 @@
 /* eslint-disable react/no-unknown-property -- react-three-fiber は three.js のプロパティを JSX 属性として使う */
 import { useMemo, useRef } from 'react'
 import { StyleSheet, View } from 'react-native'
-import { Canvas, useFrame } from '@react-three/fiber/native'
+import { Canvas, useFrame } from './r3f'
 import * as THREE from 'three'
 import {
 	DIE_HALF,
@@ -202,8 +202,8 @@ function DiceScene({ dice, shonben, rolling, rollId, durationMs }: Required<Dice
 				<planeGeometry args={[30, 30]} />
 				<meshStandardMaterial
 					color={CHIN.bg}
-					roughness={0.3}
-					metalness={0.4}
+					roughness={0.95}
+					metalness={0}
 					transparent
 					opacity={0.92}
 					depthWrite={false}
