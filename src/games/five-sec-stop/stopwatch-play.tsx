@@ -83,7 +83,7 @@ export function StopwatchPlay({ playerIndex, playerName, orderLabel, doneLabel, 
 				<Text style={styles.nameCaption}>{playerName} さんの番</Text>
 				<View style={styles.timerArea}>
 					{hidden ? (
-						<DrumrollReveal phase="rolling" />
+						<DrumrollReveal phase="rolling" lottie={false} />
 					) : (
 						<Text testID="timer-digits" style={[styles.digits, { opacity }]}>
 							{formatSeconds(sw.displayMs)}
@@ -107,7 +107,7 @@ export function StopwatchPlay({ playerIndex, playerName, orderLabel, doneLabel, 
 			<Text style={styles.orderLabel}>{playerName} さんの記録</Text>
 			{pittari && <Text style={styles.pittariTitle}>＼ ぴったり賞 ／</Text>}
 			<View style={styles.timerArea}>
-				<DrumrollReveal phase="revealed">
+				<DrumrollReveal phase="revealed" lottie={false}>
 					<View style={styles.recordBlock}>
 						<Text style={[styles.digits, { color: tierColor }]}>
 							{formatSeconds(recordMs)}
