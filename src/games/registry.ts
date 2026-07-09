@@ -2,6 +2,7 @@ import type { ComponentType } from 'react'
 import { BombGame } from './bomb-216/bomb-game'
 import { ComingSoonGame } from './coming-soon'
 import { KimagureOxGame } from './kimagure-ox/kimagure-ox-game'
+import { NoKingGame } from './no-king-game/no-king-game'
 import { WhoWillPayGame } from './who-will-pay/who-will-pay-game'
 
 export type GameMeta = {
@@ -104,12 +105,16 @@ export const games: readonly GameMeta[] = [
 		gradient: ['#F1C40F', '#B7791F'],
 		minPlayers: 3,
 		maxPlayers: 12,
+		catchCopy: 'お題も実行役もランダムに決定！\n王様がいないから、誰も文句なし！',
+		summary:
+			'このゲームは、全員に秘密の番号を配り、お題と「実行する番号」をランダムに発表する王様ゲーム風パーティーゲームです！王様がいないので、誰も文句は言えません！',
 		howToPlay: [
-			'全員に番号が配られます（自分の番号は内緒）',
-			'お題と実行する番号がランダムで発表されます',
-			'王様はいないので、誰も文句は言えません！',
+			'① 人数を選んで「番号を配る」！スマホを回して各自こっそり番号を確認（長押しで表示）',
+			'② お題が発表されたら「運命のボタン」をタップ！',
+			'③ ドラムロールのあと実行役の番号がドン！と発表',
+			'④ その番号の人は名乗り出てお題を実行！次のラウンドは番号を配り直してドキドキ継続',
 		],
-		Component: ComingSoonGame,
+		Component: NoKingGame,
 	},
 	{
 		id: 'pointing-heat-up',

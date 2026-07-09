@@ -20,8 +20,8 @@ count（人数選択）→ deal（番号配布・端末回し）→ reveal（お
 - **count**: 人数ステッパー（3〜12）＋「🔒 限定お題パック」行（タップで案内モーダル）＋「番号を配る」
 - **deal**: 「◯人目の人にスマホを渡してください」→ 長押し中のみ自分の番号を表示（離すと隠れる）→「確認した」で次の人へ。全員完了で reveal へ
 - **reveal** 2段階:
-  1. お題カード表示。スキップ可（残り回数バッジ、0で無効化）
-  2. 「運命のボタン」→ `DrumrollReveal`（既存 `drumroll`/`reveal` 効果音）→「◯番！」発表。発表後はスキップ不可
+    1. お題カード表示。スキップ可（残り回数バッジ、0で無効化）
+    2. 「運命のボタン」→ `DrumrollReveal`（既存 `drumroll`/`reveal` 効果音）→「◯番！」発表。発表後はスキップ不可
 - **done**: 「◯番の人は名乗り出てお題を実行！」→「次のラウンド（番号を配り直す）」で deal（round+1）。終了はヘッダー戻る
 
 ## ファイル構成
@@ -47,15 +47,15 @@ registry.ts: `Component: NoKingGame` 差し替え＋ `catchCopy` / `summary` / `
 type Phase = 'count' | 'deal' | 'reveal' | 'done'
 type State = {
 	phase: Phase
-	playerCount: number      // 3..12
-	numbers: number[]        // 席順 index → 割当番号（1..N のシャッフル順列）
-	dealIndex: number        // 端末回しで何人目か（0起点）
-	round: number            // 1起点
+	playerCount: number // 3..12
+	numbers: number[] // 席順 index → 割当番号（1..N のシャッフル順列）
+	dealIndex: number // 端末回しで何人目か（0起点）
+	round: number // 1起点
 	topicId: string | null
-	topicText: string        // {B} 置換済み
+	topicText: string // {B} 置換済み
 	executorNumber: number
 	usedTopicIds: string[]
-	skipsLeft: number        // 初期 2
+	skipsLeft: number // 初期 2
 	revealed: boolean
 }
 ```
@@ -66,13 +66,13 @@ type State = {
 
 ## エッジケース
 
-| ケース | 対応 |
-|---|---|
-| お題プール枯渇 | `usedTopicIds` をリセットして再抽選（重複許容） |
-| topics が空（初回オフライン） | 内蔵フォールバックお題10件で動作 |
-| スキップ残0 | ボタン無効化＋グレーアウト |
-| 覗き見防止 | 番号は長押し中のみ表示 |
-| 発表後のスキップ | `revealed` 後はスキップ UI 非表示 |
+| ケース                        | 対応                                            |
+| ----------------------------- | ----------------------------------------------- |
+| お題プール枯渇                | `usedTopicIds` をリセットして再抽選（重複許容） |
+| topics が空（初回オフライン） | 内蔵フォールバックお題10件で動作                |
+| スキップ残0                   | ボタン無効化＋グレーアウト                      |
+| 覗き見防止                    | 番号は長押し中のみ表示                          |
+| 発表後のスキップ              | `revealed` 後はスキップ UI 非表示               |
 
 ## テスト方針
 
