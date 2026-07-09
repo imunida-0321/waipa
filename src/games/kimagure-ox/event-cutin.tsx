@@ -32,7 +32,9 @@ export function EventCutin({ event, onDone }: Props) {
 		)
 		const timer = setTimeout(onDone, CUTIN_DURATION_MS)
 		return () => clearTimeout(timer)
-	}, [event, onDone, scale])
+		// マウント時に一度だけ発火させる（onDone の identity 変化で再発火させない）
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [])
 
 	const animatedStyle = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }))
 	const meta = EVENT_META[event]

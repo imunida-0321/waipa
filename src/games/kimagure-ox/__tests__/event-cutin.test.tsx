@@ -43,3 +43,13 @@ it('表示時間経過後に onDone が1回呼ばれる', async () => {
 	})
 	expect(onDone).toHaveBeenCalledTimes(1)
 })
+
+it('アンマウント後はタイマーが発火せず onDone は呼ばれない', async () => {
+	const onDone = jest.fn()
+	const { unmount } = await render(<EventCutin event="vanish" onDone={onDone} />)
+	await unmount()
+	await act(async () => {
+		jest.advanceTimersByTime(CUTIN_DURATION_MS)
+	})
+	expect(onDone).not.toHaveBeenCalled()
+})
