@@ -1,10 +1,4 @@
-import {
-	deviationMs,
-	formatDeviation,
-	formatSeconds,
-	rankRecords,
-	tierOf,
-} from '../judge'
+import { deviationMs, formatDeviation, formatSeconds, rankRecords, tierOf } from '../judge'
 
 describe('deviationMs', () => {
 	it('5000ms との差の絶対値を返す', () => {

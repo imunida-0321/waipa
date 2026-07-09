@@ -27,33 +27,29 @@
 ### Task 1: judge.ts — 判定・フォーマットの純関数
 
 **Files:**
+
 - Create: `src/games/five-sec-stop/judge.ts`
 - Test: `src/games/five-sec-stop/__tests__/judge.test.ts`
 
 **Interfaces:**
+
 - Consumes: なし（純関数のみ）
 - Produces:
-  - `TARGET_MS = 5000` / `PITTARI_MS = 50`
-  - `type Tier = 'pittari' | 'good' | 'close' | 'far'`
-  - `type Ranked = { playerIndex: number; ms: number; deviationMs: number; tier: Tier; isLoser: boolean }`
-  - `deviationMs(ms: number): number`
-  - `tierOf(ms: number): Tier`
-  - `rankRecords(records: number[]): Ranked[]`（deviation 昇順・同率は playerIndex 昇順）
-  - `formatSeconds(ms: number): string`（例 `'5.32'`）
-  - `formatDeviation(ms: number): string`（例 `'+0.32'` / `'-0.02'` / `'±0.00'`）
+    - `TARGET_MS = 5000` / `PITTARI_MS = 50`
+    - `type Tier = 'pittari' | 'good' | 'close' | 'far'`
+    - `type Ranked = { playerIndex: number; ms: number; deviationMs: number; tier: Tier; isLoser: boolean }`
+    - `deviationMs(ms: number): number`
+    - `tierOf(ms: number): Tier`
+    - `rankRecords(records: number[]): Ranked[]`（deviation 昇順・同率は playerIndex 昇順）
+    - `formatSeconds(ms: number): string`（例 `'5.32'`）
+    - `formatDeviation(ms: number): string`（例 `'+0.32'` / `'-0.02'` / `'±0.00'`）
 
 - [ ] **Step 1: 失敗するテストを書く**
 
 `src/games/five-sec-stop/__tests__/judge.test.ts`:
 
 ```ts
-import {
-	deviationMs,
-	formatDeviation,
-	formatSeconds,
-	rankRecords,
-	tierOf,
-} from '../judge'
+import { deviationMs, formatDeviation, formatSeconds, rankRecords, tierOf } from '../judge'
 
 describe('deviationMs', () => {
 	it('5000ms との差の絶対値を返す', () => {
@@ -199,17 +195,19 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 ### Task 2: theme.ts と use-stopwatch.ts — カラー定義と計測フック
 
 **Files:**
+
 - Create: `src/games/five-sec-stop/theme.ts`
 - Create: `src/games/five-sec-stop/use-stopwatch.ts`
 - Test: `src/games/five-sec-stop/__tests__/use-stopwatch.test.ts`
 
 **Interfaces:**
+
 - Consumes: `colors` from `@/theme/tokens`、Task 1 の `Tier`
 - Produces:
-  - `FSS: { bg: string; accent: string; tierColors: Record<Tier, string> }`
-  - `STOP_GUARD_MS = 300` / `HIDE_START_MS = 2500` / `HIDE_END_MS = 3000`
-  - `useStopwatch(): { displayMs: number; running: boolean; start(): void; stop(): number | null; reset(): void }`
-    - `stop()` は経過 ms（`Date.now()` 差分の整数）を返す。ガード未満なら `null` を返し計測継続
+    - `FSS: { bg: string; accent: string; tierColors: Record<Tier, string> }`
+    - `STOP_GUARD_MS = 300` / `HIDE_START_MS = 2500` / `HIDE_END_MS = 3000`
+    - `useStopwatch(): { displayMs: number; running: boolean; start(): void; stop(): number | null; reset(): void }`
+        - `stop()` は経過 ms（`Date.now()` 差分の整数）を返す。ガード未満なら `null` を返し計測継続
 
 - [ ] **Step 1: theme.ts を書く（テスト不要の定数のみ）**
 
@@ -378,14 +376,16 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 ### Task 3: stopwatch-play.tsx — 1人分の計測画面（スタンバイ→計測→記録ドン）
 
 **Files:**
+
 - Create: `src/games/five-sec-stop/pittari-burst.tsx`
 - Create: `src/games/five-sec-stop/stopwatch-play.tsx`
 - Test: `src/games/five-sec-stop/__tests__/stopwatch-play.test.tsx`
 
 **Interfaces:**
+
 - Consumes: Task 1 `tierOf/formatSeconds/formatDeviation`、Task 2 `useStopwatch/FSS/HIDE_START_MS/HIDE_END_MS`、既存 `DrumrollReveal`（`@/components/game/drumroll-reveal`）、`GradientButton`、`haptics`、`playSound`、`playerColor`
 - Produces: `<StopwatchPlay playerIndex={number} playerName={string} orderLabel={string} doneLabel={string} onDone={(ms: number) => void} />`
-  - 内部フェーズ `standby → measuring → record`。`onDone` は「つぎへ」ボタン押下時に確定記録 ms で呼ぶ
+    - 内部フェーズ `standby → measuring → record`。`onDone` は「つぎへ」ボタン押下時に確定記録 ms で呼ぶ
 
 - [ ] **Step 1: 失敗するテストを書く**
 
@@ -800,13 +800,15 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 ### Task 4: result.tsx — ランキング発表（1位から順めくり→最下位ドラムロール）
 
 **Files:**
+
 - Create: `src/games/five-sec-stop/result.tsx`
 - Test: `src/games/five-sec-stop/__tests__/result.test.tsx`
 
 **Interfaces:**
+
 - Consumes: Task 1 `rankRecords/formatSeconds/formatDeviation`、Task 2 `FSS`、既存 `useDrumroll`（`@/components/game/use-drumroll`）、`GradientButton`、`PillButton`、`playerColor`
 - Produces: `<FiveSecResult records={number[]} playerNames={string[]} onRetry={() => void} onHome={() => void} />`
-  - `REVEAL_INTERVAL_MS = 600` を export（テストから参照）
+    - `REVEAL_INTERVAL_MS = 600` を export（テストから参照）
 
 - [ ] **Step 1: 失敗するテストを書く**
 
@@ -856,7 +858,12 @@ const names = ['アオイ', 'ミキ', 'ケン', 'ユウタ']
 
 it('1位から順にカードがめくれ、敗者はドラムロール後に発表される', async () => {
 	const { getByText, queryByText } = await render(
-		<FiveSecResult records={records} playerNames={names} onRetry={jest.fn()} onHome={jest.fn()} />,
+		<FiveSecResult
+			records={records}
+			playerNames={names}
+			onRetry={jest.fn()}
+			onHome={jest.fn()}
+		/>,
 	)
 
 	// 最初は誰もめくれていない
@@ -882,7 +889,12 @@ it('1位から順にカードがめくれ、敗者はドラムロール後に発
 
 it('ぴったり賞のバッジが1位カードに出る', async () => {
 	const { getByText } = await render(
-		<FiveSecResult records={records} playerNames={names} onRetry={jest.fn()} onHome={jest.fn()} />,
+		<FiveSecResult
+			records={records}
+			playerNames={names}
+			onRetry={jest.fn()}
+			onHome={jest.fn()}
+		/>,
 	)
 	await act(async () => jest.advanceTimersByTime(REVEAL_INTERVAL_MS * 3 + DRUMROLL_MS))
 	expect(getByText('ぴったり賞')).toBeTruthy()
@@ -906,7 +918,12 @@ it('同率最下位は複数人まとめて発表される', async () => {
 it('発表完了後に「もう一回」でonRetryが呼ばれる', async () => {
 	const onRetry = jest.fn()
 	const { getByText, queryByText } = await render(
-		<FiveSecResult records={records} playerNames={names} onRetry={onRetry} onHome={jest.fn()} />,
+		<FiveSecResult
+			records={records}
+			playerNames={names}
+			onRetry={onRetry}
+			onHome={jest.fn()}
+		/>,
 	)
 	// 発表が終わるまでボタンは出ない
 	expect(queryByText('もう一回')).toBeNull()
@@ -1013,9 +1030,7 @@ function RankCard({
 	const isTop = rank === 1 && !entry.isLoser
 
 	return (
-		<View
-			style={[styles.card, isTop && styles.topCard, entry.isLoser && styles.loserCard]}
-		>
+		<View style={[styles.card, isTop && styles.topCard, entry.isLoser && styles.loserCard]}>
 			<Text style={styles.rank}>{rank}位</Text>
 			<View
 				style={[styles.colorDot, { backgroundColor: playerColor(entry.playerIndex).value }]}
@@ -1132,11 +1147,13 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 ### Task 5: five-sec-stop-game.tsx と registry 登録・統合テスト
 
 **Files:**
+
 - Create: `src/games/five-sec-stop/five-sec-stop-game.tsx`
 - Modify: `src/games/registry.ts:68-82`（`five-sec-stop` エントリ）
 - Test: `src/games/five-sec-stop/__tests__/five-sec-stop-game.test.tsx`
 
 **Interfaces:**
+
 - Consumes: Task 3 `StopwatchPlay`、Task 4 `FiveSecResult`、既存 `usePlayers/getDisplayNames`（`@/lib/players-store`）、`router`（`expo-router`）
 - Produces: `FiveSecStopGame: ComponentType`（registry の `Component` に設定）
 
@@ -1355,6 +1372,7 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 ### Task 6: 最終検証
 
 **Files:**
+
 - なし（検証のみ）
 
 - [ ] **Step 1: フルテストスイート・型チェック・フォーマット確認**
@@ -1365,6 +1383,7 @@ Expected: すべて PASS。format:check で差分が出たら `npm run format` �
 - [ ] **Step 2: 受け入れ条件の照合**
 
 Issue #11 の受け入れ条件を1つずつ確認:
+
 - スタート→ストップの高精度計測（3秒以降「???」）→ Task 2/3
 - 全員分の結果一覧＋敗者発表 → Task 4/5
 - ぴったり賞（±0.05秒）の特別演出 → Task 3

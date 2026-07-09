@@ -35,7 +35,6 @@ jest.mock('react-native-reanimated', () => {
 	}
 })
 jest.mock('@/lib/players-store', () => {
-	// eslint-disable-next-line @typescript-eslint/no-require-imports
 	const actual = jest.requireActual('@/lib/players-store')
 	return {
 		...actual,
