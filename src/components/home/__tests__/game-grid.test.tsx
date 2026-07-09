@@ -56,9 +56,14 @@ jest.mock('react-native-reanimated', () => {
 })
 
 it('レジストリの全ゲームがカード表示される', async () => {
-	const { getByText } = await render(<GameGrid />)
+	const { getByText, getByLabelText } = await render(<GameGrid />)
 	for (const g of games) {
-		expect(getByText(g.title)).toBeTruthy()
+		// thumbnail 画像カードはタイトルが画像内にあるため、読み上げラベルで確認する
+		if (g.cardThumbnail !== undefined) {
+			expect(getByLabelText(g.title)).toBeTruthy()
+		} else {
+			expect(getByText(g.title)).toBeTruthy()
+		}
 		expect(getByText(g.tagline)).toBeTruthy()
 	}
 })
