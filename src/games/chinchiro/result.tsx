@@ -118,7 +118,7 @@ export function ChinchiroResult({ hands, playerNames, onRetry, onHome, rng = Mat
 				<>
 					{/* 名前は各 RankCard の「敗者！」バッジで既に表示済みのため、ここでは repeat しない
 					   （同じ名前を持つ Text ノードが複数出来ると a11y クエリが曖昧になるのを避ける） */}
-					<Text style={styles.loserBanner}>＼ 罰ゲームけってい！ ／</Text>
+					<Text style={styles.loserBanner}>＼ 罰ゲーム決定！ ／</Text>
 					<View style={styles.actions}>
 						<GradientButton title="もう一回" onPress={onRetry} />
 						<View style={styles.actionGap} />
