@@ -10,6 +10,6 @@ export const lottieAssets = {
 	drumrollLoop: require('@/assets/lottie/drumroll-loop.json') as LottieSource,
 	/** 発表瞬間の紙吹雪・キラキラ（1回再生）。素材ページに「Free to use under the Lottie Simple License」表記を確認済み */
 	celebrate: require('@/assets/lottie/celebrate.json') as LottieSource,
-	/** きまぐれ◯×カットインの背景（1回再生） */
-	cutinFlash: null as LottieSource | null,
+	/** きまぐれ◯×カットインの背景（1回再生）。素材ページに「Free to use under the Lottie Simple License」表記を確認済み */
+	cutinFlash: require('@/assets/lottie/cutin-flash.json') as LottieSource,
 }
