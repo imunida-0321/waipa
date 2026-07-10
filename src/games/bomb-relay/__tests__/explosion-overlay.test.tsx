@@ -67,10 +67,15 @@ it('ホームへ が動く', async () => {
 	expect(onHome).toHaveBeenCalledTimes(1)
 })
 
-it('HOLD 前に unmount してもタイマーが残らない', async () => {
+it('HOLD 前に unmount するとタイマーが発火しない（警告なし）', async () => {
+	// jest.getTimerCount() は RN 内部タイマーが混ざり 0 にならないため使わない
+	// （event-cutin.test.tsx の unmount → advance → 未発火 の慣習に合わせる）
+	const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
 	const { unmount } = await render(<ExplosionOverlay onRetry={jest.fn()} onHome={jest.fn()} />)
+	await unmount()
 	await act(async () => {
-		unmount()
+		jest.advanceTimersByTime(EXPLOSION_HOLD_MS)
 	})
-	expect(jest.getTimerCount()).toBe(0)
+	expect(errorSpy).not.toHaveBeenCalled()
+	errorSpy.mockRestore()
 })
