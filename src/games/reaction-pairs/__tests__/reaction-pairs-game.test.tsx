@@ -1,4 +1,5 @@
 import { act, fireEvent, render } from '@testing-library/react-native'
+import { LUCKY_MS } from '../lucky-cutin'
 import { LANDED_MS, ROLL_MS } from '../player-roulette'
 import { MISMATCH_MS, ReactionPairsGame } from '../reaction-pairs-game'
 
@@ -73,6 +74,24 @@ it('手番表示 → ペア成立 → ルーレット → 罰発表 → 手番�
 	})
 	expect(queryByText('あおさんが罰！')).toBeNull()
 	expect(getByText(/あおさんの番/)).toBeTruthy()
+})
+
+it('ラッキーをめくると発動カットインが出て、LUCKY_MS 後に消えて手番はそのまま', async () => {
+	const { getByText, getByLabelText, queryByText } = await render(<ReactionPairsGame />)
+	expect(getByText(/あかさんの番/)).toBeTruthy()
+
+	// デッキは生成順のまま: カード16 = lucky
+	await act(async () => {
+		fireEvent.press(getByLabelText('カード16'))
+	})
+	expect(getByText('🍀 罰免除パスGET！')).toBeTruthy()
+
+	await act(async () => {
+		jest.advanceTimersByTime(LUCKY_MS)
+	})
+	expect(queryByText('🍀 罰免除パスGET！')).toBeNull()
+	expect(getByText(/🍀 あか/)).toBeTruthy()
+	expect(getByText(/あかさんの番/)).toBeTruthy()
 })
 
 it('不成立の2枚は MISMATCH_MS 後に裏へ戻り手番交代', async () => {

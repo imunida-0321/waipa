@@ -6,10 +6,11 @@ import { useTopics } from '@/lib/topics-store'
 import { playerColor } from '@/theme/player-colors'
 import { colors, radii, spacing, typography } from '@/theme/tokens'
 import { CardGrid } from './card-grid'
+import { LuckyCutIn } from './lucky-cutin'
 import { PlayerRoulette } from './player-roulette'
 import { PunishReveal } from './punish-reveal'
 import { ResultScreen } from './result-screen'
-import { initialState, isMismatchShown, reduce } from './reducer'
+import { initialState, isLuckyShown, isMismatchShown, reduce } from './reducer'
 import { pickBatsuTopic } from './topics'
 
 export const MISMATCH_MS = 1500
@@ -29,6 +30,8 @@ export function ReactionPairsGame() {
 		return () => clearTimeout(t)
 	}, [mismatch])
 
+	const luckyShown = isLuckyShown(state)
+
 	const turnColor = playerColor(state.turnIndex).value
 
 	return (
@@ -43,9 +46,16 @@ export function ReactionPairsGame() {
 
 			<CardGrid
 				cards={state.cards}
-				disabled={state.phase !== 'play' || state.flippedIds.length === 2}
+				disabled={state.phase !== 'play' || state.flippedIds.length === 2 || luckyShown}
 				onFlip={(cardId) => dispatch({ type: 'flip', cardId, rng: Math.random })}
 			/>
+
+			{luckyShown && state.passHolder !== null && (
+				<LuckyCutIn
+					playerName={names[state.passHolder]}
+					onDone={() => dispatch({ type: 'luckyDone' })}
+				/>
+			)}
 
 			{state.phase === 'roulette' && state.roulette && (
 				<PlayerRoulette
