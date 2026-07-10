@@ -7,14 +7,20 @@
 `src/app/_layout.tsx` で `registerSound(name, require(...))` により起動時に登録され、
 `playSound(name)`（`src/lib/sound.ts`）で再生される。
 
-| ファイル | 用途 | 元素材（Kenney.nl） |
-|---|---|---|
-| `tap.m4a` | ボタンタップ | [Interface Sounds](https://kenney.nl/assets/interface-sounds) `click_001.ogg` |
-| `explosion.m4a` | BOMB!! の爆発 | [Sci-Fi Sounds](https://kenney.nl/assets/sci-fi-sounds) `explosionCrunch_002.ogg` |
-| `reveal.m4a` | 結果発表 | [Digital Audio](https://kenney.nl/assets/digital-audio) `powerUp1.ogg` |
-| `event.m4a` | きまぐれ◯× イベントカットイン | [Digital Audio](https://kenney.nl/assets/digital-audio) `phaserUp1.ogg` |
-| `spin.m4a` | ルーレット回転（3.5秒） | Interface Sounds `click_002.ogg` を加工生成（下記） |
-| `drumroll.m4a` | ドラムロール（2.0秒） | 自作合成（フィルタードノイズのスネアロール） |
+| ファイル        | 用途                          | 元素材（Kenney.nl）                                                               |
+| --------------- | ----------------------------- | --------------------------------------------------------------------------------- |
+| `tap.m4a`       | ボタンタップ                  | [Interface Sounds](https://kenney.nl/assets/interface-sounds) `click_001.ogg`     |
+| `explosion.m4a` | BOMB!! の爆発                 | [Sci-Fi Sounds](https://kenney.nl/assets/sci-fi-sounds) `explosionCrunch_002.ogg` |
+| `reveal.m4a`    | 結果発表                      | [Digital Audio](https://kenney.nl/assets/digital-audio) `powerUp1.ogg`            |
+| `event.m4a`     | きまぐれ◯× イベントカットイン | [Digital Audio](https://kenney.nl/assets/digital-audio) `phaserUp1.ogg`           |
+| `spin.m4a`      | ルーレット回転（3.5秒）       | Interface Sounds `click_002.ogg` を加工生成（下記）                               |
+| `drumroll.m4a`  | ドラムロール（2.0秒）         | 自作合成（フィルタードノイズのスネアロール）                                      |
+
+### 未収録（追加予定）
+
+| ファイル   | 用途                                           | 状態                                                                                                                                                     |
+| ---------- | ---------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `tick.m4a` | カウントダウン爆弾リレーのチクタク（加速再生） | 素材未収録。追加したら `_layout.tsx` に `registerSound('tick', require('@/assets/sounds/tick.m4a'))` を1行足す。未収録の間は無音（バイブのみ）で動作する |
 
 ## 加工生成した音源について
 
@@ -31,4 +37,4 @@ AAC 変換は macOS `afconvert -f m4af -d aac -b 96000`。
 
 1. 新しい音源（CC0 等ライセンス確認済み）を同名の `.m4a` でこのフォルダに置く
 2. この README の表を更新する
-名前を追加する場合は `src/app/_layout.tsx` に `registerSound` を1行足す。
+   名前を追加する場合は `src/app/_layout.tsx` に `registerSound` を1行足す。

@@ -1,7 +1,7 @@
 import type { ComponentType } from 'react'
 import { BombGame } from './bomb-216/bomb-game'
+import { BombRelayGame } from './bomb-relay/bomb-relay-game'
 import { ChinchiroGame } from './chinchiro/chinchiro-game'
-import { ComingSoonGame } from './coming-soon'
 import { FiveSecStopGame } from './five-sec-stop/five-sec-stop-game'
 import { KimagureOxGame } from './kimagure-ox/kimagure-ox-game'
 import { NoKingGame } from './no-king-game/no-king-game'
@@ -169,12 +169,16 @@ export const games: readonly GameMeta[] = [
 		gradient: ['#A55EEA', '#8854D0'],
 		minPlayers: 3,
 		maxPlayers: 12,
+		catchCopy: 'お題に答えてスマホを回せ！\n爆発した瞬間、持ってた人の負け！',
+		summary:
+			'このゲームは、お題（例「ラーメンの具といえば？」）に答えながらスマホを回すリレーゲームです！爆弾のタイマーはランダムで、チクタクがだんだん速くなり…爆発した瞬間に持っていた人が負けです！',
 		howToPlay: [
-			'お題に答えたらスマホを次の人へ回します',
-			'爆弾のタイマーはランダム。チクタク音が速くなってきたら…',
-			'爆発した瞬間に持っていた人が負け！',
+			'① お題をみんなで確認して「スタート」！',
+			'② お題に答えたら、すぐ次の人にスマホを手渡し！',
+			'③ チクタクがだんだん速くなってきたら…爆発が近い！',
+			'④ 💥 爆発した瞬間に持っていた人の負け！',
 		],
-		Component: ComingSoonGame,
+		Component: BombRelayGame,
 	},
 	{
 		id: 'reaction-pairs',
