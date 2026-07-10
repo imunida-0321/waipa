@@ -15,6 +15,9 @@
 - コードフォーマット: タブ幅4・セミコロンなし・シングルクォート（Prettier 設定済み。コミット前に `npx prettier --write <files>`）
 - ブランチ: `feature/16-reaction-pairs`（作成済み。この上でコミットを積む）
 - テスト: `npm test -- src/games/reaction-pairs`。React 19 のため **タイマー系・状態更新系は必ず `await act(async () => { ... })`**（同期 act は失敗する。参照実装: `src/games/kimagure-ox/__tests__/`）
+- RNTL v14 では `render()` が Promise を返すため **コンポーネントテストは `await render(...)`**。状態更新を起こす `fireEvent.press` は `await act(async () => { fireEvent.press(...) })` で包む
+- `StyleSheet.absoluteFillObject` は RN 0.86 に存在しない。全画面オーバーレイは `...StyleSheet.absoluteFill` を使う（kimagure-ox の event-cutin.tsx 前例）
+- 素の `npm test`（全体）は `.claude/worktrees/` 配下の並行作業テストを拾って落ちることがある。全体回帰は `npm test -- src` で確認する
 - カラートークンは `@/theme/tokens` の `colors` / `spacing` / `radii` / `typography` を使う。ゲーム固有色は `theme.ts` に定義（registry グラデ `#26DE81 → #20BF6B` と統一）
 - プレイヤー色は `@/theme/player-colors` の `playerColor(index)` を使う
 - 効果音は `playSound('drumroll' | 'reveal' | ...)`、バイブは `haptics.tap() / heavy() / success()` のみ経由
@@ -62,7 +65,7 @@ function seqRng(values: number[]) {
 }
 
 describe('createDeck', () => {
-	it('16枚・7ペア×2・ジョーカー1・ラッキー1で構成される', () => {
+	it('16枚・7ペア×2・ジョーカー1・ラッキー1で構成される', async () => {
 		const deck = createDeck(() => 0.5)
 		expect(deck).toHaveLength(BOARD_SIZE)
 		expect(deck.filter((c) => c.kind === 'pair')).toHaveLength(PAIR_COUNT * 2)
@@ -70,7 +73,7 @@ describe('createDeck', () => {
 		expect(deck.filter((c) => c.kind === 'lucky')).toHaveLength(1)
 	})
 
-	it('各ペアはちょうど2枚ずつ・シンボルは PAIR_SYMBOLS から重複なし', () => {
+	it('各ペアはちょうど2枚ずつ・シンボルは PAIR_SYMBOLS から重複なし', async () => {
 		const deck = createDeck(() => 0.5)
 		const byPair = new Map<string, Card[]>()
 		for (const c of deck) {
@@ -88,13 +91,13 @@ describe('createDeck', () => {
 		expect(symbols.size).toBe(PAIR_COUNT)
 	})
 
-	it('全カードが hidden で始まり id は一意', () => {
+	it('全カードが hidden で始まり id は一意', async () => {
 		const deck = createDeck(() => 0.5)
 		expect(deck.every((c) => c.state === 'hidden')).toBe(true)
 		expect(new Set(deck.map((c) => c.id)).size).toBe(BOARD_SIZE)
 	})
 
-	it('rng によって並び順が変わる（シャッフルされている）', () => {
+	it('rng によって並び順が変わる（シャッフルされている）', async () => {
 		const a = createDeck(seqRng([0.1, 0.9, 0.3, 0.7, 0.5]))
 		const b = createDeck(seqRng([0.9, 0.1, 0.7, 0.3, 0.5]))
 		expect(a.map((c) => c.id)).not.toEqual(b.map((c) => c.id))
@@ -109,21 +112,21 @@ describe('isMatch', () => {
 		symbol: '🎲',
 		state: 'revealed',
 	})
-	it('同じ pairId の2枚は成立', () => {
+	it('同じ pairId の2枚は成立', async () => {
 		expect(isMatch(pair('p1', 'a'), pair('p1', 'b'))).toBe(true)
 	})
-	it('異なる pairId は不成立', () => {
+	it('異なる pairId は不成立', async () => {
 		expect(isMatch(pair('p1', 'a'), pair('p2', 'a'))).toBe(false)
 	})
 })
 
 describe('pickPunishTarget', () => {
-	it('パス保持者なし: rng の値に応じた index が first=final になる', () => {
+	it('パス保持者なし: rng の値に応じた index が first=final になる', async () => {
 		const r = pickPunishTarget(4, null, () => 0.5) // floor(0.5*4)=2
 		expect(r).toEqual({ firstIndex: 2, finalIndex: 2, passConsumed: false })
 	})
 
-	it('パス保持者が当選したら消費して本人を除いて再抽選', () => {
+	it('パス保持者が当選したら消費して本人を除いて再抽選', async () => {
 		// 1回目: floor(0.25*4)=1（パス保持者）→ 再抽選: floor(0.5*3)=1 → 保持者(1)を飛ばして 2
 		const r = pickPunishTarget(4, 1, seqRng([0.25, 0.5]))
 		expect(r.firstIndex).toBe(1)
@@ -132,12 +135,12 @@ describe('pickPunishTarget', () => {
 		expect(r.finalIndex).not.toBe(1)
 	})
 
-	it('パス保持者が当選しなければ消費しない', () => {
+	it('パス保持者が当選しなければ消費しない', async () => {
 		const r = pickPunishTarget(4, 1, () => 0.9) // floor(0.9*4)=3
 		expect(r).toEqual({ firstIndex: 3, finalIndex: 3, passConsumed: false })
 	})
 
-	it('2人プレイでパス保持者が当選したらもう1人に確定', () => {
+	it('2人プレイでパス保持者が当選したらもう1人に確定', async () => {
 		const r = pickPunishTarget(2, 0, seqRng([0.1, 0.99])) // first=0 → 再抽選は必ず 1
 		expect(r).toEqual({ firstIndex: 0, finalIndex: 1, passConsumed: true })
 	})
@@ -267,7 +270,7 @@ import type { Topic } from '@/lib/topics-store'
 import { FALLBACK_BATSU_TOPICS, pickBatsuTopic } from '../topics'
 
 describe('FALLBACK_BATSU_TOPICS', () => {
-	it('20個・全て pack=batsu・id 重複なし', () => {
+	it('20個・全て pack=batsu・id 重複なし', async () => {
 		expect(FALLBACK_BATSU_TOPICS.length).toBeGreaterThanOrEqual(20)
 		expect(FALLBACK_BATSU_TOPICS.every((t) => t.pack === 'batsu')).toBe(true)
 		expect(new Set(FALLBACK_BATSU_TOPICS.map((t) => t.id)).size).toBe(
@@ -283,22 +286,22 @@ describe('pickBatsuTopic', () => {
 		{ id: 'k1', pack: 'king', text: '王様お題（対象外）' },
 	]
 
-	it('batsu パックのお題から rng で選ぶ（他パックは無視）', () => {
+	it('batsu パックのお題から rng で選ぶ（他パックは無視）', async () => {
 		const t = pickBatsuTopic(remote, [], () => 0) // pool=[r1,r2] の先頭
 		expect(t.id).toBe('r1')
 	})
 
-	it('使用済み ID を除外する', () => {
+	it('使用済み ID を除外する', async () => {
 		const t = pickBatsuTopic(remote, ['r1'], () => 0)
 		expect(t.id).toBe('r2')
 	})
 
-	it('リモートに batsu がなければフォールバックから選ぶ', () => {
+	it('リモートに batsu がなければフォールバックから選ぶ', async () => {
 		const t = pickBatsuTopic([], [], () => 0)
 		expect(t.id).toBe(FALLBACK_BATSU_TOPICS[0].id)
 	})
 
-	it('プール枯渇時は usedIds を無視して必ず返す', () => {
+	it('プール枯渇時は usedIds を無視して必ず返す', async () => {
 		const t = pickBatsuTopic(remote.slice(0, 1), ['r1'], () => 0)
 		expect(t).toBeDefined()
 		expect(t.pack).toBe('batsu')
@@ -436,7 +439,7 @@ function flip(state: GameState, cardId: string, rng: () => number = () => 0.5): 
 }
 
 describe('initialState', () => {
-	it('16枚・play フェーズ・スコア0で始まる', () => {
+	it('16枚・play フェーズ・スコア0で始まる', async () => {
 		const s = initialState(4, () => 0.5)
 		expect(s.cards).toHaveLength(16)
 		expect(s.phase).toBe('play')
@@ -449,19 +452,19 @@ describe('initialState', () => {
 })
 
 describe('flip: 絵柄カード', () => {
-	it('1枚目は revealed になり flippedIds に入る', () => {
+	it('1枚目は revealed になり flippedIds に入る', async () => {
 		const s = flip(freshState(), 'p1-a')
 		expect(s.cards.find((c) => c.id === 'p1-a')?.state).toBe('revealed')
 		expect(s.flippedIds).toEqual(['p1-a'])
 		expect(s.phase).toBe('play')
 	})
 
-	it('同じカードの再タップ・revealed カードのタップは無効', () => {
+	it('同じカードの再タップ・revealed カードのタップは無効', async () => {
 		const s1 = flip(freshState(), 'p1-a')
 		expect(flip(s1, 'p1-a')).toBe(s1)
 	})
 
-	it('2枚目で成立: removed・スコア加算・roulette フェーズへ', () => {
+	it('2枚目で成立: removed・スコア加算・roulette フェーズへ', async () => {
 		const s = flip(flip(freshState(), 'p1-a'), 'p1-b', () => 0.5) // floor(0.5*3)=1
 		expect(s.cards.find((c) => c.id === 'p1-a')?.state).toBe('removed')
 		expect(s.cards.find((c) => c.id === 'p1-b')?.state).toBe('removed')
@@ -471,7 +474,7 @@ describe('flip: 絵柄カード', () => {
 		expect(s.flippedIds).toEqual([])
 	})
 
-	it('2枚目で不成立: revealed のまま・3枚目はめくれない', () => {
+	it('2枚目で不成立: revealed のまま・3枚目はめくれない', async () => {
 		const s = flip(flip(freshState(), 'p1-a'), 'p2-a')
 		expect(s.phase).toBe('play')
 		expect(isMismatchShown(s)).toBe(true)
@@ -480,7 +483,7 @@ describe('flip: 絵柄カード', () => {
 })
 
 describe('hideMismatch', () => {
-	it('2枚を hidden に戻し手番を次へ', () => {
+	it('2枚を hidden に戻し手番を次へ', async () => {
 		const s = reduce(flip(flip(freshState(), 'p1-a'), 'p2-a'), { type: 'hideMismatch' })
 		expect(s.cards.find((c) => c.id === 'p1-a')?.state).toBe('hidden')
 		expect(s.cards.find((c) => c.id === 'p2-a')?.state).toBe('hidden')
@@ -488,7 +491,7 @@ describe('hideMismatch', () => {
 		expect(s.turnIndex).toBe(1)
 	})
 
-	it('最後のプレイヤーの次は先頭へ周回', () => {
+	it('最後のプレイヤーの次は先頭へ周回', async () => {
 		const base = { ...freshState(3), turnIndex: 2 }
 		const s = reduce(flip(flip(base, 'p1-a'), 'p2-a'), { type: 'hideMismatch' })
 		expect(s.turnIndex).toBe(0)
@@ -496,14 +499,14 @@ describe('hideMismatch', () => {
 })
 
 describe('flip: ジョーカー', () => {
-	it('1枚目でも即 result・めくった人が loser', () => {
+	it('1枚目でも即 result・めくった人が loser', async () => {
 		const s = flip(freshState(), 'joker')
 		expect(s.phase).toBe('result')
 		expect(s.loserIndex).toBe(0)
 		expect(s.cards.find((c) => c.id === 'joker')?.state).toBe('revealed')
 	})
 
-	it('2枚目（1枚 revealed 中）でも即 result', () => {
+	it('2枚目（1枚 revealed 中）でも即 result', async () => {
 		const s = flip(flip(freshState(), 'p1-a'), 'joker')
 		expect(s.phase).toBe('result')
 		expect(s.loserIndex).toBe(0)
@@ -511,7 +514,7 @@ describe('flip: ジョーカー', () => {
 })
 
 describe('flip: ラッキー', () => {
-	it('パス付与・removed・flippedIds にカウントせず手番続行', () => {
+	it('パス付与・removed・flippedIds にカウントせず手番続行', async () => {
 		const s = flip(freshState(), 'lucky')
 		expect(s.passHolder).toBe(0)
 		expect(s.cards.find((c) => c.id === 'lucky')?.state).toBe('removed')
@@ -520,7 +523,7 @@ describe('flip: ラッキー', () => {
 		expect(s.turnIndex).toBe(0)
 	})
 
-	it('1枚めくった後にラッキー → まだ2枚目の絵柄をめくれる', () => {
+	it('1枚めくった後にラッキー → まだ2枚目の絵柄をめくれる', async () => {
 		const s = flip(flip(freshState(), 'p1-a'), 'lucky')
 		expect(s.flippedIds).toEqual(['p1-a'])
 		const s2 = flip(s, 'p1-b')
@@ -534,7 +537,7 @@ describe('rouletteDone / punishDone', () => {
 		return flip(flip(base, 'p1-a'), 'p1-b', rouletteRng)
 	}
 
-	it('rouletteDone: punish セット・罰回数加算・お題を使用済みに', () => {
+	it('rouletteDone: punish セット・罰回数加算・お題を使用済みに', async () => {
 		const s = reduce(toRoulette(), { type: 'rouletteDone', topic })
 		expect(s.phase).toBe('punish')
 		expect(s.punish).toEqual({ playerIndex: 1, topic })
@@ -542,7 +545,7 @@ describe('rouletteDone / punishDone', () => {
 		expect(s.usedTopicIds).toEqual(['t1'])
 	})
 
-	it('passConsumed のとき passHolder をクリアする', () => {
+	it('passConsumed のとき passHolder をクリアする', async () => {
 		// turnIndex=0 が成立、パス保持者=1。1回目 floor(0.34*3)=1 → 再抽選 floor(0.9*2)=1 → 保持者を飛ばして 2
 		let i = 0
 		const rng = () => [0.34, 0.9][i++] ?? 0
@@ -551,7 +554,7 @@ describe('rouletteDone / punishDone', () => {
 		expect(s.punish?.playerIndex).toBe(2)
 	})
 
-	it('punishDone: play に戻り手番が次へ', () => {
+	it('punishDone: play に戻り手番が次へ', async () => {
 		const s = reduce(reduce(toRoulette(), { type: 'rouletteDone', topic }), {
 			type: 'punishDone',
 		})
@@ -561,7 +564,7 @@ describe('rouletteDone / punishDone', () => {
 		expect(s.turnIndex).toBe(1)
 	})
 
-	it('全ペア消化後の punishDone は result へ', () => {
+	it('全ペア消化後の punishDone は result へ', async () => {
 		// p1 成立 → 罰消化 → p2 成立 → 罰消化で絵柄カードが尽きる
 		let s = reduce(reduce(toRoulette(), { type: 'rouletteDone', topic }), {
 			type: 'punishDone',
@@ -575,7 +578,7 @@ describe('rouletteDone / punishDone', () => {
 })
 
 describe('retry', () => {
-	it('同じ人数で初期状態に戻る', () => {
+	it('同じ人数で初期状態に戻る', async () => {
 		const s = reduce(flip(freshState(), 'joker'), { type: 'retry', rng: () => 0.5 })
 		expect(s.phase).toBe('play')
 		expect(s.playerCount).toBe(3)
@@ -835,35 +838,35 @@ const cards: Card[] = [
 	{ id: 'lucky', kind: 'lucky', pairId: null, symbol: '🍀', state: 'removed' },
 ]
 
-it('hidden カードのタップで onFlip が呼ばれる', () => {
+it('hidden カードのタップで onFlip が呼ばれる', async () => {
 	const onFlip = jest.fn()
-	const { getByLabelText } = render(<CardGrid cards={cards} onFlip={onFlip} />)
+	const { getByLabelText } = await render(<CardGrid cards={cards} onFlip={onFlip} />)
 	fireEvent.press(getByLabelText('カード1'))
 	expect(onFlip).toHaveBeenCalledWith('p1-a')
 })
 
-it('revealed はシンボルが見え、タップしても onFlip は呼ばれない', () => {
+it('revealed はシンボルが見え、タップしても onFlip は呼ばれない', async () => {
 	const onFlip = jest.fn()
-	const { getByText, getByLabelText } = render(<CardGrid cards={cards} onFlip={onFlip} />)
+	const { getByText, getByLabelText } = await render(<CardGrid cards={cards} onFlip={onFlip} />)
 	expect(getByText('🎤')).toBeTruthy()
 	fireEvent.press(getByLabelText('🎤'))
 	expect(onFlip).not.toHaveBeenCalled()
 })
 
-it('removed はシンボルを表示しない', () => {
-	const { queryByText } = render(<CardGrid cards={cards} onFlip={jest.fn()} />)
+it('removed はシンボルを表示しない', async () => {
+	const { queryByText } = await render(<CardGrid cards={cards} onFlip={jest.fn()} />)
 	expect(queryByText('🍀')).toBeNull()
 })
 
-it('disabled 中は hidden をタップしても無視', () => {
+it('disabled 中は hidden をタップしても無視', async () => {
 	const onFlip = jest.fn()
-	const { getByLabelText } = render(<CardGrid cards={cards} onFlip={onFlip} disabled />)
+	const { getByLabelText } = await render(<CardGrid cards={cards} onFlip={onFlip} disabled />)
 	fireEvent.press(getByLabelText('カード1'))
 	expect(onFlip).not.toHaveBeenCalled()
 })
 
-it('JOKER は表記付きで表示される', () => {
-	const { getByText } = render(<CardGrid cards={cards} onFlip={jest.fn()} />)
+it('JOKER は表記付きで表示される', async () => {
+	const { getByText } = await render(<CardGrid cards={cards} onFlip={jest.fn()} />)
 	expect(getByText('JOKER')).toBeTruthy()
 })
 ```
@@ -1085,7 +1088,7 @@ afterEach(() => {
 
 it('回転 → 停止 → 当選者表示のあと onDone が呼ばれる', async () => {
 	const onDone = jest.fn()
-	const { getByText } = render(
+	const { getByText } = await render(
 		<PlayerRoulette
 			names={names}
 			firstIndex={1}
@@ -1107,7 +1110,7 @@ it('回転 → 停止 → 当選者表示のあと onDone が呼ばれる', asyn
 
 it('免除パス発動時は再抽選を挟んで finalIndex で確定する', async () => {
 	const onDone = jest.fn()
-	const { getByText } = render(
+	const { getByText } = await render(
 		<PlayerRoulette
 			names={names}
 			firstIndex={0}
@@ -1134,8 +1137,8 @@ it('免除パス発動時は再抽選を挟んで finalIndex で確定する', a
 	expect(onDone).toHaveBeenCalledTimes(1)
 })
 
-it('全員の名前が表示される', () => {
-	const { getAllByText } = render(
+it('全員の名前が表示される', async () => {
+	const { getAllByText } = await render(
 		<PlayerRoulette
 			names={names}
 			firstIndex={0}
@@ -1261,7 +1264,7 @@ export function PlayerRoulette({ names, firstIndex, finalIndex, passConsumed, on
 
 const styles = StyleSheet.create({
 	backdrop: {
-		...StyleSheet.absoluteFillObject,
+		...StyleSheet.absoluteFill,
 		backgroundColor: 'rgba(10,8,24,0.94)',
 		alignItems: 'center',
 		justifyContent: 'center',
@@ -1333,9 +1336,9 @@ jest.mock('expo-linear-gradient', () => {
 	return { LinearGradient: View }
 })
 
-it('対象者名とお題を表示し「実行した！」で onDone', () => {
+it('対象者名とお題を表示し「実行した！」で onDone', async () => {
 	const onDone = jest.fn()
-	const { getByText } = render(
+	const { getByText } = await render(
 		<PunishReveal
 			playerName="あお"
 			playerIndex={1}
@@ -1373,20 +1376,20 @@ const base = {
 	onHome: jest.fn(),
 }
 
-it('スコア降順・同数同順位のランキングを表示する', () => {
-	const { getAllByText, getByText } = render(<ResultScreen {...base} loserIndex={null} />)
+it('スコア降順・同数同順位のランキングを表示する', async () => {
+	const { getAllByText, getByText } = await render(<ResultScreen {...base} loserIndex={null} />)
 	expect(getAllByText('1位')).toHaveLength(2) // あか・みどり が同率1位
 	expect(getByText('3位')).toBeTruthy() // あお
 	expect(getByText('罰 3回')).toBeTruthy()
 })
 
-it('ジョーカー終了時は即負け見出しを出す', () => {
-	const { getByText } = render(<ResultScreen {...base} loserIndex={1} />)
+it('ジョーカー終了時は即負け見出しを出す', async () => {
+	const { getByText } = await render(<ResultScreen {...base} loserIndex={1} />)
 	expect(getByText('あおさん、ジョーカーで即負け！')).toBeTruthy()
 })
 
-it('もう一回 / ホームへ が動く', () => {
-	const { getByText } = render(<ResultScreen {...base} loserIndex={null} />)
+it('もう一回 / ホームへ が動く', async () => {
+	const { getByText } = await render(<ResultScreen {...base} loserIndex={null} />)
 	fireEvent.press(getByText('もう一回'))
 	expect(base.onRetry).toHaveBeenCalled()
 	fireEvent.press(getByText('ホームへ'))
@@ -1442,7 +1445,7 @@ export function PunishReveal({ playerName, playerIndex, topicText, onDone }: Pro
 
 const styles = StyleSheet.create({
 	backdrop: {
-		...StyleSheet.absoluteFillObject,
+		...StyleSheet.absoluteFill,
 		backgroundColor: 'rgba(10,8,24,0.94)',
 		alignItems: 'stretch',
 		justifyContent: 'center',
@@ -1629,7 +1632,7 @@ afterEach(() => {
 })
 
 it('手番表示 → ペア成立 → ルーレット → 罰発表 → 手番交代まで通る', async () => {
-	const { getByText, getByLabelText, queryByText } = render(<ReactionPairsGame />)
+	const { getByText, getByLabelText, queryByText } = await render(<ReactionPairsGame />)
 	expect(getByText(/あかさんの番/)).toBeTruthy()
 
 	// デッキは生成順のまま: カード1 = p1-a, カード2 = p1-b（ペア成立）
@@ -1659,7 +1662,7 @@ it('手番表示 → ペア成立 → ルーレット → 罰発表 → 手番�
 })
 
 it('不成立の2枚は MISMATCH_MS 後に裏へ戻り手番交代', async () => {
-	const { getByText, getByLabelText } = render(<ReactionPairsGame />)
+	const { getByText, getByLabelText } = await render(<ReactionPairsGame />)
 	// カード1 = p1-a, カード3 = p2-a（不成立）
 	await act(async () => {
 		fireEvent.press(getByLabelText('カード1'))
@@ -1827,7 +1830,7 @@ import { ReactionPairsGame } from './reaction-pairs/reaction-pairs-game'
 Run: `npm test -- src/games/reaction-pairs && npx tsc --noEmit`
 Expected: 全 PASS・型エラーなし
 
-Run: `npm test`（全体回帰。registry を触ったのでホーム系テストが影響を受けていないか）
+Run: `npm test -- src`（全体回帰。registry を触ったのでホーム系テストが影響を受けていないか。素の `npm test` は並行ワークツリーを拾うので使わない）
 Expected: PASS
 
 - [ ] **Step 6: フォーマット＆コミット**
@@ -1926,7 +1929,7 @@ git commit -m "feat: batsu お題パックのシード SQL (#16)"
 - [ ] **Step 1: 全テスト・型・フォーマット確認**
 
 ```bash
-npm test
+npm test -- src
 npx tsc --noEmit
 npx prettier --check .
 ```
