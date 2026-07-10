@@ -1,6 +1,6 @@
 import type { Topic } from '@/lib/topics-store'
 import type { Card } from '../engine'
-import { initialState, isMismatchShown, reduce, type Action, type GameState } from '../reducer'
+import { initialState, isMismatchShown, reduce, type GameState } from '../reducer'
 
 const topic: Topic = { id: 't1', pack: 'batsu', text: '一発ギャグをする' }
 
