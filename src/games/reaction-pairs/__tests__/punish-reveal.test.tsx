@@ -1,4 +1,4 @@
-import { fireEvent, render } from '@testing-library/react-native'
+import { act, fireEvent, render } from '@testing-library/react-native'
 import { PunishReveal } from '../punish-reveal'
 
 jest.mock('@/lib/sound', () => ({ playSound: jest.fn(), registerSound: jest.fn() }))
@@ -37,6 +37,8 @@ it('対象者名とお題を表示し「実行した！」で onDone', async () 
 	)
 	expect(getByText('あおさんが罰！')).toBeTruthy()
 	expect(getByText('一発ギャグをする')).toBeTruthy()
-	fireEvent.press(getByText('実行した！'))
+	await act(async () => {
+		fireEvent.press(getByText('実行した！'))
+	})
 	expect(onDone).toHaveBeenCalledTimes(1)
 })
