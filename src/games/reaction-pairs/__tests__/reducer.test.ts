@@ -1,6 +1,6 @@
 import type { Topic } from '@/lib/topics-store'
 import type { Card } from '../engine'
-import { initialState, isMismatchShown, reduce, type GameState } from '../reducer'
+import { initialState, isLuckyShown, isMismatchShown, reduce, type GameState } from '../reducer'
 
 const topic: Topic = { id: 't1', pack: 'batsu', text: '一発ギャグをする' }
 
@@ -95,27 +95,44 @@ describe('flip: ジョーカー', () => {
 		expect(s.phase).toBe('result')
 		expect(s.loserIndex).toBe(0)
 		expect(s.cards.find((c) => c.id === 'joker')?.state).toBe('revealed')
+		expect(s.flippedIds).toEqual([])
 	})
 
 	it('2枚目（1枚 revealed 中）でも即 result', async () => {
 		const s = flip(flip(freshState(), 'p1-a'), 'joker')
 		expect(s.phase).toBe('result')
 		expect(s.loserIndex).toBe(0)
+		expect(s.flippedIds).toEqual([])
 	})
 })
 
 describe('flip: ラッキー', () => {
-	it('パス付与・removed・flippedIds にカウントせず手番続行', async () => {
+	it('発動カットイン表示: revealed・パス付与・flippedIds にカウントせず手番はそのまま', async () => {
 		const s = flip(freshState(), 'lucky')
 		expect(s.passHolder).toBe(0)
-		expect(s.cards.find((c) => c.id === 'lucky')?.state).toBe('removed')
+		expect(s.cards.find((c) => c.id === 'lucky')?.state).toBe('revealed')
 		expect(s.flippedIds).toEqual([])
 		expect(s.phase).toBe('play')
 		expect(s.turnIndex).toBe(0)
+		expect(isLuckyShown(s)).toBe(true)
 	})
 
-	it('1枚めくった後にラッキー → まだ2枚目の絵柄をめくれる', async () => {
-		const s = flip(flip(freshState(), 'p1-a'), 'lucky')
+	it('luckyDone: removed になりカットインが終わる。turn/phase は変わらない', async () => {
+		const s = reduce(flip(freshState(), 'lucky'), { type: 'luckyDone' })
+		expect(s.cards.find((c) => c.id === 'lucky')?.state).toBe('removed')
+		expect(s.phase).toBe('play')
+		expect(s.turnIndex).toBe(0)
+		expect(s.passHolder).toBe(0)
+		expect(isLuckyShown(s)).toBe(false)
+	})
+
+	it('luckyDone はラッキーが revealed でないときは無効', async () => {
+		const s = freshState()
+		expect(reduce(s, { type: 'luckyDone' })).toBe(s)
+	})
+
+	it('1枚めくった後にラッキー → luckyDone 後もまだ2枚目の絵柄をめくれる', async () => {
+		const s = reduce(flip(flip(freshState(), 'p1-a'), 'lucky'), { type: 'luckyDone' })
 		expect(s.flippedIds).toEqual(['p1-a'])
 		const s2 = flip(s, 'p1-b')
 		expect(s2.phase).toBe('roulette')

@@ -67,6 +67,7 @@ function CardCell({
 		)
 	}
 	const isJoker = card.kind === 'joker'
+	const isLucky = card.kind === 'lucky'
 	return (
 		<Pressable
 			accessibilityRole="button"
@@ -74,9 +75,17 @@ function CardCell({
 			onPress={onPress}
 			style={styles.cell}
 		>
-			<FlipIn style={[styles.faceFill, styles.face, isJoker && styles.jokerFace]}>
+			<FlipIn
+				style={[
+					styles.faceFill,
+					styles.face,
+					isJoker && styles.jokerFace,
+					isLucky && styles.luckyFace,
+				]}
+			>
 				<Text style={styles.symbol}>{card.symbol}</Text>
 				{isJoker && <Text style={styles.jokerLabel}>JOKER</Text>}
+				{isLucky && <Text style={styles.luckyLabel}>LUCKY</Text>}
 			</FlipIn>
 		</Pressable>
 	)
@@ -122,8 +131,10 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 	},
 	jokerFace: { borderColor: RP.joker, backgroundColor: '#2A1024' },
+	luckyFace: { borderColor: RP.lucky, backgroundColor: '#2A2210' },
 	symbol: { fontSize: 34 },
 	jokerLabel: { fontSize: 11, fontWeight: '800', color: RP.joker, marginTop: 2 },
+	luckyLabel: { fontSize: 11, fontWeight: '800', color: RP.lucky, marginTop: 2 },
 	removed: {
 		borderWidth: 1,
 		borderColor: colors.surfaceBorder,

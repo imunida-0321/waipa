@@ -28,6 +28,7 @@ export type GameState = {
 export type Action =
 	| { type: 'flip'; cardId: string; rng: Rng }
 	| { type: 'hideMismatch' }
+	| { type: 'luckyDone' }
 	| { type: 'rouletteDone'; topic: Topic }
 	| { type: 'punishDone' }
 	| { type: 'retry'; rng: Rng }
@@ -56,6 +57,12 @@ export function isMismatchShown(state: GameState): boolean {
 	return !isMatch(a, b)
 }
 
+// ラッキーの発動カットインを見せている最中か（コンポーネントが LUCKY_MS 後に luckyDone を送る）
+export function isLuckyShown(state: GameState): boolean {
+	if (state.phase !== 'play') return false
+	return state.cards.some((c) => c.kind === 'lucky' && c.state === 'revealed')
+}
+
 function setCardState(cards: Card[], ids: string[], cardState: Card['state']): Card[] {
 	return cards.map((c) => (ids.includes(c.id) ? { ...c, state: cardState } : c))
 }
@@ -76,6 +83,8 @@ export function reduce(state: GameState, action: Action): GameState {
 			return flip(state, action.cardId, action.rng)
 		case 'hideMismatch':
 			return hideMismatch(state)
+		case 'luckyDone':
+			return luckyDone(state)
 		case 'rouletteDone':
 			return rouletteDone(state, action.topic)
 		case 'punishDone':
@@ -94,6 +103,7 @@ function flip(state: GameState, cardId: string, rng: Rng): GameState {
 		return {
 			...state,
 			cards: setCardState(state.cards, [cardId], 'revealed'),
+			flippedIds: [],
 			loserIndex: state.turnIndex,
 			phase: 'result',
 		}
@@ -101,7 +111,7 @@ function flip(state: GameState, cardId: string, rng: Rng): GameState {
 	if (card.kind === 'lucky') {
 		return {
 			...state,
-			cards: setCardState(state.cards, [cardId], 'removed'),
+			cards: setCardState(state.cards, [cardId], 'revealed'),
 			passHolder: state.turnIndex,
 		}
 	}
@@ -132,6 +142,15 @@ function hideMismatch(state: GameState): GameState {
 		cards: setCardState(state.cards, state.flippedIds, 'hidden'),
 		flippedIds: [],
 		turnIndex: nextTurn(state),
+	}
+}
+
+function luckyDone(state: GameState): GameState {
+	if (!isLuckyShown(state)) return state
+	const luckyId = state.cards.find((c) => c.kind === 'lucky')?.id
+	return {
+		...state,
+		cards: setCardState(state.cards, luckyId ? [luckyId] : [], 'removed'),
 	}
 }
 
