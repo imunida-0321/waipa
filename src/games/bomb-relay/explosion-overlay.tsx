@@ -28,7 +28,7 @@ export function ExplosionOverlay({ onRetry, onHome }: Props) {
 		flash.value = withTiming(0, { duration: 600 })
 		const t = setTimeout(() => setShowActions(true), EXPLOSION_HOLD_MS)
 		return () => clearTimeout(t)
-	}, [])
+	}, [flash])
 
 	const flashStyle = useAnimatedStyle(() => ({ opacity: flash.value }))
 

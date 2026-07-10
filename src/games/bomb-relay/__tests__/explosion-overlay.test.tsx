@@ -70,14 +70,14 @@ it('ホームへ が動く', async () => {
 it('HOLD 前に unmount すると保留タイマーが clear される', async () => {
 	// React 19 は unmount 後 setState の警告を出さないため、console.error 監視では
 	// cleanup 欠落を検出できない。setTimeout の戻り値を捕まえて clear を直接検証する
-	const setSpy = jest.spyOn(global, 'setTimeout')
-	const clearSpy = jest.spyOn(global, 'clearTimeout')
+	const setSpy = jest.spyOn(globalThis, 'setTimeout')
+	const clearSpy = jest.spyOn(globalThis, 'clearTimeout')
 	const { unmount } = await render(<ExplosionOverlay onRetry={jest.fn()} onHome={jest.fn()} />)
-	const holdIndex = setSpy.mock.calls.findIndex(([, ms]) => ms === EXPLOSION_HOLD_MS)
+	const holdIndex = setSpy.mock.calls.findIndex((call) => call[1] === EXPLOSION_HOLD_MS)
 	expect(holdIndex).toBeGreaterThanOrEqual(0)
 	const holdId = setSpy.mock.results[holdIndex].value
 	await unmount()
-	expect(clearSpy.mock.calls.some(([id]) => id === holdId)).toBe(true)
+	expect(clearSpy.mock.calls.some((call) => call[0] === holdId)).toBe(true)
 	setSpy.mockRestore()
 	clearSpy.mockRestore()
 })
