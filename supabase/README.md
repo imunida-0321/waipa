@@ -7,6 +7,7 @@
 
 1. `0001_create_topics.sql` — topics テーブル＋RLS ポリシー作成
 2. `0002_seed_topics.sql` — 初期お題データ投入（125件）
+3. `0003_seed_batsu_topics.sql` — リアクション神経衰弱の罰お題（30件）
 
 適用後の確認（anon キーで無料お題だけ読めること）:
 
@@ -23,6 +24,7 @@ curl "https://ltkkzucuzngtavpreixq.supabase.co/rest/v1/topics?select=pack&limit=
 | `king`             | 王様のいない王様ゲーム                   | false      |
 | `talk`             | カウントダウン爆弾リレー（カテゴリお題） | false      |
 | `pointing`         | 指差しヒートアップ                       | false      |
+| `batsu`            | リアクション神経衰弱（罰お題）           | false      |
 | `king_premium`     | 王様ゲーム限定パック（恋愛系）           | true       |
 | `pointing_premium` | 指差し限定パック（恋愛系）               | true       |
 
