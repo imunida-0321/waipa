@@ -77,22 +77,25 @@ export function PlayerRoulette({ names, firstIndex, finalIndex, passConsumed, on
 				{step === 'passPause' ? '🍀 免除パス発動！' : '誰が罰ゲーム！？'}
 			</Text>
 			<View style={styles.list}>
-				{names.map((name, i) => (
-					<View
-						key={`${i}-${name}`}
-						style={[
-							styles.row,
-							i === highlight && {
-								backgroundColor: playerColor(i).value,
-								borderColor: playerColor(i).value,
-							},
-						]}
-					>
-						<Text style={[styles.name, i === highlight && styles.nameActive]}>
-							{name}
-						</Text>
-					</View>
-				))}
+				{names.map((name, i) => {
+					const highlightColor = playerColor(i).value
+					return (
+						<View
+							key={`${i}-${name}`}
+							style={[
+								styles.row,
+								i === highlight && {
+									backgroundColor: highlightColor,
+									borderColor: highlightColor,
+								},
+							]}
+						>
+							<Text style={[styles.name, i === highlight && styles.nameActive]}>
+								{name}
+							</Text>
+						</View>
+					)
+				})}
 			</View>
 			{step === 'landed' && <Text style={styles.landed}>{names[finalIndex]}さん！</Text>}
 		</View>

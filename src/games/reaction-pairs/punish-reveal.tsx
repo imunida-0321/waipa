@@ -21,11 +21,11 @@ export function PunishReveal({ playerName, playerIndex, topicText, onDone }: Pro
 		playSound('reveal')
 	}, [])
 
+	const playerColorValue = playerColor(playerIndex).value
+
 	return (
 		<View style={styles.backdrop}>
-			<Text style={[styles.who, { color: playerColor(playerIndex).value }]}>
-				{playerName}さんが罰！
-			</Text>
+			<Text style={[styles.who, { color: playerColorValue }]}>{playerName}さんが罰！</Text>
 			<View style={styles.card}>
 				<Text style={styles.topic}>{topicText}</Text>
 			</View>

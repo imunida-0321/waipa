@@ -29,19 +29,20 @@ export function ResultScreen({ names, scores, punishCounts, loserIndex, onRetry,
 					<Text style={styles.loser}>{names[loserIndex]}さん、ジョーカーで即負け！</Text>
 				)}
 				<Text style={styles.heading}>獲得ペア数ランキング</Text>
-				{order.map((i) => (
-					<View key={i} style={styles.row}>
-						<Text style={styles.rank}>{ranks[i]}位</Text>
-						<View
-							style={[styles.colorBar, { backgroundColor: playerColor(i).value }]}
-						/>
-						<Text style={styles.name} numberOfLines={1}>
-							{names[i]}
-						</Text>
-						<Text style={styles.score}>{scores[i]}ペア</Text>
-						<Text style={styles.punish}>罰 {punishCounts[i]}回</Text>
-					</View>
-				))}
+				{order.map((i) => {
+					const rowColor = playerColor(i).value
+					return (
+						<View key={i} style={styles.row}>
+							<Text style={styles.rank}>{ranks[i]}位</Text>
+							<View style={[styles.colorBar, { backgroundColor: rowColor }]} />
+							<Text style={styles.name} numberOfLines={1}>
+								{names[i]}
+							</Text>
+							<Text style={styles.score}>{scores[i]}ペア</Text>
+							<Text style={styles.punish}>罰 {punishCounts[i]}回</Text>
+						</View>
+					)
+				})}
 			</View>
 		</ResultOverlay>
 	)
