@@ -29,7 +29,9 @@ export function PlayerRoulette({ names, firstIndex, finalIndex, passConsumed, on
 	const [highlight, setHighlight] = useState(0)
 	const tick = useRef<ReturnType<typeof setInterval> | null>(null)
 	const onDoneRef = useRef(onDone)
-	onDoneRef.current = onDone
+	useEffect(() => {
+		onDoneRef.current = onDone
+	}, [onDone])
 
 	// step ごとにタイマーを張り替える単純な状態機械
 	useEffect(() => {
