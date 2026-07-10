@@ -8,6 +8,11 @@ jest.mock('expo-linear-gradient', () => {
 	return { LinearGradient: View }
 })
 
+let mockPremiumUnlocked = false
+jest.mock('@/lib/premium', () => ({
+	isPremiumUnlocked: () => mockPremiumUnlocked,
+}))
+
 const baseGame: GameMeta = {
 	id: 'test-game',
 	title: 'テストゲーム',
@@ -50,4 +55,39 @@ it('タップで onPress が呼ばれる（thumbnail あり）', async () => {
 	const { getByLabelText } = await render(<GameCard game={withThumb} onPress={onPress} />)
 	fireEvent.press(getByLabelText('テストゲーム'))
 	expect(onPress).toHaveBeenCalled()
+})
+
+describe('プレミアムロック表示', () => {
+	beforeEach(() => {
+		mockPremiumUnlocked = false
+	})
+
+	it('premium かつ未解放: 黒マスク＋👑バッジを重ねる（グラデフォールバック）', async () => {
+		const { getByTestId, getByText } = await render(
+			<GameCard game={{ ...baseGame, premium: true }} onPress={jest.fn()} />,
+		)
+		expect(getByTestId('premium-lock-mask')).toBeTruthy()
+		expect(getByText('👑 プレミアム')).toBeTruthy()
+	})
+
+	it('premium かつ未解放: cardThumbnail ありでもマスクを重ねる', async () => {
+		const { getByTestId } = await render(
+			<GameCard game={{ ...baseGame, premium: true, cardThumbnail: 1 }} onPress={jest.fn()} />,
+		)
+		expect(getByTestId('card-thumb-image')).toBeTruthy()
+		expect(getByTestId('premium-lock-mask')).toBeTruthy()
+	})
+
+	it('premium でも解放済みなら通常表示', async () => {
+		mockPremiumUnlocked = true
+		const { queryByTestId } = await render(
+			<GameCard game={{ ...baseGame, premium: true }} onPress={jest.fn()} />,
+		)
+		expect(queryByTestId('premium-lock-mask')).toBeNull()
+	})
+
+	it('無料ゲームにはマスクを出さない', async () => {
+		const { queryByTestId } = await render(<GameCard game={baseGame} onPress={jest.fn()} />)
+		expect(queryByTestId('premium-lock-mask')).toBeNull()
+	})
 })
