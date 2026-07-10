@@ -377,12 +377,17 @@ it('ホームへ が動く', async () => {
 	expect(onHome).toHaveBeenCalledTimes(1)
 })
 
-it('HOLD 前に unmount してもタイマーが残らない', async () => {
+it('HOLD 前に unmount するとタイマーが発火しない（警告なし）', async () => {
+	// jest.getTimerCount() は RN 内部タイマーが混ざり 0 にならないため使わない
+	// （event-cutin.test.tsx の unmount → advance → 未発火 の慣習に合わせる）
+	const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
 	const { unmount } = await render(<ExplosionOverlay onRetry={jest.fn()} onHome={jest.fn()} />)
+	await unmount()
 	await act(async () => {
-		unmount()
+		jest.advanceTimersByTime(EXPLOSION_HOLD_MS)
 	})
-	expect(jest.getTimerCount()).toBe(0)
+	expect(errorSpy).not.toHaveBeenCalled()
+	errorSpy.mockRestore()
 })
 ```
 
@@ -525,6 +530,7 @@ git commit -m "feat: 爆弾リレーの爆発演出（Lottie＋赤フラッシ�
 ```tsx
 import { act, fireEvent, render } from '@testing-library/react-native'
 import { haptics } from '@/lib/haptics'
+import { playSound } from '@/lib/sound'
 import { FUSE_MIN_MS, TICK_START_MS } from '../engine'
 import { EXPLOSION_HOLD_MS } from '../explosion-overlay'
 import { BombRelayGame } from '../bomb-relay-game'
@@ -624,12 +630,20 @@ it('導火線が尽きると爆発し、もう一回で新お題の ready に戻
 	expect(getByText('スタート')).toBeTruthy()
 })
 
-it('ticking 中に unmount してもタイマーが残らない', async () => {
+it('ticking 中に unmount すると爆発もチクタクも発火しない', async () => {
+	// jest.getTimerCount() は RN 内部タイマーが混ざるため使わない（event-cutin.test.tsx 慣習）
 	const { unmount } = await startGame()
+	const soundMock = playSound as jest.Mock
+	const tapMock = haptics.tap as jest.Mock
+	await unmount()
+	const soundsBefore = soundMock.mock.calls.length
+	const tapsBefore = tapMock.mock.calls.length
 	await act(async () => {
-		unmount()
+		jest.advanceTimersByTime(FUSE_MIN_MS + 1000)
 	})
-	expect(jest.getTimerCount()).toBe(0)
+	expect(soundMock).not.toHaveBeenCalledWith('explosion')
+	expect(soundMock.mock.calls.length).toBe(soundsBefore) // tick も発火しない
+	expect(tapMock.mock.calls.length).toBe(tapsBefore)
 })
 ```
 
