@@ -79,7 +79,7 @@ const styles = StyleSheet.create({
 		borderColor: colors.surfaceBorder,
 	},
 	lockMask: {
-		...StyleSheet.absoluteFillObject,
+		...StyleSheet.absoluteFill,
 		backgroundColor: 'rgba(10, 8, 20, 0.55)',
 		borderRadius: radii.lg,
 		alignItems: 'center',
