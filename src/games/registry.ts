@@ -5,6 +5,7 @@ import { ComingSoonGame } from './coming-soon'
 import { FiveSecStopGame } from './five-sec-stop/five-sec-stop-game'
 import { KimagureOxGame } from './kimagure-ox/kimagure-ox-game'
 import { NoKingGame } from './no-king-game/no-king-game'
+import { ReactionPairsGame } from './reaction-pairs/reaction-pairs-game'
 import { WhoWillPayGame } from './who-will-pay/who-will-pay-game'
 
 export type GameMeta = {
@@ -176,12 +177,17 @@ export const games: readonly GameMeta[] = [
 		gradient: ['#26DE81', '#20BF6B'],
 		minPlayers: 2,
 		maxPlayers: 12,
+		requiresPlayers: true,
+		catchCopy: 'ペアが揃った瞬間、\n全員ルーレットで罰ゲーム対象者が決定！',
+		summary:
+			'このゲームは、4×4の神経衰弱です！ペアが揃うたびに全員ルーレットで罰ゲーム対象者を抽選。ジョーカーを引いたら即負け、ラッキー🍀を引けば罰免除パスがもらえます！',
 		howToPlay: [
-			'みんなで順番にカードをめくる神経衰弱',
-			'ペアが揃った瞬間、罰ゲーム対象者がルーレットで決定！',
-			'ジョーカーを引いた人は即アウト',
+			'① 一緒に遊ぶメンバーを登録しよう！（2〜12名）',
+			'② 順番にカードを2枚めくる神経衰弱！揃っても揃わなくても次の人へ',
+			'③ ペアが揃った瞬間、全員ルーレットで罰ゲーム対象者が決定！',
+			'④ ジョーカーは即負けで終了、ラッキー🍀は罰免除パス。全ペアそろえてもゴール！',
 		],
-		Component: ComingSoonGame,
+		Component: ReactionPairsGame,
 	},
 ]
 
