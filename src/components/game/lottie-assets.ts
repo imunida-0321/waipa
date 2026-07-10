@@ -12,4 +12,6 @@ export const lottieAssets = {
 	celebrate: require('@/assets/lottie/celebrate.json') as LottieSource,
 	/** きまぐれ◯×カットインの背景（1回再生）。素材ページに「Free to use under the Lottie Simple License」表記を確認済み */
 	cutinFlash: require('@/assets/lottie/cutin-flash.json') as LottieSource,
+	/** 爆弾リレーの爆発（1回再生）。素材ページに「Free to use under the Lottie Simple License」表記を確認済み */
+	explosion: require('@/assets/lottie/explosion.json') as LottieSource,
 }
