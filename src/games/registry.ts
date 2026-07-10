@@ -70,7 +70,8 @@ export const games: readonly GameMeta[] = [
 		catchCopy: '16個のボタンにハズレが2つ！\n勝敗は完全運ゲームで決まる！',
 		summary:
 			'このゲームは、16個のボタンから1つを選ぶだけ！中には「全員アウト」と「あなただけアウト」の2つのハズレが潜んでいる、完全運ゲーです！',
-		thumbnail: require('@/assets/images/bomb/bg.jpg'),
+		thumbnail: require('@/assets/images/bomb/intro.jpg'),
+		cardThumbnail: require('@/assets/images/bomb/card.jpg'),
 		howToPlay: [
 			'① 16個のボタンのどこかに爆弾が2個…（💣1人負け ＋ 💥全員負け）',
 			'② スマホを回して、1人1個ずつタップ！セーフなら次の人へ',
@@ -91,6 +92,8 @@ export const games: readonly GameMeta[] = [
 		catchCopy: '5.00秒ぴったりを狙ってストップ！\nでも途中から数字は見えない…！',
 		summary:
 			'このゲームは、タイマーを5.00秒ぴったりを狙って止めるゲームです！3秒をすぎると数字が見えなくなるので、最後は自分の体内時計だけが頼り。5.00秒から一番遠かった人が負けです！',
+		thumbnail: require('@/assets/images/five-sec-stop/intro.jpg'),
+		cardThumbnail: require('@/assets/images/five-sec-stop/card.jpg'),
 		howToPlay: [
 			'① 一緒に遊ぶメンバーを登録しよう！（2〜12名）',
 			'② 自分の番が来たらタップでスタート！5.00秒ぴったりを狙ってもう一度タップ！',
@@ -107,6 +110,8 @@ export const games: readonly GameMeta[] = [
 		gradient: ['#F7B731', '#E67E22'],
 		minPlayers: 2,
 		maxPlayers: 2,
+		thumbnail: require('@/assets/images/kimagure-ox/intro.jpg'),
+		cardThumbnail: require('@/assets/images/kimagure-ox/card.jpg'),
 		howToPlay: [
 			'① 交互にマスをタップして、タテ・ヨコ・ナナメに3つ並べたら勝ち！',
 			'② ただしターンの合間に「きまぐれイベント」がランダム発生！',
@@ -146,6 +151,8 @@ export const games: readonly GameMeta[] = [
 		catchCopy: 'サイコロ3つを丼に振って役で勝負！\n一番弱かった人が負け！',
 		summary:
 			'このゲームは、3個のサイコロを振って出た役の強さで勝負するチンチロです！役が出るまで最大3回振れます。ピンゾロ（1・1・1）が最強、ヒフミ（1・2・3）は最弱。丼からサイコロが飛び出す『ションベン』にも注意！',
+		thumbnail: require('@/assets/images/chinchiro/intro.jpg'),
+		cardThumbnail: require('@/assets/images/chinchiro/card.jpg'),
 		howToPlay: [
 			'① 一緒に遊ぶメンバーを登録しよう！（2〜12名）',
 			'② 自分の番が来たらタップでサイコロを3つ振ろう！役が出たら確定、役なしなら最大3投まで振り直し！',
