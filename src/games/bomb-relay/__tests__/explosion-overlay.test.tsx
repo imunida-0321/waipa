@@ -67,15 +67,17 @@ it('ホームへ が動く', async () => {
 	expect(onHome).toHaveBeenCalledTimes(1)
 })
 
-it('HOLD 前に unmount するとタイマーが発火しない（警告なし）', async () => {
-	// jest.getTimerCount() は RN 内部タイマーが混ざり 0 にならないため使わない
-	// （event-cutin.test.tsx の unmount → advance → 未発火 の慣習に合わせる）
-	const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+it('HOLD 前に unmount すると保留タイマーが clear される', async () => {
+	// React 19 は unmount 後 setState の警告を出さないため、console.error 監視では
+	// cleanup 欠落を検出できない。setTimeout の戻り値を捕まえて clear を直接検証する
+	const setSpy = jest.spyOn(global, 'setTimeout')
+	const clearSpy = jest.spyOn(global, 'clearTimeout')
 	const { unmount } = await render(<ExplosionOverlay onRetry={jest.fn()} onHome={jest.fn()} />)
+	const holdIndex = setSpy.mock.calls.findIndex(([, ms]) => ms === EXPLOSION_HOLD_MS)
+	expect(holdIndex).toBeGreaterThanOrEqual(0)
+	const holdId = setSpy.mock.results[holdIndex].value
 	await unmount()
-	await act(async () => {
-		jest.advanceTimersByTime(EXPLOSION_HOLD_MS)
-	})
-	expect(errorSpy).not.toHaveBeenCalled()
-	errorSpy.mockRestore()
+	expect(clearSpy.mock.calls.some(([id]) => id === holdId)).toBe(true)
+	setSpy.mockRestore()
+	clearSpy.mockRestore()
 })
