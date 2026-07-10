@@ -8,6 +8,8 @@ import Animated, {
 	withSequence,
 	withTiming,
 } from 'react-native-reanimated'
+import { lottieAssets } from '@/components/game/lottie-assets'
+import { LottieEffect } from '@/components/game/lottie-effect'
 import { GradientButton } from '@/components/ui/gradient-button'
 import { haptics } from '@/lib/haptics'
 import { playSound } from '@/lib/sound'
@@ -85,7 +87,15 @@ export function BombRelayGame() {
 				<Text style={styles.topicText}>{topic.text}</Text>
 			</View>
 
-			<Animated.Text style={[styles.bomb, pulseStyle]}>🧨</Animated.Text>
+			{/* 素材があれば Lottie の爆弾、なければ従来の🧨。どちらも ticking 中は脈打つ */}
+			<Animated.View style={pulseStyle}>
+				<LottieEffect
+					source={lottieAssets.bombTicking}
+					loop
+					style={styles.bombLottie}
+					fallback={<Text style={styles.bomb}>🧨</Text>}
+				/>
+			</Animated.View>
 
 			{phase === 'ready' ? (
 				<GradientButton title="スタート" onPress={start} />
@@ -118,5 +128,6 @@ const styles = StyleSheet.create({
 	topicLabel: { ...typography.caption, color: BR.purple, textAlign: 'center' },
 	topicText: { ...typography.title, textAlign: 'center', lineHeight: 32 },
 	bomb: { fontSize: 96, textAlign: 'center' },
+	bombLottie: { width: 180, height: 180, alignSelf: 'center' },
 	hint: { ...typography.body, color: colors.textMuted, textAlign: 'center' },
 })

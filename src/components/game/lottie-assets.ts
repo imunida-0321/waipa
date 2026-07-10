@@ -14,4 +14,6 @@ export const lottieAssets = {
 	cutinFlash: require('@/assets/lottie/cutin-flash.json') as LottieSource,
 	/** 爆弾リレーの爆発（1回再生）。素材ページに「Free to use under the Lottie Simple License」表記を確認済み */
 	explosion: require('@/assets/lottie/explosion.json') as LottieSource,
+	/** 爆弾リレーの導火線爆弾（ループ再生）。LottieFiles 由来のユーザー提供素材（2026-07-11 受領・ライセンスは提供者確認） */
+	bombTicking: require('@/assets/lottie/bomb-ticking.json') as LottieSource,
 }
