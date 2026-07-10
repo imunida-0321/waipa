@@ -17,6 +17,8 @@ export type GameMeta = {
 	minPlayers: number
 	maxPlayers: number
 	requiresPlayers?: boolean
+	/** プレミアム限定ゲーム（全体ロック）。ホームでマスク＋👑バッジ、非プレミアムはロックモーダル */
+	premium?: boolean
 	/** イントロ画面のキャッチコピー（\n 可）。未指定なら tagline */
 	catchCopy?: string
 	/** イントロ画面の遊び方ダイジェスト。未指定なら howToPlay を連結 */
