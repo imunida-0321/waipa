@@ -102,6 +102,17 @@ it('導火線が尽きると爆発し、もう一回で新お題の ready に戻
 	// usedIds に fb-talk-1 が入っているので次は fb-talk-2
 	expect(getByText('都道府県の名前')).toBeTruthy()
 	expect(getByText('スタート')).toBeTruthy()
+
+	// 2周目: 再スタートで新しいチクタク連鎖が走り、再び FUSE_MIN_MS で爆発する
+	// （fuseRef 再セット・[phase] deps で effect が新規起動することの回帰ガード）
+	await act(async () => {
+		fireEvent.press(getByText('スタート'))
+	})
+	expect(getByText('答えたら次の人へ回せ！')).toBeTruthy()
+	await act(async () => {
+		jest.advanceTimersByTime(FUSE_MIN_MS)
+	})
+	expect(getByText('💥 今持ってる人の負け！')).toBeTruthy()
 })
 
 it('ticking 中に unmount すると爆発もチクタクも発火しない', async () => {
