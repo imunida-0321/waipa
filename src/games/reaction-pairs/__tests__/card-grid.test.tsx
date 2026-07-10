@@ -1,4 +1,4 @@
-import { fireEvent, render } from '@testing-library/react-native'
+import { act, fireEvent, render } from '@testing-library/react-native'
 import type { Card } from '../engine'
 import { CardGrid } from '../card-grid'
 
@@ -32,7 +32,9 @@ const cards: Card[] = [
 it('hidden カードのタップで onFlip が呼ばれる', async () => {
 	const onFlip = jest.fn()
 	const { getByLabelText } = await render(<CardGrid cards={cards} onFlip={onFlip} />)
-	fireEvent.press(getByLabelText('カード1'))
+	await act(async () => {
+		fireEvent.press(getByLabelText('カード1'))
+	})
 	expect(onFlip).toHaveBeenCalledWith('p1-a')
 })
 
@@ -40,7 +42,9 @@ it('revealed はシンボルが見え、タップしても onFlip は呼ばれ�
 	const onFlip = jest.fn()
 	const { getByText, getByLabelText } = await render(<CardGrid cards={cards} onFlip={onFlip} />)
 	expect(getByText('🎤')).toBeTruthy()
-	fireEvent.press(getByLabelText('🎤'))
+	await act(async () => {
+		fireEvent.press(getByLabelText('🎤'))
+	})
 	expect(onFlip).not.toHaveBeenCalled()
 })
 
@@ -52,7 +56,9 @@ it('removed はシンボルを表示しない', async () => {
 it('disabled 中は hidden をタップしても無視', async () => {
 	const onFlip = jest.fn()
 	const { getByLabelText } = await render(<CardGrid cards={cards} onFlip={onFlip} disabled />)
-	fireEvent.press(getByLabelText('カード1'))
+	await act(async () => {
+		fireEvent.press(getByLabelText('カード1'))
+	})
 	expect(onFlip).not.toHaveBeenCalled()
 })
 

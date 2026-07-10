@@ -1,4 +1,4 @@
-import { fireEvent, render } from '@testing-library/react-native'
+import { act, fireEvent, render } from '@testing-library/react-native'
 import { ResultScreen } from '../result-screen'
 
 jest.mock('expo-linear-gradient', () => {
@@ -46,8 +46,12 @@ it('ジョーカー終了時は即負け見出しを出す', async () => {
 
 it('もう一回 / ホームへ が動く', async () => {
 	const { getByText } = await render(<ResultScreen {...base} loserIndex={null} />)
-	fireEvent.press(getByText('もう一回'))
+	await act(async () => {
+		fireEvent.press(getByText('もう一回'))
+	})
 	expect(base.onRetry).toHaveBeenCalled()
-	fireEvent.press(getByText('ホームへ'))
+	await act(async () => {
+		fireEvent.press(getByText('ホームへ'))
+	})
 	expect(base.onHome).toHaveBeenCalled()
 })
