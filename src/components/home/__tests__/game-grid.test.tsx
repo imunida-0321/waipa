@@ -75,8 +75,8 @@ it('レジストリの全ゲームがカード表示される', async () => {
 })
 
 it('カードタップで該当ゲームへ遷移する', async () => {
-	const { getByText } = await render(<GameGrid />)
-	fireEvent.press(getByText('BOMB!! 2/16'))
+	const { getByLabelText } = await render(<GameGrid />)
+	fireEvent.press(getByLabelText('BOMB!! 2/16'))
 	expect(router.push).toHaveBeenCalledWith({
 		pathname: '/game/[id]',
 		params: { id: 'bomb-2-16' },
