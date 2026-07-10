@@ -731,7 +731,7 @@ const styles = StyleSheet.create({
 		borderColor: colors.surfaceBorder,
 	},
 	lockMask: {
-		...StyleSheet.absoluteFillObject,
+		...StyleSheet.absoluteFill,
 		backgroundColor: 'rgba(10, 8, 20, 0.55)',
 		borderRadius: radii.lg,
 		alignItems: 'center',
@@ -1133,7 +1133,7 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 	},
 	tensionMask: {
-		...StyleSheet.absoluteFillObject,
+		...StyleSheet.absoluteFill,
 		backgroundColor: BC.maskRed,
 	},
 	hint: { ...typography.caption, color: colors.textMuted, textAlign: 'center' },
