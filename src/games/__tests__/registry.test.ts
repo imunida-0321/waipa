@@ -57,8 +57,8 @@ jest.mock('react-native-reanimated', () => {
 jest.mock('@/games/chinchiro/dice-3d', () => ({ Dice3D: jest.fn() }))
 
 describe('ゲームレジストリ', () => {
-	it('MVP の8ゲームが登録されている', () => {
-		expect(games).toHaveLength(8)
+	it('MVP の8ゲーム＋プレミアム第1号のバーストチキンが登録されている', () => {
+		expect(games).toHaveLength(9)
 	})
 
 	it('id が一意', () => {
