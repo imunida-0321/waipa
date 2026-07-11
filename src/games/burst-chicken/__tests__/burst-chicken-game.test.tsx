@@ -124,7 +124,7 @@ it('積んだ結果の合計でバイブ強度を判定する（低いうちは 
 	await press(getByLabelText('+2')) // 19→21: tensionLevel(21)=0.4 まだ tap
 	expect(haptics.heavy).not.toHaveBeenCalled()
 
-	await press(getByLabelText('+2')) // 21→23: tensionLevel(23)≈0.53 → heavy（押す前の18ではなく結果値で判定）
+	await press(getByLabelText('+2')) // 21→23: tensionLevel(23)≈0.53 → heavy（押す前の21ではなく結果値で判定）
 	expect(haptics.heavy).toHaveBeenCalledTimes(1)
 })
 
