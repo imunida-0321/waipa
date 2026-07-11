@@ -67,6 +67,11 @@ jest.mock('@/games/chinchiro/dice-3d', () => {
 	const { View } = require('react-native')
 	return { Dice3D: () => <View testID="dice-3d" /> }
 })
+jest.mock('@/games/daut-dice/dice-roll-3d', () => {
+	// eslint-disable-next-line @typescript-eslint/no-require-imports
+	const { View } = require('react-native')
+	return { DiceRoll3D: () => <View testID="dice-roll-3d" />, ROLL_ANIM_MS: 1200 }
+})
 
 it('レジストリの全ゲームがカード表示される', async () => {
 	const { getByText, getByLabelText } = await render(<GameGrid />)

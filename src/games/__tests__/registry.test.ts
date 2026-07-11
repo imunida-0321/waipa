@@ -55,10 +55,14 @@ jest.mock('react-native-reanimated', () => {
 })
 // expo-gl / @react-three/fiber は jest 環境でロードできないため 3D 表示はモック
 jest.mock('@/games/chinchiro/dice-3d', () => ({ Dice3D: jest.fn() }))
+jest.mock('@/games/daut-dice/dice-roll-3d', () => ({
+	DiceRoll3D: jest.fn(),
+	ROLL_ANIM_MS: 1200,
+}))
 
 describe('ゲームレジストリ', () => {
-	it('MVP の8ゲーム＋プレミアム第1号のバーストチキンが登録されている', () => {
-		expect(games).toHaveLength(9)
+	it('MVP の8ゲーム＋プレミアム2本（バーストチキン・ダウトダイス）が登録されている', () => {
+		expect(games).toHaveLength(10)
 	})
 
 	it('id が一意', () => {
