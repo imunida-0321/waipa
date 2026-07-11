@@ -1439,7 +1439,7 @@ import { RoundResult } from './round-result'
 		if (state.phase === 'settled') {
 			drum.start()
 		}
-	}, [state.phase, drum])
+	}, [state.phase, drum.start])
 
 	const retry = () => {
 		drum.reset()
