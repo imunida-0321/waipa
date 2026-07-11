@@ -1,4 +1,4 @@
-import { fireEvent, render, waitFor } from '@testing-library/react-native'
+import { act, fireEvent, render, waitFor } from '@testing-library/react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { router } from 'expo-router'
 import { playersStore } from '@/lib/players-store'
@@ -124,4 +124,83 @@ it('×を押すと router.back が呼ばれる', async () => {
 	const { getByLabelText } = await render(<PlayerSetupSheet onProceed={jest.fn()} />)
 	fireEvent.press(getByLabelText('閉じる'))
 	expect(router.back).toHaveBeenCalledTimes(1)
+})
+
+describe('人数のゲーム別範囲クランプ', () => {
+	it('保存済み人数が maxPlayers を超えていたらマウント時に切り詰めて案内を出す', async () => {
+		await playersStore.setCount(10)
+		const { getAllByPlaceholderText, getByText } = await render(
+			<PlayerSetupSheet onProceed={jest.fn()} minPlayers={2} maxPlayers={8} />,
+		)
+		await waitFor(() => {
+			expect(getAllByPlaceholderText('プレイヤー名を入力...')).toHaveLength(8)
+		})
+		expect(playersStore.getState().count).toBe(8)
+		expect(getByText('このゲームは2〜8人用のため人数を調整しました')).toBeTruthy()
+	})
+
+	it('保存済み人数が minPlayers 未満なら引き上げて案内を出す', async () => {
+		await playersStore.setCount(2)
+		const { getAllByPlaceholderText, getByText } = await render(
+			<PlayerSetupSheet onProceed={jest.fn()} minPlayers={3} maxPlayers={8} />,
+		)
+		await waitFor(() => {
+			expect(getAllByPlaceholderText('プレイヤー名を入力...')).toHaveLength(3)
+		})
+		expect(playersStore.getState().count).toBe(3)
+		expect(getByText('このゲームは3〜8人用のため人数を調整しました')).toBeTruthy()
+	})
+
+	it('2人専用ゲーム（min=max=2）では2人に切り詰めて専用文言を出す', async () => {
+		await playersStore.setCount(6)
+		const { getAllByPlaceholderText, getByText } = await render(
+			<PlayerSetupSheet onProceed={jest.fn()} minPlayers={2} maxPlayers={2} />,
+		)
+		await waitFor(() => {
+			expect(getAllByPlaceholderText('プレイヤー名を入力...')).toHaveLength(2)
+		})
+		expect(getByText('このゲームは2人用のため人数を調整しました')).toBeTruthy()
+	})
+
+	it('範囲内なら人数は変更されず案内も表示されない', async () => {
+		await playersStore.setCount(4)
+		const { getAllByPlaceholderText, queryByText } = await render(
+			<PlayerSetupSheet onProceed={jest.fn()} minPlayers={2} maxPlayers={8} />,
+		)
+		expect(getAllByPlaceholderText('プレイヤー名を入力...')).toHaveLength(4)
+		expect(playersStore.getState().count).toBe(4)
+		expect(queryByText('このゲームは2〜8人用のため人数を調整しました')).toBeNull()
+	})
+
+	it('境界値ちょうど（count === maxPlayers）は調整されない', async () => {
+		await playersStore.setCount(8)
+		const { getAllByPlaceholderText, queryByText } = await render(
+			<PlayerSetupSheet onProceed={jest.fn()} minPlayers={2} maxPlayers={8} />,
+		)
+		expect(getAllByPlaceholderText('プレイヤー名を入力...')).toHaveLength(8)
+		expect(queryByText('このゲームは2〜8人用のため人数を調整しました')).toBeNull()
+	})
+
+	it('履歴適用で範囲外の人数になった場合もクランプされる', async () => {
+		await AsyncStorage.setItem(
+			'waipa.players',
+			JSON.stringify({
+				count: 4,
+				names: [],
+				history: [['あ', 'い', 'う', 'え', 'お', 'か', 'き', 'く', 'け', 'こ']],
+			}),
+		)
+		await playersStore.hydrate()
+		const { getByText, getAllByPlaceholderText } = await render(
+			<PlayerSetupSheet onProceed={jest.fn()} minPlayers={2} maxPlayers={8} />,
+		)
+		await act(async () => {
+			fireEvent.press(getByText('あ、い、う、え、お、か、き、く、け、こ'))
+		})
+		await waitFor(() => {
+			expect(playersStore.getState().count).toBe(8)
+		})
+		expect(getAllByPlaceholderText('プレイヤー名を入力...')).toHaveLength(8)
+		expect(getByText('このゲームは2〜8人用のため人数を調整しました')).toBeTruthy()
+	})
 })

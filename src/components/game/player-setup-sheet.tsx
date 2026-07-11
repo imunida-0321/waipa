@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { router } from 'expo-router'
@@ -28,6 +28,22 @@ export function PlayerSetupSheet({
 	const insets = useSafeAreaInsets()
 	const players = usePlayers()
 	const [showError, setShowError] = useState(false)
+	const [rangeAdjusted, setRangeAdjusted] = useState(false)
+
+	// 永続化された人数や履歴適用がこのゲームの人数範囲外なら強制的に収める
+	const { count } = players
+	const outOfRange = count < minPlayers || count > maxPlayers
+	if (outOfRange && !rangeAdjusted) {
+		setRangeAdjusted(true)
+	}
+	useEffect(() => {
+		if (count < minPlayers || count > maxPlayers) {
+			playersStore.setCount(Math.min(maxPlayers, Math.max(minPlayers, count)))
+		}
+	}, [count, minPlayers, maxPlayers])
+
+	const rangeLabel =
+		minPlayers === maxPlayers ? `${minPlayers}人` : `${minPlayers}〜${maxPlayers}人`
 
 	const proceed = async () => {
 		haptics.tap()
@@ -61,6 +77,14 @@ export function PlayerSetupSheet({
 			{showError && (
 				<View style={styles.banner}>
 					<Text style={styles.bannerText}>名前が入力されていないものがあります</Text>
+				</View>
+			)}
+
+			{rangeAdjusted && (
+				<View style={[styles.banner, styles.bannerNotice]}>
+					<Text style={styles.bannerText}>
+						このゲームは{rangeLabel}用のため人数を調整しました
+					</Text>
 				</View>
 			)}
 
@@ -169,6 +193,7 @@ const styles = StyleSheet.create({
 		paddingVertical: spacing.sm,
 		paddingHorizontal: spacing.md,
 	},
+	bannerNotice: { backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.accentTo },
 	bannerText: { ...typography.body, fontWeight: '700', textAlign: 'center' },
 	content: { padding: spacing.md, gap: spacing.md },
 	card: {
