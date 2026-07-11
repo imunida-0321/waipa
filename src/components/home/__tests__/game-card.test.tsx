@@ -72,7 +72,10 @@ describe('プレミアムロック表示', () => {
 
 	it('premium かつ未解放: cardThumbnail ありでもマスクを重ねる', async () => {
 		const { getByTestId } = await render(
-			<GameCard game={{ ...baseGame, premium: true, cardThumbnail: 1 }} onPress={jest.fn()} />,
+			<GameCard
+				game={{ ...baseGame, premium: true, cardThumbnail: 1 }}
+				onPress={jest.fn()}
+			/>,
 		)
 		expect(getByTestId('card-thumb-image')).toBeTruthy()
 		expect(getByTestId('premium-lock-mask')).toBeTruthy()
