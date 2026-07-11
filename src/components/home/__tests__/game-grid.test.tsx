@@ -1,8 +1,15 @@
-import { fireEvent, render } from '@testing-library/react-native'
+import { act, fireEvent, render } from '@testing-library/react-native'
 import { router } from 'expo-router'
 import { games } from '@/games/registry'
 import { GameGrid } from '../game-grid'
 
+// プレミアム判定は @/lib/premium に集約されているのでここだけモックする
+let mockPremiumUnlocked = false
+jest.mock('@/lib/premium', () => ({
+	isPremiumUnlocked: () => mockPremiumUnlocked,
+}))
+
+// プレミアム限定ゲームの実例として実レジストリの burst-chicken（premium: true）をそのまま使う
 jest.mock('@react-native-async-storage/async-storage', () =>
 	// eslint-disable-next-line @typescript-eslint/no-require-imports
 	require('@react-native-async-storage/async-storage/jest/async-storage-mock'),
@@ -80,5 +87,41 @@ it('カードタップで該当ゲームへ遷移する', async () => {
 	expect(router.push).toHaveBeenCalledWith({
 		pathname: '/game/[id]',
 		params: { id: 'bomb-2-16' },
+	})
+})
+
+describe('プレミアムゲート', () => {
+	beforeEach(() => {
+		mockPremiumUnlocked = false
+		jest.clearAllMocks()
+	})
+
+	it('ロック中のプレミアムゲームをタップするとモーダルが出て遷移しない', async () => {
+		const { getByLabelText, getByText } = await render(<GameGrid />)
+		await act(async () => {
+			fireEvent.press(getByLabelText('バーストチキン'))
+		})
+		expect(getByText(/WaiPa プレミアムで遊べます/)).toBeTruthy()
+		expect(router.push).not.toHaveBeenCalled()
+	})
+
+	it('解放済みなら通常どおり遷移する', async () => {
+		mockPremiumUnlocked = true
+		const { getByLabelText, queryByText } = await render(<GameGrid />)
+		fireEvent.press(getByLabelText('バーストチキン'))
+		expect(queryByText(/WaiPa プレミアムで遊べます/)).toBeNull()
+		expect(router.push).toHaveBeenCalledWith({
+			pathname: '/game/[id]',
+			params: { id: 'burst-chicken' },
+		})
+	})
+
+	it('無料ゲームはロック判定に関係なく遷移する', async () => {
+		const { getByLabelText } = await render(<GameGrid />)
+		fireEvent.press(getByLabelText('BOMB!! 2/16'))
+		expect(router.push).toHaveBeenCalledWith({
+			pathname: '/game/[id]',
+			params: { id: 'bomb-2-16' },
+		})
 	})
 })
