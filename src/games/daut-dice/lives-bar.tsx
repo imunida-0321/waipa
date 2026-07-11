@@ -12,18 +12,25 @@ type Props = {
 export function LivesBar({ names, lives, turnIndex }: Props) {
 	return (
 		<View style={styles.bar}>
-			{names.map((name, i) => (
-				<View
-					key={`${i}-${name}`}
-					style={[styles.chip, i === turnIndex && { borderColor: playerColor(i).value }]}
-				>
-					<View style={[styles.dot, { backgroundColor: playerColor(i).value }]} />
-					<Text style={styles.name} numberOfLines={1}>
-						{name}
-					</Text>
-					<Text style={styles.hearts}>{lives[i] > 0 ? '♥'.repeat(lives[i]) : '💔'}</Text>
-				</View>
-			))}
+			{names.map((name, i) => {
+				// Reanimated の Babel プラグインは style prop 内の `.value` アクセスを
+				// SharedValue の誤用とみなし console.warn を注入するため、事前に変数へ退避する
+				const dotColor = playerColor(i).value
+				return (
+					<View
+						key={`${i}-${name}`}
+						style={[styles.chip, i === turnIndex && { borderColor: dotColor }]}
+					>
+						<View style={[styles.dot, { backgroundColor: dotColor }]} />
+						<Text style={styles.name} numberOfLines={1}>
+							{name}
+						</Text>
+						<Text style={styles.hearts}>
+							{lives[i] > 0 ? '♥'.repeat(lives[i]) : '💔'}
+						</Text>
+					</View>
+				)
+			})}
 		</View>
 	)
 }
