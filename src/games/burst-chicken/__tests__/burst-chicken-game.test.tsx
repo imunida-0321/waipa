@@ -71,3 +71,39 @@ it('ストップは合計15未満では出ず、15で出現する', async () => 
 	await press(getByLabelText('+3')) // 15
 	expect(getByText(/ストップ宣言/)).toBeTruthy()
 })
+
+it('バーストで爆発演出＋リザルトが出て、もう一回で新ラウンドが始まる', async () => {
+	// limit=21 に固定（rng=0）
+	;(Math.random as jest.Mock).mockReturnValue(0)
+	const { getByLabelText, getByText, queryByText } = await render(<BurstChickenGame />)
+	for (let i = 0; i < 7; i++) {
+		await press(getByLabelText('+3')) // 21 ちょうどまで（セーフ）
+	}
+	expect(queryByText(/の負け/)).toBeNull()
+	await press(getByLabelText('+1')) // 22 > 21 バースト（手番は あお）
+	expect(getByText(/あおさんの負け/)).toBeTruthy()
+	expect(getByText(/上限は 21 だった/)).toBeTruthy()
+
+	await press(getByText('もう一回'))
+	expect(getByText('0')).toBeTruthy()
+	// 開始プレイヤーが +1 ローテーション（あお から）
+	expect(getByText(/あおさんの番/)).toBeTruthy()
+})
+
+it('ストップ宣言でドラムロール後に精算リザルトが出る', async () => {
+	;(Math.random as jest.Mock).mockReturnValue(0.9999999) // limit=30
+	const { getByLabelText, getByText } = await render(<BurstChickenGame />)
+	// あか +3 ×3回 / あお +2 ×2回 → 交互: 3,2,3,2,3 = 13 → あお +2 = 15
+	await press(getByLabelText('+3'))
+	await press(getByLabelText('+2'))
+	await press(getByLabelText('+3'))
+	await press(getByLabelText('+2'))
+	await press(getByLabelText('+3'))
+	await press(getByLabelText('+2')) // 合計15、手番=あか、貢献 [9, 6]
+	await press(getByText(/ストップ宣言/)) // 宣言者=あか、最少=あお(6)
+	await act(async () => {
+		jest.advanceTimersByTime(2000) // ドラムロール完了
+	})
+	expect(getByText(/あおさんの負け/)).toBeTruthy()
+	expect(getByText(/上限は 30 だった/)).toBeTruthy()
+})

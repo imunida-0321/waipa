@@ -1,11 +1,17 @@
-import { useReducer } from 'react'
+import { router } from 'expo-router'
+import { useEffect, useReducer } from 'react'
 import { Pressable, StyleSheet, Text, View } from 'react-native'
+import { DrumrollReveal } from '@/components/game/drumroll-reveal'
+import { lottieAssets } from '@/components/game/lottie-assets'
+import { LottieEffect } from '@/components/game/lottie-effect'
+import { useDrumroll } from '@/components/game/use-drumroll'
 import { haptics } from '@/lib/haptics'
 import { getDisplayNames, usePlayers } from '@/lib/players-store'
 import { playSound } from '@/lib/sound'
 import { playerColor } from '@/theme/player-colors'
 import { colors, radii, spacing, typography } from '@/theme/tokens'
 import { LIMIT_MAX, LIMIT_MIN, canStop, createInitialState, reduce } from './engine'
+import { RoundResult } from './round-result'
 import { tensionLevel } from './tension'
 import { BC } from './theme'
 
@@ -33,11 +39,57 @@ export function BurstChickenGame() {
 		dispatch({ type: 'stop' })
 	}
 
-	if (state.phase !== 'playing') {
-		// Task 8 でリザルト演出（爆発・精算・答え合わせ）に差し替える
+	const drum = useDrumroll()
+
+	// バースト: 爆発音＋強バイブ。精算: ドラムロール開始
+	// 注意: drum は useDrumroll() が毎レンダー新規オブジェクトを返すため、
+	// 依存配列には drum 自体ではなく安定した drum.start（useCallback）を渡す
+	// （drum を渡すと phase 変化のたびに再実行され、ドラムロールが延々リスタートしてしまう）
+	useEffect(() => {
+		if (state.phase === 'exploded') {
+			playSound('explosion')
+			haptics.heavy()
+		}
+		if (state.phase === 'settled') {
+			drum.start()
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [state.phase, drum.start])
+
+	const retry = () => {
+		drum.reset()
+		dispatch({ type: 'restart', rng: Math.random })
+	}
+
+	if (state.phase === 'exploded') {
+		return (
+			<View style={[styles.container, styles.explodedBg]}>
+				<LottieEffect
+					source={lottieAssets.explosion}
+					style={styles.explosionLottie}
+					fallback={<Text style={styles.explosionEmoji}>💥</Text>}
+				/>
+				<RoundResult
+					state={state}
+					names={names}
+					onRetry={retry}
+					onHome={() => router.replace('/')}
+				/>
+			</View>
+		)
+	}
+
+	if (state.phase === 'settled') {
 		return (
 			<View style={styles.container}>
-				<Text style={styles.totalValue}>💥</Text>
+				<DrumrollReveal phase={drum.phase === 'idle' ? 'rolling' : drum.phase}>
+					<RoundResult
+						state={state}
+						names={names}
+						onRetry={retry}
+						onHome={() => router.replace('/')}
+					/>
+				</DrumrollReveal>
 			</View>
 		)
 	}
@@ -103,6 +155,9 @@ const styles = StyleSheet.create({
 		...StyleSheet.absoluteFill,
 		backgroundColor: BC.maskRed,
 	},
+	explodedBg: { backgroundColor: BC.maskRed },
+	explosionLottie: { width: 160, height: 160, alignSelf: 'center' },
+	explosionEmoji: { fontSize: 96, textAlign: 'center' },
 	hint: { ...typography.caption, color: colors.textMuted, textAlign: 'center' },
 	totalBlock: { alignItems: 'center', gap: spacing.xs },
 	totalLabel: { ...typography.caption, color: colors.textMuted },
