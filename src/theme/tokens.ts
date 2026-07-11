@@ -12,6 +12,7 @@ export const colors = {
 	success: '#34C759',
 	danger: '#FF4D4F',
 	gold: '#FFC53D',
+	premiumGold: '#F0C776', // プレミアム枠の👑バッジ・ロック表示用
 } as const
 
 export const spacing = {

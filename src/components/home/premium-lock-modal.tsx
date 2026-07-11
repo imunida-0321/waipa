@@ -57,5 +57,5 @@ const styles = StyleSheet.create({
 		paddingHorizontal: spacing.md,
 		paddingVertical: spacing.xs,
 	},
-	badgeText: { ...typography.caption, color: colors.textMuted },
+	badgeText: { ...typography.caption, color: colors.premiumGold },
 })

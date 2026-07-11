@@ -29,7 +29,8 @@ export function BurstChickenGame() {
 
 	const add = (amount: 1 | 2 | 3) => {
 		playSound('tick') // 素材未登録の間は無音スキップ（bomb-relay と同じ扱い）
-		if (tension >= 0.5) haptics.heavy()
+		// バイブは押した結果の合計で判定（表示用マスクの opacity は現行値=state.total のままでよい）
+		if (tensionLevel(state.total + amount) >= 0.5) haptics.heavy()
 		else haptics.tap()
 		dispatch({ type: 'add', amount })
 	}
@@ -190,7 +191,7 @@ const styles = StyleSheet.create({
 	stopBtn: {
 		alignSelf: 'center',
 		backgroundColor: BC.red,
-		borderRadius: 999,
+		borderRadius: radii.pill,
 		paddingHorizontal: spacing.xl,
 		paddingVertical: spacing.md,
 	},

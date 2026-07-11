@@ -1,4 +1,5 @@
 import { act, fireEvent, render } from '@testing-library/react-native'
+import { haptics } from '@/lib/haptics'
 import { BurstChickenGame } from '../burst-chicken-game'
 
 jest.mock('@/lib/sound', () => ({ playSound: jest.fn(), registerSound: jest.fn() }))
@@ -34,6 +35,7 @@ jest.mock('react-native-reanimated', () => {
 
 // Math.random を 0.9999… に固定 → limit は常に 30（バーストさせないテスト用）
 beforeEach(() => {
+	jest.clearAllMocks() // haptics/sound の jest.fn() 呼び出し回数をテスト間で引き継がない
 	jest.spyOn(Math, 'random').mockReturnValue(0.9999999)
 	jest.useFakeTimers()
 })
@@ -106,4 +108,52 @@ it('ストップ宣言でドラムロール後に精算リザルトが出る', a
 	})
 	expect(getByText(/あおさんの負け/)).toBeTruthy()
 	expect(getByText(/上限は 30 だった/)).toBeTruthy()
+})
+
+it('積んだ結果の合計でバイブ強度を判定する（低いうちは tap、結果が23になる add では heavy）', async () => {
+	const { getByLabelText } = await render(<BurstChickenGame />)
+	await press(getByLabelText('+1')) // 0→1: 低いので tap
+	expect(haptics.tap).toHaveBeenCalledTimes(1)
+	expect(haptics.heavy).not.toHaveBeenCalled()
+
+	for (let i = 0; i < 6; i++) {
+		await press(getByLabelText('+3')) // 1→4→7→10→13→16→19
+	}
+	expect(haptics.heavy).not.toHaveBeenCalled()
+
+	await press(getByLabelText('+2')) // 19→21: tensionLevel(21)=0.4 まだ tap
+	expect(haptics.heavy).not.toHaveBeenCalled()
+
+	await press(getByLabelText('+2')) // 21→23: tensionLevel(23)≈0.53 → heavy（押す前の18ではなく結果値で判定）
+	expect(haptics.heavy).toHaveBeenCalledTimes(1)
+})
+
+it('settled → もう一回 → 再度ストップまで進めてもドラムロール後にリザルトが出る（drum-deps 再スタートバグの回帰ガード）', async () => {
+	;(Math.random as jest.Mock).mockReturnValue(0.9999999) // limit=30固定
+	const { getByLabelText, getByText, queryByText } = await render(<BurstChickenGame />)
+
+	// 1周目: 合計15までためてストップ→ドラムロール完了→精算リザルト
+	for (let i = 0; i < 5; i++) {
+		await press(getByLabelText('+3')) // 3,6,9,12,15
+	}
+	await press(getByText(/ストップ宣言/))
+	await act(async () => {
+		jest.advanceTimersByTime(2000)
+	})
+	expect(getByText(/の負け/)).toBeTruthy()
+
+	// もう一回 → drum.reset() 経由で新ラウンド開始
+	await press(getByText('もう一回'))
+	expect(getByText('0')).toBeTruthy()
+	expect(queryByText(/の負け/)).toBeNull()
+
+	// 2周目: 再度合計15までためてストップ→ドラムロールが正しく完了して敗者が再表示される
+	for (let i = 0; i < 5; i++) {
+		await press(getByLabelText('+3')) // 3,6,9,12,15
+	}
+	await press(getByText(/ストップ宣言/))
+	await act(async () => {
+		jest.advanceTimersByTime(2000)
+	})
+	expect(getByText(/の負け/)).toBeTruthy()
 })
