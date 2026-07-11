@@ -9,30 +9,7 @@ jest.mock('@/lib/premium', () => ({
 	isPremiumUnlocked: () => mockPremiumUnlocked,
 }))
 
-// 実レジストリ（who-will-pay / bomb-2-16 等）を維持したまま、
-// プレミアム限定ゲームを1つだけ追加する（既存の「全ゲーム表示」テストと共存させるため）
-jest.mock('@/games/registry', () => {
-	const actual = jest.requireActual('@/games/registry')
-	return {
-		...actual,
-		games: [
-			...actual.games,
-			{
-				id: 'burst-chicken',
-				title: 'バーストチキン',
-				tagline: '積みすぎたら爆発',
-				emoji: '🐔',
-				gradient: ['#FF9F43', '#EE5253'],
-				minPlayers: 2,
-				maxPlayers: 12,
-				premium: true,
-				howToPlay: ['遊び方'],
-				Component: () => null,
-			},
-		],
-	}
-})
-
+// プレミアム限定ゲームの実例として実レジストリの burst-chicken（premium: true）をそのまま使う
 jest.mock('@react-native-async-storage/async-storage', () =>
 	// eslint-disable-next-line @typescript-eslint/no-require-imports
 	require('@react-native-async-storage/async-storage/jest/async-storage-mock'),
