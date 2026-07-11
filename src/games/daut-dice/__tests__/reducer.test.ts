@@ -99,13 +99,27 @@ describe('doubt（ダウト）', () => {
 })
 
 describe('revealDone → 続行 / 終了', () => {
-	it('続行: ライフを失った人から宣言リセットで roll 向け handover', () => {
+	it('続行（嘘）: 宣言者がライフを失う→ 手番を渡すため handover 経由', () => {
 		let s = declareFlow(initialState(3), 3, 5, 66)
-		s = reduce(s, { type: 'doubt' }) // 0番がライフ-1
+		s = reduce(s, { type: 'doubt' }) // 0番（宣言者）がライフ-1、いま手元にあるのは1番
+		expect(s.reveal).toEqual({ wasBluff: true, lifeLoserIndex: 0 })
 		s = reduce(s, { type: 'revealDone' })
 		expect(s.phase).toBe('handover')
 		expect(s.handoverNext).toBe('roll')
 		expect(s.turnIndex).toBe(0)
+		expect(s.prevDeclaration).toBeNull()
+		expect(s.actualRoll).toBeNull()
+		expect(s.reveal).toBeNull()
+	})
+
+	it('続行（本当）: 応答者自身がライフを失う→ 自己手渡しをスキップして直接 roll', () => {
+		let s = declareFlow(initialState(3), 3, 5, 53)
+		s = reduce(s, { type: 'doubt' }) // 1番（応答者＝いま手元にある人）がライフ-1
+		expect(s.reveal).toEqual({ wasBluff: false, lifeLoserIndex: 1 })
+		expect(s.turnIndex).toBe(1)
+		s = reduce(s, { type: 'revealDone' })
+		expect(s.phase).toBe('roll')
+		expect(s.turnIndex).toBe(1)
 		expect(s.prevDeclaration).toBeNull()
 		expect(s.actualRoll).toBeNull()
 		expect(s.reveal).toBeNull()

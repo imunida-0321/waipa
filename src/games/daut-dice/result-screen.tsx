@@ -53,5 +53,5 @@ const styles = StyleSheet.create({
 	},
 	bar: { width: 4, height: 24, borderRadius: 2 },
 	name: { ...typography.body, flex: 1 },
-	hearts: { fontSize: 14, color: '#FF6B81' },
+	hearts: { fontSize: 14, color: DD.heart },
 })

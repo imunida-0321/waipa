@@ -1,3 +1,4 @@
+/** [0, 1) を返す（Math.random 互換）。1 ちょうどを返す実装は不可 */
 export type Rng = () => number
 
 export const MIE = 21

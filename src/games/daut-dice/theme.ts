@@ -3,4 +3,5 @@ export const DD = {
 	red: '#EE5253',
 	redDeep: '#B33939',
 	gold: '#FFC53D',
+	heart: '#FF6B81',
 } as const

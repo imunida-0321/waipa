@@ -1,6 +1,7 @@
 import { StyleSheet, Text, View } from 'react-native'
 import { playerColor } from '@/theme/player-colors'
 import { colors, radii, spacing, typography } from '@/theme/tokens'
+import { DD } from './theme'
 
 type Props = {
 	names: string[]
@@ -55,5 +56,5 @@ const styles = StyleSheet.create({
 	},
 	dot: { width: 8, height: 8, borderRadius: 4 },
 	name: { ...typography.caption, color: colors.text, maxWidth: 72 },
-	hearts: { fontSize: 12, color: '#FF6B81' },
+	hearts: { fontSize: 12, color: DD.heart },
 })

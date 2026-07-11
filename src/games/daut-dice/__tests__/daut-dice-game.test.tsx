@@ -84,6 +84,34 @@ async function rollAndPeek(utils: Awaited<ReturnType<typeof render>>) {
 	})
 }
 
+it('peek: 長押し前は宣言不可・pressOut すると実出目が隠れる', async () => {
+	const utils = await render(<DautDiceGame />)
+	await act(async () => {
+		fireEvent.press(utils.getByText('タップで振る'))
+	})
+	await act(async () => {
+		jest.advanceTimersByTime(ROLL_ANIM_MS)
+	})
+	// 長押し前: 宣言してもフェーズが進まない（宣言リストが出てこない）
+	await act(async () => {
+		fireEvent.press(utils.getByText('宣言する'))
+	})
+	expect(utils.queryByText('21（ミエ）')).toBeNull()
+	expect(utils.getByText('長押しでこっそり確認')).toBeTruthy()
+
+	// 長押し中は実出目が見える
+	await act(async () => {
+		fireEvent(utils.getByLabelText('長押しで出目を確認'), 'pressIn')
+	})
+	expect(utils.getByText('11（ゾロ目）')).toBeTruthy()
+
+	// 離すと実出目テキストは消える（秘匿）
+	await act(async () => {
+		fireEvent(utils.getByLabelText('長押しで出目を確認'), 'pressOut')
+	})
+	expect(utils.queryByText('11（ゾロ目）')).toBeNull()
+})
+
 it('roll → peek（長押し確認）→ declare → handover → respond まで通る', async () => {
 	const utils = await render(<DautDiceGame />)
 	expect(utils.getByText(/あかさんの番/)).toBeTruthy()

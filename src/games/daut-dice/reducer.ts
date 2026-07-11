@@ -96,6 +96,9 @@ export function reduce(state: GameState, action: Action): GameState {
 		case 'revealDone': {
 			if (state.phase !== 'reveal' || state.reveal === null) return state
 			if (state.loserIndex !== null) return { ...state, phase: 'result' }
+			// ダウト失敗（応答者自身がライフを失う）は今スマホを持っている人がそのまま次の先手なので
+			// handover を挟まず直接 roll へ進む
+			const selfContinues = state.reveal.lifeLoserIndex === state.turnIndex
 			return {
 				...state,
 				turnIndex: state.reveal.lifeLoserIndex,
@@ -104,7 +107,7 @@ export function reduce(state: GameState, action: Action): GameState {
 				actualRoll: null,
 				reveal: null,
 				handoverNext: 'roll',
-				phase: 'handover',
+				phase: selfContinues ? 'roll' : 'handover',
 			}
 		}
 		case 'retry': {

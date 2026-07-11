@@ -18,10 +18,23 @@ import { RevealOverlay } from './reveal-overlay'
 import { DD } from './theme'
 import { useShake } from './use-shake'
 
+// rollId をシードにした決定的疑似乱数（dice-roll-3d.tsx の mulberry32 と同等実装）
+function mulberry32(seed: number): () => number {
+	let s = seed >>> 0
+	return () => {
+		s = (s + 0x6d2b79f5) >>> 0
+		let t = s
+		t = Math.imul(t ^ (t >>> 15), t | 1)
+		t ^= t + Math.imul(t ^ (t >>> 7), t | 61)
+		return ((t ^ (t >>> 14)) >>> 0) / 4294967296
+	}
+}
+
 // rollId シードの決定的ダミー出目（転がり演出用）。実出目は長押し確認と公開時のみ表示する
 function dummyDice(rollId: number): [number, number] {
-	const a = ((rollId * 7 + 3) % 6) + 1
-	const b = ((rollId * 13 + 5) % 6) + 1
+	const rng = mulberry32(rollId)
+	const a = Math.floor(rng() * 6) + 1
+	const b = Math.floor(rng() * 6) + 1
 	return [a, b]
 }
 
