@@ -61,3 +61,20 @@ it('決選投票前の再議論では見出しが変わる', async () => {
 	)
 	expect(getByText(/決選投票/)).toBeTruthy()
 })
+
+it('スキップ確定後はチクタクも onDone 再発火もしない', async () => {
+	const onDone = jest.fn()
+	const { getByText } = await render(<DiscussScreen seconds={180} onDone={onDone} />)
+	await act(async () => {
+		fireEvent.press(getByText('投票へすすむ'))
+	})
+	await act(async () => {
+		fireEvent.press(getByText('もう一度タップで投票へ！'))
+	})
+	;(playSound as jest.Mock).mockClear()
+	await act(async () => {
+		jest.advanceTimersByTime(180_000)
+	})
+	expect(onDone).toHaveBeenCalledTimes(1)
+	expect(playSound).not.toHaveBeenCalledWith('tick')
+})

@@ -18,20 +18,25 @@ export function DiscussScreen({ seconds, isRunoff = false, onDone }: Props) {
 	const [remaining, setRemaining] = useState(seconds)
 	const [confirming, setConfirming] = useState(false)
 	const doneRef = useRef(false)
+	const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
 	const finish = () => {
 		if (doneRef.current) return
 		doneRef.current = true
+		if (intervalRef.current) clearInterval(intervalRef.current)
 		haptics.heavy()
 		onDone()
 	}
 
 	useEffect(() => {
-		const id = setInterval(() => setRemaining((r) => r - 1), 1000)
-		return () => clearInterval(id)
+		intervalRef.current = setInterval(() => setRemaining((r) => r - 1), 1000)
+		return () => {
+			if (intervalRef.current) clearInterval(intervalRef.current)
+		}
 	}, [])
 
 	useEffect(() => {
+		if (doneRef.current) return
 		if (remaining <= 0) {
 			finish()
 			return
