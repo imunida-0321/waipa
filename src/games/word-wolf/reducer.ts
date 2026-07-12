@@ -9,14 +9,7 @@ import {
 } from './engine'
 
 export type Phase =
-	| 'setup'
-	| 'deal'
-	| 'discuss'
-	| 'vote'
-	| 'runoff-discuss'
-	| 'reveal'
-	| 'reversal'
-	| 'result'
+	'setup' | 'deal' | 'discuss' | 'vote' | 'runoff-discuss' | 'reveal' | 'reversal' | 'result'
 
 export type Outcome = 'citizens' | 'wolf' | 'wolf-reversal'
 

@@ -52,7 +52,9 @@ export function DealPass({ dealIndex, playerCount, name, word, onConfirm }: Prop
 
 			<GradientButton
 				title={
-					dealIndex + 1 < playerCount ? '確認した（次の人へ）' : '確認した（議論スタート！）'
+					dealIndex + 1 < playerCount
+						? '確認した（次の人へ）'
+						: '確認した（議論スタート！）'
 				}
 				onPress={onConfirm}
 				disabled={!viewed || pressing}

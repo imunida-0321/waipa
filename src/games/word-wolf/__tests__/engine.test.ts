@@ -86,7 +86,9 @@ describe('choosePair', () => {
 describe('FALLBACK_PAIRS / PACKS', () => {
 	it('全パックにフォールバックが2件以上ある', () => {
 		for (const pack of PACKS) {
-			expect(FALLBACK_PAIRS.filter((p) => p.pack === pack.id).length).toBeGreaterThanOrEqual(2)
+			expect(FALLBACK_PAIRS.filter((p) => p.pack === pack.id).length).toBeGreaterThanOrEqual(
+				2,
+			)
 		}
 	})
 })

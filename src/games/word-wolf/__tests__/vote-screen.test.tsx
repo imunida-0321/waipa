@@ -23,7 +23,13 @@ async function toChoose(ui: Awaited<ReturnType<typeof render>>) {
 
 it('ハンドオーバー画面から始まり、候補に自分が出ない', async () => {
 	const ui = await render(
-		<VoteScreen voterIndex={0} voterName="あか" names={names} candidates={null} onVote={jest.fn()} />,
+		<VoteScreen
+			voterIndex={0}
+			voterName="あか"
+			names={names}
+			candidates={null}
+			onVote={jest.fn()}
+		/>,
 	)
 	expect(ui.getByText(/あかさんにスマホを渡して/)).toBeTruthy()
 	await toChoose(ui)
@@ -35,7 +41,13 @@ it('ハンドオーバー画面から始まり、候補に自分が出ない', a
 it('選択→確定で onVote が呼ばれる。未選択では確定できない', async () => {
 	const onVote = jest.fn()
 	const ui = await render(
-		<VoteScreen voterIndex={0} voterName="あか" names={names} candidates={null} onVote={onVote} />,
+		<VoteScreen
+			voterIndex={0}
+			voterName="あか"
+			names={names}
+			candidates={null}
+			onVote={onVote}
+		/>,
 	)
 	await toChoose(ui)
 	await act(async () => {
@@ -53,7 +65,13 @@ it('選択→確定で onVote が呼ばれる。未選択では確定できな�
 
 it('決選投票では候補だけが並ぶ', async () => {
 	const ui = await render(
-		<VoteScreen voterIndex={2} voterName="き" names={names} candidates={[0, 1]} onVote={jest.fn()} />,
+		<VoteScreen
+			voterIndex={2}
+			voterName="き"
+			names={names}
+			candidates={[0, 1]}
+			onVote={jest.fn()}
+		/>,
 	)
 	await toChoose(ui)
 	expect(ui.getByText('あか')).toBeTruthy()

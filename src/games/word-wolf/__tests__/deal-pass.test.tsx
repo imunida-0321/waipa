@@ -12,7 +12,13 @@ jest.mock('expo-linear-gradient', () => {
 
 it('長押し中だけお題が表示され、離すと隠れる', async () => {
 	const { getByText, queryByText, getByLabelText } = await render(
-		<DealPass dealIndex={0} playerCount={3} name="あか" word="ラーメン" onConfirm={jest.fn()} />,
+		<DealPass
+			dealIndex={0}
+			playerCount={3}
+			name="あか"
+			word="ラーメン"
+			onConfirm={jest.fn()}
+		/>,
 	)
 	// 長押し前はお題が漏れない
 	expect(queryByText('ラーメン')).toBeNull()
@@ -30,7 +36,13 @@ it('長押し中だけお題が表示され、離すと隠れる', async () => {
 it('一度確認するまで「次の人へ」は押せない', async () => {
 	const onConfirm = jest.fn()
 	const { getByText, getByLabelText } = await render(
-		<DealPass dealIndex={0} playerCount={3} name="あか" word="ラーメン" onConfirm={onConfirm} />,
+		<DealPass
+			dealIndex={0}
+			playerCount={3}
+			name="あか"
+			word="ラーメン"
+			onConfirm={onConfirm}
+		/>,
 	)
 	await act(async () => {
 		fireEvent.press(getByText('確認した（次の人へ）'))

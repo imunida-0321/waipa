@@ -56,9 +56,7 @@ it('「投票へすすむ」は2度押しで確定する', async () => {
 })
 
 it('決選投票前の再議論では見出しが変わる', async () => {
-	const { getByText } = await render(
-		<DiscussScreen seconds={60} isRunoff onDone={jest.fn()} />,
-	)
+	const { getByText } = await render(<DiscussScreen seconds={60} isRunoff onDone={jest.fn()} />)
 	expect(getByText(/決選投票/)).toBeTruthy()
 })
 

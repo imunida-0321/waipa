@@ -78,15 +78,7 @@ export function SetupScreen({ playerCount, onStart }: Props) {
 	)
 }
 
-function Chip({
-	label,
-	active,
-	onPress,
-}: {
-	label: string
-	active: boolean
-	onPress: () => void
-}) {
+function Chip({ label, active, onPress }: { label: string; active: boolean; onPress: () => void }) {
 	return (
 		<Pressable
 			accessibilityRole="button"
