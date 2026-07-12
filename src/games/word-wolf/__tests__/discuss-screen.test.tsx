@@ -78,3 +78,23 @@ it('スキップ確定後はチクタクも onDone 再発火もしない', async
 	expect(onDone).toHaveBeenCalledTimes(1)
 	expect(playSound).not.toHaveBeenCalledWith('tick')
 })
+
+it('残り5秒圏内でスキップしても半拍チクタクが残らない', async () => {
+	const onDone = jest.fn()
+	const { getByText } = await render(<DiscussScreen seconds={4} onDone={onDone} />)
+	await act(async () => {
+		jest.advanceTimersByTime(1_000) // 残り3秒: 半拍がスケジュールされる
+	})
+	await act(async () => {
+		fireEvent.press(getByText('投票へすすむ'))
+	})
+	await act(async () => {
+		fireEvent.press(getByText('もう一度タップで投票へ！'))
+	})
+	;(playSound as jest.Mock).mockClear()
+	await act(async () => {
+		jest.advanceTimersByTime(2_000)
+	})
+	expect(playSound).not.toHaveBeenCalledWith('tick')
+	expect(onDone).toHaveBeenCalledTimes(1)
+})

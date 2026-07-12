@@ -19,11 +19,13 @@ export function DiscussScreen({ seconds, isRunoff = false, onDone }: Props) {
 	const [confirming, setConfirming] = useState(false)
 	const doneRef = useRef(false)
 	const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
+	const halfRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
 	const finish = () => {
 		if (doneRef.current) return
 		doneRef.current = true
 		if (intervalRef.current) clearInterval(intervalRef.current)
+		if (halfRef.current) clearTimeout(halfRef.current)
 		haptics.heavy()
 		onDone()
 	}
@@ -45,8 +47,10 @@ export function DiscussScreen({ seconds, isRunoff = false, onDone }: Props) {
 			playSound('tick') // 素材未登録の間は無音スキップ（#75）
 			haptics.tap()
 			if (remaining <= 5) {
-				const half = setTimeout(() => playSound('tick'), 500)
-				return () => clearTimeout(half)
+				halfRef.current = setTimeout(() => playSound('tick'), 500)
+				return () => {
+					if (halfRef.current) clearTimeout(halfRef.current)
+				}
 			}
 		}
 		// remaining のカウントダウンごとに評価する
