@@ -63,11 +63,13 @@ size → play ─(不成立: 1.5秒後 hideMismatch)→ play（次の人）
 ### Task 1: カード素材パイプライン（assets/images/cards）
 
 **Files:**
+
 - Create: `scripts/build-card-assets.sh`
 - Create: `assets/images/cards/README.md`
 - Create: `assets/images/cards/*.webp`（スクリプト実行で53枚生成）
 
 **Interfaces:**
+
 - Produces: `assets/images/cards/{RANK}{S}.webp`（RANK = A,2..10,J,Q,K / S = S,H,D,C）と `assets/images/cards/Joker1.webp`。Task 4 の `card-assets.ts` がこの命名を require する
 
 - [ ] **Step 1: ビルドスクリプトを書く**
@@ -143,10 +145,12 @@ git commit -m "feat: トランプカード素材（PD/WebP 53枚）とビルド�
 ### Task 2: 罰プリセット punishments.ts
 
 **Files:**
+
 - Create: `src/games/nomige-suijaku/punishments.ts`
 - Test: `src/games/nomige-suijaku/__tests__/punishments.test.ts`
 
 **Interfaces:**
+
 - Produces: `type Punishment = { id: string; text: string; type: 'normal' | 'special' }` / `NORMAL_PUNISHMENTS: readonly Punishment[]`（40個）/ `SPECIAL_PUNISHMENTS: readonly Punishment[]`（10個）/ `LUCKY_PUNISHMENT_ID = 'n40'`。Task 3 の `createDeck` と Task 8 の `punish-reveal` が使う
 
 - [ ] **Step 1: 失敗するテストを書く**
@@ -154,11 +158,7 @@ git commit -m "feat: トランプカード素材（PD/WebP 53枚）とビルド�
 `src/games/nomige-suijaku/__tests__/punishments.test.ts`:
 
 ```ts
-import {
-	LUCKY_PUNISHMENT_ID,
-	NORMAL_PUNISHMENTS,
-	SPECIAL_PUNISHMENTS,
-} from '../punishments'
+import { LUCKY_PUNISHMENT_ID, NORMAL_PUNISHMENTS, SPECIAL_PUNISHMENTS } from '../punishments'
 
 it('通常罰は40個・特大罰は10個ある', () => {
 	expect(NORMAL_PUNISHMENTS).toHaveLength(40)
@@ -256,10 +256,18 @@ export const SPECIAL_PUNISHMENTS: readonly Punishment[] = [
 	{ id: 's02', text: '全員のグラスにドリンクを注いで乾杯の音頭、自分は3杯', type: 'special' },
 	{ id: 's03', text: '次のドリンクを全員分おごる宣言、できなければグラス半分', type: 'special' },
 	{ id: 's04', text: '全員に一発芸、スベったら追加で2杯', type: 'special' },
-	{ id: 's05', text: '好きな人（または推し）を実名で発表、言えなければグラス半分', type: 'special' },
+	{
+		id: 's05',
+		text: '好きな人（または推し）を実名で発表、言えなければグラス半分',
+		type: 'special',
+	},
 	{ id: 's06', text: 'LINEの最新トーク画面を見せる、拒否ならグラス半分', type: 'special' },
 	{ id: 's07', text: 'ゲーム終了まで王様キャラで話す、素に戻ったら1杯', type: 'special' },
-	{ id: 's08', text: '全員から質問を1つずつ受けて正直に答える、パスは1回につき1杯', type: 'special' },
+	{
+		id: 's08',
+		text: '全員から質問を1つずつ受けて正直に答える、パスは1回につき1杯',
+		type: 'special',
+	},
 	{ id: 's09', text: '電話帳の5番目の人との思い出を語る、拒否ならグラス半分', type: 'special' },
 	{ id: 's10', text: '幹事（いなければ最年長）に感謝を全力で伝えてグラス半分', type: 'special' },
 ]
@@ -282,19 +290,21 @@ git commit -m "feat: 飲みゲー衰弱の罰プリセット（normal40/special1
 ### Task 3: engine.ts（デッキ生成・マッチ判定）
 
 **Files:**
+
 - Create: `src/games/nomige-suijaku/engine.ts`
 - Test: `src/games/nomige-suijaku/__tests__/engine.test.ts`
 
 **Interfaces:**
+
 - Consumes: `NORMAL_PUNISHMENTS` / `SPECIAL_PUNISHMENTS`（Task 2）
 - Produces:
-  - `type Rng = () => number`
-  - `type BoardSize = 'small' | 'medium' | 'large'`
-  - `type Suit = '♠' | '♥' | '♦' | '♣'`
-  - `type Card = { id: string; pairId: string | null; rank: string; suit: Suit | null; punishmentId: string; punishment: string; state: 'hidden' | 'revealed' | 'removed' }`
-  - `BOARD_CONFIG: Record<BoardSize, { columns: number; pairs: number; label: string; estimate: string }>`
-  - `JOKER_COUNT = 2`
-  - `shuffle<T>(items, rng): T[]` / `createDeck(size, rng): Card[]` / `isMatch(a, b): boolean` / `remainingPairs(cards): number`
+    - `type Rng = () => number`
+    - `type BoardSize = 'small' | 'medium' | 'large'`
+    - `type Suit = '♠' | '♥' | '♦' | '♣'`
+    - `type Card = { id: string; pairId: string | null; rank: string; suit: Suit | null; punishmentId: string; punishment: string; state: 'hidden' | 'revealed' | 'removed' }`
+    - `BOARD_CONFIG: Record<BoardSize, { columns: number; pairs: number; label: string; estimate: string }>`
+    - `JOKER_COUNT = 2`
+    - `shuffle<T>(items, rng): T[]` / `createDeck(size, rng): Card[]` / `isMatch(a, b): boolean` / `remainingPairs(cards): number`
 
 - [ ] **Step 1: 失敗するテストを書く**
 
@@ -516,11 +526,13 @@ git commit -m "feat: 飲みゲー衰弱エンジン（デッキ生成・マッ�
 ### Task 4: card-assets.ts（画像 require マップ・自動生成）
 
 **Files:**
+
 - Create: `scripts/generate-card-assets.mjs`
 - Create: `src/games/nomige-suijaku/card-assets.ts`（スクリプトで生成してコミット）
 - Test: `src/games/nomige-suijaku/__tests__/card-assets.test.ts`
 
 **Interfaces:**
+
 - Consumes: `type Suit`（Task 3）/ `assets/images/cards/*.webp`（Task 1）
 - Produces: `cardImageSource(rank: string, suit: Suit): number` / `JOKER_IMAGE: number`。Task 7 の `card-grid.tsx` が使う
 
@@ -619,17 +631,19 @@ git commit -m "feat: カード画像 require マップ（自動生成）を追�
 ### Task 5: reducer.ts（状態遷移）
 
 **Files:**
+
 - Create: `src/games/nomige-suijaku/reducer.ts`
 - Test: `src/games/nomige-suijaku/__tests__/reducer.test.ts`
 
 **Interfaces:**
+
 - Consumes: `createDeck` / `isMatch` / `type Card, BoardSize, Rng`（Task 3）
 - Produces:
-  - `type Phase = 'size' | 'play' | 'matchAnim' | 'punish' | 'result'`
-  - `type Punish = { kind: 'pair' | 'joker'; punishmentId: string; text: string; playerIndex: number }`
-  - `type GameState = { phase: Phase; size: BoardSize; cards: Card[]; playerCount: number; turnIndex: number; flippedIds: string[]; scores: number[]; punish: Punish | null }`
-  - `type Action = { type: 'start'; size: BoardSize; rng: Rng } | { type: 'flip'; cardId: string } | { type: 'hideMismatch' } | { type: 'matchAnimDone' } | { type: 'punishDone' } | { type: 'retry'; rng: Rng }`
-  - `initialState(playerCount): GameState` / `reduce(state, action): GameState` / `isMismatchShown(state): boolean`
+    - `type Phase = 'size' | 'play' | 'matchAnim' | 'punish' | 'result'`
+    - `type Punish = { kind: 'pair' | 'joker'; punishmentId: string; text: string; playerIndex: number }`
+    - `type GameState = { phase: Phase; size: BoardSize; cards: Card[]; playerCount: number; turnIndex: number; flippedIds: string[]; scores: number[]; punish: Punish | null }`
+    - `type Action = { type: 'start'; size: BoardSize; rng: Rng } | { type: 'flip'; cardId: string } | { type: 'hideMismatch' } | { type: 'matchAnimDone' } | { type: 'punishDone' } | { type: 'retry'; rng: Rng }`
+    - `initialState(playerCount): GameState` / `reduce(state, action): GameState` / `isMismatchShown(state): boolean`
 
 - [ ] **Step 1: 失敗するテストを書く**
 
@@ -639,11 +653,7 @@ git commit -m "feat: カード画像 require マップ（自動生成）を追�
 import type { Card } from '../engine'
 import { initialState, isMismatchShown, reduce, type GameState } from '../reducer'
 
-function pairCard(
-	id: string,
-	pairId: string,
-	overrides: Partial<Card> = {},
-): Card {
+function pairCard(id: string, pairId: string, overrides: Partial<Card> = {}): Card {
 	return {
 		id,
 		pairId,
@@ -677,8 +687,18 @@ function playState(overrides: Partial<GameState> = {}): GameState {
 		cards: [
 			pairCard('p1-a', 'p1'),
 			pairCard('p1-b', 'p1'),
-			pairCard('p2-a', 'p2', { rank: 'Q', suit: '♦', punishmentId: 'n07', punishment: '全員と乾杯して1杯' }),
-			pairCard('p2-b', 'p2', { rank: 'Q', suit: '♦', punishmentId: 'n07', punishment: '全員と乾杯して1杯' }),
+			pairCard('p2-a', 'p2', {
+				rank: 'Q',
+				suit: '♦',
+				punishmentId: 'n07',
+				punishment: '全員と乾杯して1杯',
+			}),
+			pairCard('p2-b', 'p2', {
+				rank: 'Q',
+				suit: '♦',
+				punishmentId: 'n07',
+				punishment: '全員と乾杯して1杯',
+			}),
 			jokerCard('joker-1'),
 		],
 		playerCount: 3,
@@ -1009,11 +1029,13 @@ git commit -m "feat: 飲みゲー衰弱 reducer（フェーズ遷移・ジョー
 ### Task 6: theme.ts と size-select.tsx（盤面サイズ選択）
 
 **Files:**
+
 - Create: `src/games/nomige-suijaku/theme.ts`
 - Create: `src/games/nomige-suijaku/size-select.tsx`
 - Test: `src/games/nomige-suijaku/__tests__/size-select.test.tsx`
 
 **Interfaces:**
+
 - Consumes: `BOARD_CONFIG` / `type BoardSize`（Task 3）
 - Produces: `NS`（カラー定数）/ `SizeSelect({ onStart: (size: BoardSize) => void })`。Task 10 が使う
 
@@ -1169,10 +1191,12 @@ git commit -m "feat: 飲みゲー衰弱の盤面サイズ選択画面を追加 (
 ### Task 7: card-grid.tsx（盤面・フリップ・成立クロスフェード・秘匿）
 
 **Files:**
+
 - Create: `src/games/nomige-suijaku/card-grid.tsx`
 - Test: `src/games/nomige-suijaku/__tests__/card-grid.test.tsx`
 
 **Interfaces:**
+
 - Consumes: `type Card`（Task 3）/ `cardImageSource` / `JOKER_IMAGE`（Task 4）/ `NS`（Task 6）
 - Produces: `CardGrid({ cards, columns, matchAnimIds, onFlip, disabled })` / `MATCH_ANIM_MS = 1000`。Task 10 が使う
 - **秘匿要件:** `punishment` テキストは `matchAnimIds` に含まれるカードにのみ描画する。それ以外（hidden / revealed / removed）では一切 render しない
@@ -1227,7 +1251,14 @@ function card(id: string, overrides: Partial<Card> = {}): Card {
 const deck = [
 	card('p1-a'),
 	card('p1-b'),
-	card('joker-1', { pairId: null, rank: 'JOKER', suit: null, punishmentId: 's01', punishment: 'グラスの残りを飲み干す（無理は禁物！）', state: 'hidden' }),
+	card('joker-1', {
+		pairId: null,
+		rank: 'JOKER',
+		suit: null,
+		punishmentId: 's01',
+		punishment: 'グラスの残りを飲み干す（無理は禁物！）',
+		state: 'hidden',
+	}),
 ]
 
 it('hidden カードのタップで onFlip が呼ばれる', async () => {
@@ -1266,9 +1297,7 @@ it('秘匿: revealed でも罰テキストは描画されない', async () => {
 })
 
 it('成立演出: matchAnimIds のカードにだけ罰テキストがうっすら出る', async () => {
-	const revealed = deck.map((c) =>
-		c.pairId === 'p1' ? { ...c, state: 'revealed' as const } : c,
-	)
+	const revealed = deck.map((c) => (c.pairId === 'p1' ? { ...c, state: 'revealed' as const } : c))
 	const utils = await render(
 		<CardGrid
 			cards={revealed}
@@ -1400,7 +1429,11 @@ function CardCell({
 				) : (
 					<>
 						<Image
-							source={isJoker ? JOKER_IMAGE : cardImageSource(card.rank, card.suit as Suit)}
+							source={
+								isJoker
+									? JOKER_IMAGE
+									: cardImageSource(card.rank, card.suit as Suit)
+							}
 							style={styles.image}
 							contentFit="contain"
 						/>
@@ -1512,10 +1545,12 @@ git commit -m "feat: 飲みゲー衰弱の盤面グリッド（フリップ・�
 ### Task 8: punish-reveal.tsx（罰発表オーバーレイ）
 
 **Files:**
+
 - Create: `src/games/nomige-suijaku/punish-reveal.tsx`
 - Test: `src/games/nomige-suijaku/__tests__/punish-reveal.test.tsx`
 
 **Interfaces:**
+
 - Consumes: `type Punish`（Task 5）/ `LUCKY_PUNISHMENT_ID`（Task 2）/ `NS`（Task 6）
 - Produces: `PunishReveal({ punish, playerName, playerIndex, onDone })`。Task 10 が使う
 - 文言仕様: pair →「◯◯さん、誰にやらせる？」＋「実行した！」/ joker →「◯◯さんが実行！」＋特大罰バッジ / n40 →「ラッキー！全員から拍手！」（「誰にやらせる？」は出さない）
@@ -1542,7 +1577,12 @@ it('ペア成立: 罰全文＋煽り＋実行した！で onDone', async () => {
 	const onDone = jest.fn()
 	const utils = await render(
 		<PunishReveal
-			punish={{ kind: 'pair', punishmentId: 'n07', text: '全員と乾杯して1杯', playerIndex: 0 }}
+			punish={{
+				kind: 'pair',
+				punishmentId: 'n07',
+				text: '全員と乾杯して1杯',
+				playerIndex: 0,
+			}}
 			playerName="あか"
 			playerIndex={0}
 			onDone={onDone}
@@ -1644,7 +1684,8 @@ export function PunishReveal({ punish, playerName, playerIndex, onDone }: Props)
 			</View>
 			{isLucky ? (
 				<Text style={styles.aori}>
-					<Text style={{ color: nameColor }}>{playerName}さん</Text>、ラッキー！全員から拍手！
+					<Text style={{ color: nameColor }}>{playerName}さん</Text>
+					、ラッキー！全員から拍手！
 				</Text>
 			) : isJoker ? (
 				<Text style={styles.aori}>
@@ -1708,10 +1749,12 @@ git commit -m "feat: 飲みゲー衰弱の罰発表オーバーレイ（pair/jok
 ### Task 9: result-screen.tsx（ランキングリザルト）
 
 **Files:**
+
 - Create: `src/games/nomige-suijaku/result-screen.tsx`
 - Test: `src/games/nomige-suijaku/__tests__/result-screen.test.tsx`
 
 **Interfaces:**
+
 - Consumes: `playerColor`（既存 `@/theme/player-colors`）
 - Produces: `buildRanking(names, scores): { index, name, score, rank }[]`（同数同順位）/ `ResultScreen({ names, scores, onRetry, onHome })`。Task 10 が使う
 
@@ -1815,7 +1858,10 @@ export function ResultScreen({ names, scores, onRetry, onHome }: Props) {
 						<View key={row.index} style={[styles.row, isLast && styles.lastRow]}>
 							<Text style={styles.rank}>{row.rank}位</Text>
 							<View
-								style={[styles.colorBar, { backgroundColor: playerColor(row.index).value }]}
+								style={[
+									styles.colorBar,
+									{ backgroundColor: playerColor(row.index).value },
+								]}
 							/>
 							<Text style={styles.name} numberOfLines={1}>
 								{row.name}
@@ -1892,10 +1938,12 @@ git commit -m "feat: 飲みゲー衰弱のランキングリザルトを追加 (
 ### Task 10: nomige-suijaku-game.tsx（本体・フェーズ結線）
 
 **Files:**
+
 - Create: `src/games/nomige-suijaku/nomige-suijaku-game.tsx`
 - Test: `src/games/nomige-suijaku/__tests__/nomige-suijaku-game.test.tsx`
 
 **Interfaces:**
+
 - Consumes: Task 3〜9 の全エクスポート＋ `usePlayers` / `getDisplayNames`（既存）
 - Produces: `NomigeSuijakuGame`（Task 11 の registry が使う）/ `MISMATCH_MS = 1500`
 
@@ -2152,7 +2200,10 @@ export function NomigeSuijakuGame() {
 		<View style={styles.container}>
 			<View style={styles.header}>
 				<View
-					style={[styles.turnDot, { backgroundColor: playerColor(state.turnIndex).value }]}
+					style={[
+						styles.turnDot,
+						{ backgroundColor: playerColor(state.turnIndex).value },
+					]}
 				/>
 				<Text style={styles.turn}>{names[state.turnIndex]}さんの番</Text>
 				<Text style={styles.remain}>残り{remainingPairs(state.cards)}ペア</Text>
@@ -2209,10 +2260,12 @@ git commit -m "feat: 飲みゲー衰弱の本体コンポーネント（フェ�
 ### Task 11: registry 結線（プレミアムゲート）
 
 **Files:**
+
 - Modify: `src/games/registry.ts`（import 追加＋ games 配列末尾に entry 追加）
 - Modify: `src/games/__tests__/registry.test.ts:65`（`toHaveLength(10)` → `toHaveLength(11)`）
 
 **Interfaces:**
+
 - Consumes: `NomigeSuijakuGame`（Task 10）
 - Produces: ホーム一覧に 👑 バッジ付きカードが出る（既存の `game-card.tsx` / `premium-lock-modal.tsx` が `premium: true` を見て自動で処理する。**このタスクで新規 UI は作らない**）
 
@@ -2221,7 +2274,7 @@ git commit -m "feat: 飲みゲー衰弱の本体コンポーネント（フェ�
 `src/games/__tests__/registry.test.ts` の 65 行目を修正:
 
 ```ts
-		expect(games).toHaveLength(11)
+expect(games).toHaveLength(11)
 ```
 
 Run: `bun run test -- src/games/__tests__/registry.test.ts`
