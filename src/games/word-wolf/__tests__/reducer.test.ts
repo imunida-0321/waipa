@@ -174,6 +174,25 @@ describe('reveal / reversal / result', () => {
 		expect(apply(base, { type: 'reversalJudged', guessed: false }).outcome).toBe('citizens')
 	})
 
+	it('ウルフ2人ラウンドで1人だけ吊っても reversal へ（市民勝ちルート）', () => {
+		let s = apply(toDiscuss(start(7, 2)), { type: 'discussDone' })
+		expect(s.wolfIndices).toEqual([0, 1]) // rng0: assignRoles がウルフ index 0, 1 を選ぶ
+		s = apply(
+			s,
+			{ type: 'vote', target: 2 }, // 0 → 2（自分以外の誰かへ）
+			{ type: 'vote', target: 0 }, // 1 → 0
+			{ type: 'vote', target: 0 }, // 2 → 0
+			{ type: 'vote', target: 0 }, // 3 → 0
+			{ type: 'vote', target: 0 }, // 4 → 0
+			{ type: 'vote', target: 0 }, // 5 → 0
+			{ type: 'vote', target: 0 }, // 6 → 0（ウルフ index 0 に6票集中）
+		)
+		expect(s.phase).toBe('reveal')
+		expect(s.eliminatedIndex).toBe(0)
+		s = apply(s, { type: 'revealDone' })
+		expect(s.phase).toBe('reversal')
+	})
+
 	it('市民を吊ったら即 result（ウルフの勝ち）', () => {
 		let s = apply(toDiscuss(start(3)), { type: 'discussDone' })
 		// 全員が 1 に投票（0 は 1 へ、1 は 2 へ…とせず、1 を 2 票にする）
