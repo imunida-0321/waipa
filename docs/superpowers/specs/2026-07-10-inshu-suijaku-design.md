@@ -1,4 +1,4 @@
-# 飲みゲー衰弱（罰ゲーム神経衰弱・プレミアム）設計
+# 飲酒衰弱（罰ゲーム神経衰弱・プレミアム）設計
 
 2026-07-10 確定。2026-07-12 改訂（カード表面の罰テキスト秘匿化・成立演出の追加・罰プリセット全文の確定・プレミアム基盤の既存化を反映）。
 
@@ -55,12 +55,12 @@ size（盤面サイズ選択）→ play（盤面・手番回し）→ punish（�
 ## ファイル構成
 
 ```
-src/games/nomige-suijaku/
+src/games/inshu-suijaku/
   engine.ts             // 純関数: デッキ生成（サイズ→ペア/ジョーカー配置＋罰割当＋シャッフル）、マッチ判定
   reducer.ts            // State / Action / reducer
   punishments.ts        // プリセット罰データ（normal 40 / special 10、本書末尾の確定全文）
   card-assets.ts        // rank/suit → require(assets/images/cards/*.webp) の解決マップ
-  nomige-suijaku-game.tsx // 本体。useReducer + フェーズ切替
+  inshu-suijaku-game.tsx // 本体。useReducer + フェーズ切替
   size-select.tsx       // 盤面サイズ選択
   card-grid.tsx         // 盤面グリッド＋フリップアニメ＋成立クロスフェード演出
   punish-reveal.tsx     // 罰発表オーバーレイ（ペア/ジョーカー兼用）
@@ -69,7 +69,7 @@ src/games/nomige-suijaku/
   __tests__/
 ```
 
-registry.ts: `id: 'nomige-suijaku'`, `title: '飲みゲー衰弱'`, `requiresPlayers: true`, `minPlayers: 2`, `maxPlayers: 12`, `premium: true` で新規追加。プレミアムゲート（👑 バッジ・ロックモーダル）は実装済みの既存基盤をそのまま利用する。
+registry.ts: `id: 'inshu-suijaku'`, `title: '飲酒衰弱'`, `requiresPlayers: true`, `minPlayers: 2`, `maxPlayers: 12`, `premium: true` で新規追加。プレミアムゲート（👑 バッジ・ロックモーダル）は実装済みの既存基盤をそのまま利用する。
 
 ## 状態設計
 

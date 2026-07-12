@@ -7,7 +7,7 @@ import { DautDiceGame } from './daut-dice/daut-dice-game'
 import { FiveSecStopGame } from './five-sec-stop/five-sec-stop-game'
 import { KimagureOxGame } from './kimagure-ox/kimagure-ox-game'
 import { NoKingGame } from './no-king-game/no-king-game'
-import { NomigeSuijakuGame } from './nomige-suijaku/nomige-suijaku-game'
+import { InshuSuijakuGame } from './inshu-suijaku/inshu-suijaku-game'
 import { ReactionPairsGame } from './reaction-pairs/reaction-pairs-game'
 import { WhoWillPayGame } from './who-will-pay/who-will-pay-game'
 
@@ -248,8 +248,8 @@ export const games: readonly GameMeta[] = [
 		Component: DautDiceGame,
 	},
 	{
-		id: 'nomige-suijaku',
-		title: '飲みゲー衰弱',
+		id: 'inshu-suijaku',
+		title: '飲酒衰弱',
 		tagline: 'ペアを揃えたら罰ゲーム発表！',
 		emoji: '🍻',
 		gradient: ['#FF6B81', '#B33939'],
@@ -266,7 +266,7 @@ export const games: readonly GameMeta[] = [
 			'③ ペアが揃うと罰ゲームがドン！と発表。揃えた人が「誰にやらせるか」を指名しよう！',
 			'④ ジョーカーは引いた本人が特大罰！全ペア消化で獲得ペア数ランキングを発表！',
 		],
-		Component: NomigeSuijakuGame,
+		Component: InshuSuijakuGame,
 	},
 ]
 

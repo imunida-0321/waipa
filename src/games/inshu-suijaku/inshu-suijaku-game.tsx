@@ -16,7 +16,7 @@ export const MISMATCH_MS = 1500
 
 const rng: Rng = () => Math.random()
 
-export function NomigeSuijakuGame() {
+export function InshuSuijakuGame() {
 	const players = usePlayers()
 	const names = getDisplayNames(players)
 	const [state, dispatch] = useReducer(reduce, players.count, initialState)

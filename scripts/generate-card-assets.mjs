@@ -1,4 +1,4 @@
-// src/games/nomige-suijaku/card-assets.ts を生成する。
+// src/games/inshu-suijaku/card-assets.ts を生成する。
 // React Native の require は静的パス必須のため、52枚＋ジョーカーを列挙したマップを吐く
 import { writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
@@ -33,7 +33,7 @@ lines.push(
 
 const out = join(
 	dirname(fileURLToPath(import.meta.url)),
-	'../src/games/nomige-suijaku/card-assets.ts',
+	'../src/games/inshu-suijaku/card-assets.ts',
 )
 writeFileSync(out, lines.join('\n'))
 console.log(`generated: ${out}`)

@@ -1,4 +1,4 @@
-// 飲みゲー衰弱の赤系（registry グラデと統一）
+// 飲酒衰弱の赤系（registry グラデと統一）
 export const NS = {
 	rose: '#FF6B81',
 	redDeep: '#B33939',

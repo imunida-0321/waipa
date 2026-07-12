@@ -1,23 +1,23 @@
-# 飲みゲー衰弱（#67）Implementation Plan
+# 飲酒衰弱（#67）Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** トランプ素材のペア当て神経衰弱に秘匿罰ゲームを仕込んだプレミアム限定ゲーム「飲みゲー衰弱」を実装する。
+**Goal:** トランプ素材のペア当て神経衰弱に秘匿罰ゲームを仕込んだプレミアム限定ゲーム「飲酒衰弱」を実装する。
 
 **Architecture:** 純粋エンジン（`engine.ts`）＋ reducer（`reducer.ts`）＋フェーズ切替コンポーネント方式。参照実装は `src/games/reaction-pairs/`（同じ神経衰弱・カードグリッド・罰オーバーレイ構造）と `src/games/daut-dice/`（最新のテスト規約・秘匿テスト）。カード表面はパブリックドメインのトランプ画像（WebP 事前ラスタライズ）を `expo-image` で表示する。
 
 **Tech Stack:** Expo (React Native) / TypeScript / react-native-reanimated（フリップ・クロスフェード）/ expo-image / jest + @testing-library/react-native
 
-**Spec:** `docs/superpowers/specs/2026-07-10-nomige-suijaku-design.md`（先に必ず読むこと）
+**Spec:** `docs/superpowers/specs/2026-07-10-inshu-suijaku-design.md`（先に必ず読むこと）
 
-**Branch:** `feature/67-nomige-suijaku`（作成済み。この上で作業する）
+**Branch:** `feature/67-inshu-suijaku`（作成済み。この上で作業する）
 
 ## Global Constraints
 
 - コードフォーマット: **タブ幅4・セミコロンなし・シングルクォート**（既存コードに合わせる。Prettier 設定済み）
 - テスト: React 19 のため **`await act(async () => { ... })` 必須**（同期 act は fake timers と併用で失敗する）。参照: `src/games/daut-dice/__tests__/daut-dice-game.test.tsx`
 - `.env` 系ファイルは読まない（プロジェクトのセキュリティポリシー）
-- ゲーム ID: `nomige-suijaku` / タイトル表記: **飲みゲー衰弱**
+- ゲーム ID: `inshu-suijaku` / タイトル表記: **飲酒衰弱**
 - プレミアム: 既存基盤に `premium: true` で乗るだけ（`src/lib/premium.ts` はスタブ、#7 で結線。本プランでは変更しない）
 - 参加人数 2〜12、`requiresPlayers: true`
 - 盤面: 小 4×4（7ペア＋J2）/ 中 4×5（9ペア＋J2）/ 大 5×6（14ペア＋J2）。ジョーカーは常に2枚
@@ -34,7 +34,7 @@ scripts/
   generate-card-assets.mjs    // assets の命名から card-assets.ts を自動生成
 assets/images/cards/
   {RANK}{S}.webp × 52 + Joker1.webp + README.md
-src/games/nomige-suijaku/
+src/games/inshu-suijaku/
   punishments.ts              // 罰プリセット（normal 40 / special 10、スペック確定全文）
   engine.ts                   // 純関数: BOARD_CONFIG / shuffle / createDeck / isMatch / remainingPairs
   card-assets.ts              // rank+suit → require(webp) 解決マップ（自動生成）
@@ -44,7 +44,7 @@ src/games/nomige-suijaku/
   card-grid.tsx               // グリッド＋フリップイン＋成立クロスフェード
   punish-reveal.tsx           // 罰発表オーバーレイ（pair / joker / n40ラッキー兼用）
   result-screen.tsx           // 獲得ペア数ランキング（同数同順位・最下位ハイライト）
-  nomige-suijaku-game.tsx     // 本体（useReducer＋フェーズ切替＋タイマー）
+  inshu-suijaku-game.tsx     // 本体（useReducer＋フェーズ切替＋タイマー）
   __tests__/                  // 上記のユニット・コンポーネントテスト
 src/games/registry.ts         // 修正: entry 追加（premium: true）
 src/games/__tests__/registry.test.ts // 修正: ゲーム数 10 → 11
@@ -146,8 +146,8 @@ git commit -m "feat: トランプカード素材（PD/WebP 53枚）とビルド�
 
 **Files:**
 
-- Create: `src/games/nomige-suijaku/punishments.ts`
-- Test: `src/games/nomige-suijaku/__tests__/punishments.test.ts`
+- Create: `src/games/inshu-suijaku/punishments.ts`
+- Test: `src/games/inshu-suijaku/__tests__/punishments.test.ts`
 
 **Interfaces:**
 
@@ -155,7 +155,7 @@ git commit -m "feat: トランプカード素材（PD/WebP 53枚）とビルド�
 
 - [ ] **Step 1: 失敗するテストを書く**
 
-`src/games/nomige-suijaku/__tests__/punishments.test.ts`:
+`src/games/inshu-suijaku/__tests__/punishments.test.ts`:
 
 ```ts
 import { LUCKY_PUNISHMENT_ID, NORMAL_PUNISHMENTS, SPECIAL_PUNISHMENTS } from '../punishments'
@@ -188,12 +188,12 @@ it('ラッキーカードは n40', () => {
 
 - [ ] **Step 2: テストが失敗することを確認する**
 
-Run: `bun run test -- src/games/nomige-suijaku/__tests__/punishments.test.ts`
+Run: `bun run test -- src/games/inshu-suijaku/__tests__/punishments.test.ts`
 Expected: FAIL（`Cannot find module '../punishments'`）
 
 - [ ] **Step 3: punishments.ts を実装する**
 
-`src/games/nomige-suijaku/punishments.ts`（テキストはスペック「罰プリセット確定全文」と一字一句同じにする）:
+`src/games/inshu-suijaku/punishments.ts`（テキストはスペック「罰プリセット確定全文」と一字一句同じにする）:
 
 ```ts
 export type PunishmentType = 'normal' | 'special'
@@ -275,14 +275,14 @@ export const SPECIAL_PUNISHMENTS: readonly Punishment[] = [
 
 - [ ] **Step 4: テストが通ることを確認する**
 
-Run: `bun run test -- src/games/nomige-suijaku/__tests__/punishments.test.ts`
+Run: `bun run test -- src/games/inshu-suijaku/__tests__/punishments.test.ts`
 Expected: PASS（4 tests）
 
 - [ ] **Step 5: Commit**
 
 ```bash
-git add src/games/nomige-suijaku/punishments.ts src/games/nomige-suijaku/__tests__/punishments.test.ts
-git commit -m "feat: 飲みゲー衰弱の罰プリセット（normal40/special10）を追加 (#67)"
+git add src/games/inshu-suijaku/punishments.ts src/games/inshu-suijaku/__tests__/punishments.test.ts
+git commit -m "feat: 飲酒衰弱の罰プリセット（normal40/special10）を追加 (#67)"
 ```
 
 ---
@@ -291,8 +291,8 @@ git commit -m "feat: 飲みゲー衰弱の罰プリセット（normal40/special1
 
 **Files:**
 
-- Create: `src/games/nomige-suijaku/engine.ts`
-- Test: `src/games/nomige-suijaku/__tests__/engine.test.ts`
+- Create: `src/games/inshu-suijaku/engine.ts`
+- Test: `src/games/inshu-suijaku/__tests__/engine.test.ts`
 
 **Interfaces:**
 
@@ -308,7 +308,7 @@ git commit -m "feat: 飲みゲー衰弱の罰プリセット（normal40/special1
 
 - [ ] **Step 1: 失敗するテストを書く**
 
-`src/games/nomige-suijaku/__tests__/engine.test.ts`:
+`src/games/inshu-suijaku/__tests__/engine.test.ts`:
 
 ```ts
 import {
@@ -407,12 +407,12 @@ it('remainingPairs: removed を除いたペア数を返す', () => {
 
 - [ ] **Step 2: テストが失敗することを確認する**
 
-Run: `bun run test -- src/games/nomige-suijaku/__tests__/engine.test.ts`
+Run: `bun run test -- src/games/inshu-suijaku/__tests__/engine.test.ts`
 Expected: FAIL（`Cannot find module '../engine'`）
 
 - [ ] **Step 3: engine.ts を実装する**
 
-`src/games/nomige-suijaku/engine.ts`:
+`src/games/inshu-suijaku/engine.ts`:
 
 ```ts
 import { NORMAL_PUNISHMENTS, SPECIAL_PUNISHMENTS } from './punishments'
@@ -511,14 +511,14 @@ export function remainingPairs(cards: Card[]): number {
 
 - [ ] **Step 4: テストが通ることを確認する**
 
-Run: `bun run test -- src/games/nomige-suijaku/__tests__/engine.test.ts`
+Run: `bun run test -- src/games/inshu-suijaku/__tests__/engine.test.ts`
 Expected: PASS
 
 - [ ] **Step 5: Commit**
 
 ```bash
-git add src/games/nomige-suijaku/engine.ts src/games/nomige-suijaku/__tests__/engine.test.ts
-git commit -m "feat: 飲みゲー衰弱エンジン（デッキ生成・マッチ判定）を追加 (#67)"
+git add src/games/inshu-suijaku/engine.ts src/games/inshu-suijaku/__tests__/engine.test.ts
+git commit -m "feat: 飲酒衰弱エンジン（デッキ生成・マッチ判定）を追加 (#67)"
 ```
 
 ---
@@ -528,8 +528,8 @@ git commit -m "feat: 飲みゲー衰弱エンジン（デッキ生成・マッ�
 **Files:**
 
 - Create: `scripts/generate-card-assets.mjs`
-- Create: `src/games/nomige-suijaku/card-assets.ts`（スクリプトで生成してコミット）
-- Test: `src/games/nomige-suijaku/__tests__/card-assets.test.ts`
+- Create: `src/games/inshu-suijaku/card-assets.ts`（スクリプトで生成してコミット）
+- Test: `src/games/inshu-suijaku/__tests__/card-assets.test.ts`
 
 **Interfaces:**
 
@@ -538,7 +538,7 @@ git commit -m "feat: 飲みゲー衰弱エンジン（デッキ生成・マッ�
 
 - [ ] **Step 1: 失敗するテストを書く**
 
-`src/games/nomige-suijaku/__tests__/card-assets.test.ts`:
+`src/games/inshu-suijaku/__tests__/card-assets.test.ts`:
 
 ```ts
 import { cardImageSource, JOKER_IMAGE } from '../card-assets'
@@ -559,7 +559,7 @@ it('ジョーカー画像が解決できる', () => {
 
 - [ ] **Step 2: テストが失敗することを確認する**
 
-Run: `bun run test -- src/games/nomige-suijaku/__tests__/card-assets.test.ts`
+Run: `bun run test -- src/games/inshu-suijaku/__tests__/card-assets.test.ts`
 Expected: FAIL（`Cannot find module '../card-assets'`）
 
 - [ ] **Step 3: 生成スクリプトを書く**
@@ -567,7 +567,7 @@ Expected: FAIL（`Cannot find module '../card-assets'`）
 `scripts/generate-card-assets.mjs`:
 
 ```js
-// src/games/nomige-suijaku/card-assets.ts を生成する。
+// src/games/inshu-suijaku/card-assets.ts を生成する。
 // React Native の require は静的パス必須のため、52枚＋ジョーカーを列挙したマップを吐く
 import { writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
@@ -602,7 +602,7 @@ lines.push(
 
 const out = join(
 	dirname(fileURLToPath(import.meta.url)),
-	'../src/games/nomige-suijaku/card-assets.ts',
+	'../src/games/inshu-suijaku/card-assets.ts',
 )
 writeFileSync(out, lines.join('\n'))
 console.log(`generated: ${out}`)
@@ -610,10 +610,10 @@ console.log(`generated: ${out}`)
 
 - [ ] **Step 4: 生成して検証する**
 
-Run: `node scripts/generate-card-assets.mjs && bunx prettier --write src/games/nomige-suijaku/card-assets.ts && grep -c "require(" src/games/nomige-suijaku/card-assets.ts`
+Run: `node scripts/generate-card-assets.mjs && bunx prettier --write src/games/inshu-suijaku/card-assets.ts && grep -c "require(" src/games/inshu-suijaku/card-assets.ts`
 Expected: `53`（52枚＋ジョーカー。prettier で整形して format:check に通す）
 
-Run: `bun run test -- src/games/nomige-suijaku/__tests__/card-assets.test.ts`
+Run: `bun run test -- src/games/inshu-suijaku/__tests__/card-assets.test.ts`
 Expected: PASS
 
 Run: `bun run typecheck`
@@ -622,7 +622,7 @@ Expected: エラーなし
 - [ ] **Step 5: Commit**
 
 ```bash
-git add scripts/generate-card-assets.mjs src/games/nomige-suijaku/card-assets.ts src/games/nomige-suijaku/__tests__/card-assets.test.ts
+git add scripts/generate-card-assets.mjs src/games/inshu-suijaku/card-assets.ts src/games/inshu-suijaku/__tests__/card-assets.test.ts
 git commit -m "feat: カード画像 require マップ（自動生成）を追加 (#67)"
 ```
 
@@ -632,8 +632,8 @@ git commit -m "feat: カード画像 require マップ（自動生成）を追�
 
 **Files:**
 
-- Create: `src/games/nomige-suijaku/reducer.ts`
-- Test: `src/games/nomige-suijaku/__tests__/reducer.test.ts`
+- Create: `src/games/inshu-suijaku/reducer.ts`
+- Test: `src/games/inshu-suijaku/__tests__/reducer.test.ts`
 
 **Interfaces:**
 
@@ -647,7 +647,7 @@ git commit -m "feat: カード画像 require マップ（自動生成）を追�
 
 - [ ] **Step 1: 失敗するテストを書く**
 
-`src/games/nomige-suijaku/__tests__/reducer.test.ts`:
+`src/games/inshu-suijaku/__tests__/reducer.test.ts`:
 
 ```ts
 import type { Card } from '../engine'
@@ -837,12 +837,12 @@ it('retry: 同サイズの新デッキで play から再開・スコアリセッ
 
 - [ ] **Step 2: テストが失敗することを確認する**
 
-Run: `bun run test -- src/games/nomige-suijaku/__tests__/reducer.test.ts`
+Run: `bun run test -- src/games/inshu-suijaku/__tests__/reducer.test.ts`
 Expected: FAIL（`Cannot find module '../reducer'`）
 
 - [ ] **Step 3: reducer.ts を実装する**
 
-`src/games/nomige-suijaku/reducer.ts`:
+`src/games/inshu-suijaku/reducer.ts`:
 
 ```ts
 import { createDeck, isMatch, type BoardSize, type Card, type Rng } from './engine'
@@ -1014,14 +1014,14 @@ function punishDone(state: GameState): GameState {
 
 - [ ] **Step 4: テストが通ることを確認する**
 
-Run: `bun run test -- src/games/nomige-suijaku/__tests__/reducer.test.ts`
+Run: `bun run test -- src/games/inshu-suijaku/__tests__/reducer.test.ts`
 Expected: PASS（12 tests）
 
 - [ ] **Step 5: Commit**
 
 ```bash
-git add src/games/nomige-suijaku/reducer.ts src/games/nomige-suijaku/__tests__/reducer.test.ts
-git commit -m "feat: 飲みゲー衰弱 reducer（フェーズ遷移・ジョーカー分岐）を追加 (#67)"
+git add src/games/inshu-suijaku/reducer.ts src/games/inshu-suijaku/__tests__/reducer.test.ts
+git commit -m "feat: 飲酒衰弱 reducer（フェーズ遷移・ジョーカー分岐）を追加 (#67)"
 ```
 
 ---
@@ -1030,9 +1030,9 @@ git commit -m "feat: 飲みゲー衰弱 reducer（フェーズ遷移・ジョー
 
 **Files:**
 
-- Create: `src/games/nomige-suijaku/theme.ts`
-- Create: `src/games/nomige-suijaku/size-select.tsx`
-- Test: `src/games/nomige-suijaku/__tests__/size-select.test.tsx`
+- Create: `src/games/inshu-suijaku/theme.ts`
+- Create: `src/games/inshu-suijaku/size-select.tsx`
+- Test: `src/games/inshu-suijaku/__tests__/size-select.test.tsx`
 
 **Interfaces:**
 
@@ -1041,7 +1041,7 @@ git commit -m "feat: 飲みゲー衰弱 reducer（フェーズ遷移・ジョー
 
 - [ ] **Step 1: 失敗するテストを書く**
 
-`src/games/nomige-suijaku/__tests__/size-select.test.tsx`:
+`src/games/inshu-suijaku/__tests__/size-select.test.tsx`:
 
 ```tsx
 import { act, fireEvent, render } from '@testing-library/react-native'
@@ -1085,15 +1085,15 @@ it('未選択でもデフォルト（小）でスタートできる', async () =
 
 - [ ] **Step 2: テストが失敗することを確認する**
 
-Run: `bun run test -- src/games/nomige-suijaku/__tests__/size-select.test.tsx`
+Run: `bun run test -- src/games/inshu-suijaku/__tests__/size-select.test.tsx`
 Expected: FAIL（`Cannot find module '../size-select'`）
 
 - [ ] **Step 3: theme.ts と size-select.tsx を実装する**
 
-`src/games/nomige-suijaku/theme.ts`:
+`src/games/inshu-suijaku/theme.ts`:
 
 ```ts
-// 飲みゲー衰弱の赤系（registry グラデと統一）
+// 飲酒衰弱の赤系（registry グラデと統一）
 export const NS = {
 	rose: '#FF6B81',
 	redDeep: '#B33939',
@@ -1104,7 +1104,7 @@ export const NS = {
 } as const
 ```
 
-`src/games/nomige-suijaku/size-select.tsx`:
+`src/games/inshu-suijaku/size-select.tsx`:
 
 ```tsx
 import { useState } from 'react'
@@ -1176,14 +1176,14 @@ const styles = StyleSheet.create({
 
 - [ ] **Step 4: テストが通ることを確認する**
 
-Run: `bun run test -- src/games/nomige-suijaku/__tests__/size-select.test.tsx`
+Run: `bun run test -- src/games/inshu-suijaku/__tests__/size-select.test.tsx`
 Expected: PASS（2 tests）
 
 - [ ] **Step 5: Commit**
 
 ```bash
-git add src/games/nomige-suijaku/theme.ts src/games/nomige-suijaku/size-select.tsx src/games/nomige-suijaku/__tests__/size-select.test.tsx
-git commit -m "feat: 飲みゲー衰弱の盤面サイズ選択画面を追加 (#67)"
+git add src/games/inshu-suijaku/theme.ts src/games/inshu-suijaku/size-select.tsx src/games/inshu-suijaku/__tests__/size-select.test.tsx
+git commit -m "feat: 飲酒衰弱の盤面サイズ選択画面を追加 (#67)"
 ```
 
 ---
@@ -1192,8 +1192,8 @@ git commit -m "feat: 飲みゲー衰弱の盤面サイズ選択画面を追加 (
 
 **Files:**
 
-- Create: `src/games/nomige-suijaku/card-grid.tsx`
-- Test: `src/games/nomige-suijaku/__tests__/card-grid.test.tsx`
+- Create: `src/games/inshu-suijaku/card-grid.tsx`
+- Test: `src/games/inshu-suijaku/__tests__/card-grid.test.tsx`
 
 **Interfaces:**
 
@@ -1203,7 +1203,7 @@ git commit -m "feat: 飲みゲー衰弱の盤面サイズ選択画面を追加 (
 
 - [ ] **Step 1: 失敗するテストを書く**
 
-`src/games/nomige-suijaku/__tests__/card-grid.test.tsx`:
+`src/games/inshu-suijaku/__tests__/card-grid.test.tsx`:
 
 ```tsx
 import { act, fireEvent, render } from '@testing-library/react-native'
@@ -1313,12 +1313,12 @@ it('成立演出: matchAnimIds のカードにだけ罰テキストがうっす�
 
 - [ ] **Step 2: テストが失敗することを確認する**
 
-Run: `bun run test -- src/games/nomige-suijaku/__tests__/card-grid.test.tsx`
+Run: `bun run test -- src/games/inshu-suijaku/__tests__/card-grid.test.tsx`
 Expected: FAIL（`Cannot find module '../card-grid'`）
 
 - [ ] **Step 3: card-grid.tsx を実装する**
 
-`src/games/nomige-suijaku/card-grid.tsx`:
+`src/games/inshu-suijaku/card-grid.tsx`:
 
 ```tsx
 import { Image } from 'expo-image'
@@ -1530,14 +1530,14 @@ const styles = StyleSheet.create({
 
 - [ ] **Step 4: テストが通ることを確認する**
 
-Run: `bun run test -- src/games/nomige-suijaku/__tests__/card-grid.test.tsx`
+Run: `bun run test -- src/games/inshu-suijaku/__tests__/card-grid.test.tsx`
 Expected: PASS（4 tests。秘匿テスト含む）
 
 - [ ] **Step 5: Commit**
 
 ```bash
-git add src/games/nomige-suijaku/card-grid.tsx src/games/nomige-suijaku/__tests__/card-grid.test.tsx
-git commit -m "feat: 飲みゲー衰弱の盤面グリッド（フリップ・成立クロスフェード・罰秘匿）を追加 (#67)"
+git add src/games/inshu-suijaku/card-grid.tsx src/games/inshu-suijaku/__tests__/card-grid.test.tsx
+git commit -m "feat: 飲酒衰弱の盤面グリッド（フリップ・成立クロスフェード・罰秘匿）を追加 (#67)"
 ```
 
 ---
@@ -1546,8 +1546,8 @@ git commit -m "feat: 飲みゲー衰弱の盤面グリッド（フリップ・�
 
 **Files:**
 
-- Create: `src/games/nomige-suijaku/punish-reveal.tsx`
-- Test: `src/games/nomige-suijaku/__tests__/punish-reveal.test.tsx`
+- Create: `src/games/inshu-suijaku/punish-reveal.tsx`
+- Test: `src/games/inshu-suijaku/__tests__/punish-reveal.test.tsx`
 
 **Interfaces:**
 
@@ -1557,7 +1557,7 @@ git commit -m "feat: 飲みゲー衰弱の盤面グリッド（フリップ・�
 
 - [ ] **Step 1: 失敗するテストを書く**
 
-`src/games/nomige-suijaku/__tests__/punish-reveal.test.tsx`:
+`src/games/inshu-suijaku/__tests__/punish-reveal.test.tsx`:
 
 ```tsx
 import { act, fireEvent, render } from '@testing-library/react-native'
@@ -1636,12 +1636,12 @@ it('n40 ラッキーカード: 拍手の煽りになり「誰にやらせる？�
 
 - [ ] **Step 2: テストが失敗することを確認する**
 
-Run: `bun run test -- src/games/nomige-suijaku/__tests__/punish-reveal.test.tsx`
+Run: `bun run test -- src/games/inshu-suijaku/__tests__/punish-reveal.test.tsx`
 Expected: FAIL（`Cannot find module '../punish-reveal'`）
 
 - [ ] **Step 3: punish-reveal.tsx を実装する**
 
-`src/games/nomige-suijaku/punish-reveal.tsx`:
+`src/games/inshu-suijaku/punish-reveal.tsx`:
 
 ```tsx
 import { useEffect } from 'react'
@@ -1734,14 +1734,14 @@ const styles = StyleSheet.create({
 
 - [ ] **Step 4: テストが通ることを確認する**
 
-Run: `bun run test -- src/games/nomige-suijaku/__tests__/punish-reveal.test.tsx`
+Run: `bun run test -- src/games/inshu-suijaku/__tests__/punish-reveal.test.tsx`
 Expected: PASS（3 tests）
 
 - [ ] **Step 5: Commit**
 
 ```bash
-git add src/games/nomige-suijaku/punish-reveal.tsx src/games/nomige-suijaku/__tests__/punish-reveal.test.tsx
-git commit -m "feat: 飲みゲー衰弱の罰発表オーバーレイ（pair/joker/ラッキー分岐）を追加 (#67)"
+git add src/games/inshu-suijaku/punish-reveal.tsx src/games/inshu-suijaku/__tests__/punish-reveal.test.tsx
+git commit -m "feat: 飲酒衰弱の罰発表オーバーレイ（pair/joker/ラッキー分岐）を追加 (#67)"
 ```
 
 ---
@@ -1750,8 +1750,8 @@ git commit -m "feat: 飲みゲー衰弱の罰発表オーバーレイ（pair/jok
 
 **Files:**
 
-- Create: `src/games/nomige-suijaku/result-screen.tsx`
-- Test: `src/games/nomige-suijaku/__tests__/result-screen.test.tsx`
+- Create: `src/games/inshu-suijaku/result-screen.tsx`
+- Test: `src/games/inshu-suijaku/__tests__/result-screen.test.tsx`
 
 **Interfaces:**
 
@@ -1760,7 +1760,7 @@ git commit -m "feat: 飲みゲー衰弱の罰発表オーバーレイ（pair/jok
 
 - [ ] **Step 1: 失敗するテストを書く**
 
-`src/games/nomige-suijaku/__tests__/result-screen.test.tsx`:
+`src/games/inshu-suijaku/__tests__/result-screen.test.tsx`:
 
 ```tsx
 import { act, fireEvent, render } from '@testing-library/react-native'
@@ -1808,12 +1808,12 @@ it('最下位（同数含む）がハイライトされ、ボタンが動く', a
 
 - [ ] **Step 2: テストが失敗することを確認する**
 
-Run: `bun run test -- src/games/nomige-suijaku/__tests__/result-screen.test.tsx`
+Run: `bun run test -- src/games/inshu-suijaku/__tests__/result-screen.test.tsx`
 Expected: FAIL（`Cannot find module '../result-screen'`）
 
 - [ ] **Step 3: result-screen.tsx を実装する**
 
-`src/games/nomige-suijaku/result-screen.tsx`:
+`src/games/inshu-suijaku/result-screen.tsx`:
 
 ```tsx
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
@@ -1923,39 +1923,39 @@ const styles = StyleSheet.create({
 
 - [ ] **Step 4: テストが通ることを確認する**
 
-Run: `bun run test -- src/games/nomige-suijaku/__tests__/result-screen.test.tsx`
+Run: `bun run test -- src/games/inshu-suijaku/__tests__/result-screen.test.tsx`
 Expected: PASS（2 tests）
 
 - [ ] **Step 5: Commit**
 
 ```bash
-git add src/games/nomige-suijaku/result-screen.tsx src/games/nomige-suijaku/__tests__/result-screen.test.tsx
-git commit -m "feat: 飲みゲー衰弱のランキングリザルトを追加 (#67)"
+git add src/games/inshu-suijaku/result-screen.tsx src/games/inshu-suijaku/__tests__/result-screen.test.tsx
+git commit -m "feat: 飲酒衰弱のランキングリザルトを追加 (#67)"
 ```
 
 ---
 
-### Task 10: nomige-suijaku-game.tsx（本体・フェーズ結線）
+### Task 10: inshu-suijaku-game.tsx（本体・フェーズ結線）
 
 **Files:**
 
-- Create: `src/games/nomige-suijaku/nomige-suijaku-game.tsx`
-- Test: `src/games/nomige-suijaku/__tests__/nomige-suijaku-game.test.tsx`
+- Create: `src/games/inshu-suijaku/inshu-suijaku-game.tsx`
+- Test: `src/games/inshu-suijaku/__tests__/inshu-suijaku-game.test.tsx`
 
 **Interfaces:**
 
 - Consumes: Task 3〜9 の全エクスポート＋ `usePlayers` / `getDisplayNames`（既存）
-- Produces: `NomigeSuijakuGame`（Task 11 の registry が使う）/ `MISMATCH_MS = 1500`
+- Produces: `InshuSuijakuGame`（Task 11 の registry が使う）/ `MISMATCH_MS = 1500`
 
 - [ ] **Step 1: 失敗するテストを書く**
 
-`src/games/nomige-suijaku/__tests__/nomige-suijaku-game.test.tsx`:
+`src/games/inshu-suijaku/__tests__/inshu-suijaku-game.test.tsx`:
 
 ```tsx
 import { act, fireEvent, render } from '@testing-library/react-native'
 import type { Card } from '../engine'
 import { MATCH_ANIM_MS } from '../card-grid'
-import { MISMATCH_MS, NomigeSuijakuGame } from '../nomige-suijaku-game'
+import { MISMATCH_MS, InshuSuijakuGame } from '../inshu-suijaku-game'
 
 jest.mock('@/lib/sound', () => ({ playSound: jest.fn(), registerSound: jest.fn() }))
 jest.mock('@/lib/haptics', () => ({
@@ -2039,14 +2039,14 @@ async function startGame(utils: Awaited<ReturnType<typeof render>>) {
 }
 
 it('サイズ選択 → play: 秘匿された盤面が出る', async () => {
-	const utils = await render(<NomigeSuijakuGame />)
+	const utils = await render(<InshuSuijakuGame />)
 	expect(utils.getByText('盤面サイズをえらぼう')).toBeTruthy()
 	await startGame(utils)
 	expect(utils.queryByText('全員と乾杯して1杯')).toBeNull() // 罰は秘匿
 })
 
 it('ペア成立: クロスフェード → 罰発表 → 実行した！で次の人へ', async () => {
-	const utils = await render(<NomigeSuijakuGame />)
+	const utils = await render(<InshuSuijakuGame />)
 	await startGame(utils)
 	await act(async () => {
 		fireEvent.press(utils.getByLabelText('カード1'))
@@ -2068,7 +2068,7 @@ it('ペア成立: クロスフェード → 罰発表 → 実行した！で次�
 })
 
 it('不成立: 約1.5秒後に裏へ戻り次の人へ', async () => {
-	const utils = await render(<NomigeSuijakuGame />)
+	const utils = await render(<InshuSuijakuGame />)
 	await startGame(utils)
 	await act(async () => {
 		fireEvent.press(utils.getByLabelText('カード1'))
@@ -2083,7 +2083,7 @@ it('不成立: 約1.5秒後に裏へ戻り次の人へ', async () => {
 })
 
 it('ジョーカー → 特大罰 → 全ペア消化で結果発表まで通る', async () => {
-	const utils = await render(<NomigeSuijakuGame />)
+	const utils = await render(<InshuSuijakuGame />)
 	await startGame(utils)
 	// あか: ジョーカー（本人実行・手番終了）
 	await act(async () => {
@@ -2127,12 +2127,12 @@ it('ジョーカー → 特大罰 → 全ペア消化で結果発表まで通る
 
 - [ ] **Step 2: テストが失敗することを確認する**
 
-Run: `bun run test -- src/games/nomige-suijaku/__tests__/nomige-suijaku-game.test.tsx`
-Expected: FAIL（`Cannot find module '../nomige-suijaku-game'`）
+Run: `bun run test -- src/games/inshu-suijaku/__tests__/inshu-suijaku-game.test.tsx`
+Expected: FAIL（`Cannot find module '../inshu-suijaku-game'`）
 
-- [ ] **Step 3: nomige-suijaku-game.tsx を実装する**
+- [ ] **Step 3: inshu-suijaku-game.tsx を実装する**
 
-`src/games/nomige-suijaku/nomige-suijaku-game.tsx`:
+`src/games/inshu-suijaku/inshu-suijaku-game.tsx`:
 
 ```tsx
 import { router } from 'expo-router'
@@ -2153,7 +2153,7 @@ export const MISMATCH_MS = 1500
 
 const rng: Rng = () => Math.random()
 
-export function NomigeSuijakuGame() {
+export function InshuSuijakuGame() {
 	const players = usePlayers()
 	const names = getDisplayNames(players)
 	const [state, dispatch] = useReducer(reduce, players.count, initialState)
@@ -2240,19 +2240,19 @@ const styles = StyleSheet.create({
 
 - [ ] **Step 4: テストが通ることを確認する**
 
-Run: `bun run test -- src/games/nomige-suijaku/__tests__/nomige-suijaku-game.test.tsx`
+Run: `bun run test -- src/games/inshu-suijaku/__tests__/inshu-suijaku-game.test.tsx`
 Expected: PASS（4 tests）
 
 - [ ] **Step 5: ゲームディレクトリの全テストを回す**
 
-Run: `bun run test -- src/games/nomige-suijaku`
+Run: `bun run test -- src/games/inshu-suijaku`
 Expected: 全 PASS
 
 - [ ] **Step 6: Commit**
 
 ```bash
-git add src/games/nomige-suijaku/nomige-suijaku-game.tsx src/games/nomige-suijaku/__tests__/nomige-suijaku-game.test.tsx
-git commit -m "feat: 飲みゲー衰弱の本体コンポーネント（フェーズ結線）を追加 (#67)"
+git add src/games/inshu-suijaku/inshu-suijaku-game.tsx src/games/inshu-suijaku/__tests__/inshu-suijaku-game.test.tsx
+git commit -m "feat: 飲酒衰弱の本体コンポーネント（フェーズ結線）を追加 (#67)"
 ```
 
 ---
@@ -2266,7 +2266,7 @@ git commit -m "feat: 飲みゲー衰弱の本体コンポーネント（フェ�
 
 **Interfaces:**
 
-- Consumes: `NomigeSuijakuGame`（Task 10）
+- Consumes: `InshuSuijakuGame`（Task 10）
 - Produces: ホーム一覧に 👑 バッジ付きカードが出る（既存の `game-card.tsx` / `premium-lock-modal.tsx` が `premium: true` を見て自動で処理する。**このタスクで新規 UI は作らない**）
 
 - [ ] **Step 1: registry テストを 11 ゲームに更新する（失敗確認）**
@@ -2285,15 +2285,15 @@ Expected: FAIL（`Expected length: 11, Received length: 10`）
 `src/games/registry.ts` の import 群に追加（アルファベット順の位置に）:
 
 ```ts
-import { NomigeSuijakuGame } from './nomige-suijaku/nomige-suijaku-game'
+import { InshuSuijakuGame } from './inshu-suijaku/inshu-suijaku-game'
 ```
 
 `games` 配列の末尾（daut-dice の後）に追加:
 
 ```ts
 	{
-		id: 'nomige-suijaku',
-		title: '飲みゲー衰弱',
+		id: 'inshu-suijaku',
+		title: '飲酒衰弱',
 		tagline: 'ペアを揃えたら罰ゲーム発表！',
 		emoji: '🍻',
 		gradient: ['#FF6B81', '#B33939'],
@@ -2310,7 +2310,7 @@ import { NomigeSuijakuGame } from './nomige-suijaku/nomige-suijaku-game'
 			'③ ペアが揃うと罰ゲームがドン！と発表。揃えた人が「誰にやらせるか」を指名しよう！',
 			'④ ジョーカーは引いた本人が特大罰！全ペア消化で獲得ペア数ランキングを発表！',
 		],
-		Component: NomigeSuijakuGame,
+		Component: InshuSuijakuGame,
 	},
 ```
 
@@ -2323,7 +2323,7 @@ Expected: PASS
 
 ```bash
 git add src/games/registry.ts src/games/__tests__/registry.test.ts
-git commit -m "feat: 飲みゲー衰弱を registry に追加しプレミアムゲートを結線 (#67)"
+git commit -m "feat: 飲酒衰弱を registry に追加しプレミアムゲートを結線 (#67)"
 ```
 
 ---
@@ -2341,7 +2341,7 @@ Expected: すべてエラーなし・全テスト PASS（format:check で崩れ�
 
 `bun run ios`（または `bun run start`）でアプリを起動し、以下を確認する:
 
-1. ホームに「🍻 飲みゲー衰弱」カードが 👑 バッジ付きで表示される（開発ビルドはプレミアム解放される）
+1. ホームに「🍻 飲酒衰弱」カードが 👑 バッジ付きで表示される（開発ビルドはプレミアム解放される）
 2. イントロ → メンバー登録 → サイズ選択 → 盤面表示
 3. カードをめくるとトランプ画像がフリップ表示され、罰テキストは見えない
 4. ペア成立でクロスフェード → 罰発表（効果音＋バイブ）→「実行した！」で次の人へ
@@ -2368,7 +2368,7 @@ Issue の受け入れ条件を1項目ずつ確認してチェックを付ける:
 - [ ] **Step 4: 最終 Commit（修正が出た場合）と push**
 
 ```bash
-git push -u origin feature/67-nomige-suijaku
+git push -u origin feature/67-inshu-suijaku
 ```
 
 PR 作成は実行フェーズのオーナー（ユーザー）確認後に行う。PR 本文には Issue #67 への `Closes #67` と、実機確認の有無を記載する。

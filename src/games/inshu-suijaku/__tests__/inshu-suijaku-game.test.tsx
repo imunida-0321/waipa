@@ -1,7 +1,7 @@
 import { act, fireEvent, render } from '@testing-library/react-native'
 import type { Card } from '../engine'
 import { MATCH_ANIM_MS } from '../card-grid'
-import { MISMATCH_MS, NomigeSuijakuGame } from '../nomige-suijaku-game'
+import { MISMATCH_MS, InshuSuijakuGame } from '../inshu-suijaku-game'
 
 jest.mock('@/lib/sound', () => ({ playSound: jest.fn(), registerSound: jest.fn() }))
 jest.mock('@/lib/haptics', () => ({
@@ -93,14 +93,14 @@ async function startGame(utils: Awaited<ReturnType<typeof render>>) {
 }
 
 it('サイズ選択 → play: 秘匿された盤面が出る', async () => {
-	const utils = await render(<NomigeSuijakuGame />)
+	const utils = await render(<InshuSuijakuGame />)
 	expect(utils.getByText('盤面サイズをえらぼう')).toBeTruthy()
 	await startGame(utils)
 	expect(utils.queryByText('全員と乾杯して1杯')).toBeNull() // 罰は秘匿
 })
 
 it('ペア成立: クロスフェード → 罰発表 → 実行した！で次の人へ', async () => {
-	const utils = await render(<NomigeSuijakuGame />)
+	const utils = await render(<InshuSuijakuGame />)
 	await startGame(utils)
 	await act(async () => {
 		fireEvent.press(utils.getByLabelText('カード1'))
@@ -122,7 +122,7 @@ it('ペア成立: クロスフェード → 罰発表 → 実行した！で次�
 })
 
 it('不成立: 約1.5秒後に裏へ戻り次の人へ', async () => {
-	const utils = await render(<NomigeSuijakuGame />)
+	const utils = await render(<InshuSuijakuGame />)
 	await startGame(utils)
 	await act(async () => {
 		fireEvent.press(utils.getByLabelText('カード1'))
@@ -137,7 +137,7 @@ it('不成立: 約1.5秒後に裏へ戻り次の人へ', async () => {
 })
 
 it('ジョーカー → 特大罰 → 全ペア消化で結果発表まで通る', async () => {
-	const utils = await render(<NomigeSuijakuGame />)
+	const utils = await render(<InshuSuijakuGame />)
 	await startGame(utils)
 	// あか: ジョーカー（本人実行・手番終了）
 	await act(async () => {
