@@ -1,0 +1,35 @@
+-- ささやきリミット用セリフお題（30件・無料 pack）
+-- 先頭20件は src/games/sasayaki-limit/topics.ts のフォールバックと同一文言（同期必須）
+-- 年齢レーティング配慮: 飲酒・恋愛の直接的表現を入れない
+
+insert into public.topics (pack, text) values
+('whisper', '乾杯ーー！'),
+('whisper', '今日は無礼講だ！'),
+('whisper', 'よっ、待ってました！'),
+('whisper', '幹事さん、ありがとう！'),
+('whisper', '明日もがんばるぞー！'),
+('whisper', 'ここのからあげ、世界一！'),
+('whisper', 'みんな大好きだーー！'),
+('whisper', '次いくぞ、次！'),
+('whisper', '今日という日を忘れない！'),
+('whisper', 'しーっ、静かに！'),
+('whisper', '俺の話を聞けーー！'),
+('whisper', 'ラストオーダーです！'),
+('whisper', '優勝ーー！'),
+('whisper', 'それな！！'),
+('whisper', 'まじで！？'),
+('whisper', 'やっぱりそうだと思った！'),
+('whisper', '全員集合ーー！'),
+('whisper', 'お疲れさまでした！'),
+('whisper', 'さすがです先輩！'),
+('whisper', 'アンコール！アンコール！'),
+('whisper', 'ちょっと聞いてくださいよ！'),
+('whisper', '天才かもしれない！'),
+('whisper', '今日は帰りたくない！'),
+('whisper', '見て見て、これすごい！'),
+('whisper', '神ってる！'),
+('whisper', '早く言ってよ〜！'),
+('whisper', 'なんでやねん！'),
+('whisper', '本日の主役はあなたです！'),
+('whisper', '世界一楽しい夜！'),
+('whisper', 'また来週も集まろう！');
