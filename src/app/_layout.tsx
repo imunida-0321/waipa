@@ -8,6 +8,7 @@ import { playersStore } from '@/lib/players-store'
 import { settingsStore } from '@/lib/settings-store'
 import { registerSound } from '@/lib/sound'
 import { topicsStore } from '@/lib/topics-store'
+import { wordPairsStore } from '@/lib/word-pairs-store'
 import { colors } from '@/theme/tokens'
 
 SplashScreen.preventAutoHideAsync()
@@ -20,6 +21,9 @@ export default function RootLayout() {
 		playersStore.hydrate()
 		topicsStore.hydrate().then(() => {
 			topicsStore.refresh()
+		})
+		wordPairsStore.hydrate().then(() => {
+			wordPairsStore.refresh()
 		})
 		// 効果音の登録（出典・ライセンスは assets/sounds/README.md 参照）。
 		// SSR 環境に Audio API がないため、モジュール直下ではなく

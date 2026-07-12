@@ -45,6 +45,18 @@ export function PlayerSetupSheet({
 	const rangeLabel =
 		minPlayers === maxPlayers ? `${minPlayers}人` : `${minPlayers}〜${maxPlayers}人`
 
+	// ゲーム側の minPlayers/maxPlayers は players-store のグローバル人数より厳しい場合がある
+	// （例: 直前に2人用ゲームで人数を絞った後、最小3人のゲームに遷移する等）。
+	// マウント時に範囲外ならクランプし、投票などが人数不足で成立しない状態を防ぐ
+	useEffect(() => {
+		if (players.count < minPlayers) {
+			playersStore.setCount(minPlayers)
+		} else if (players.count > maxPlayers) {
+			playersStore.setCount(maxPlayers)
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [])
+
 	const proceed = async () => {
 		haptics.tap()
 		if (!allNamesFilled(players)) {

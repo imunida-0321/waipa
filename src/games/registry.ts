@@ -9,6 +9,7 @@ import { KimagureOxGame } from './kimagure-ox/kimagure-ox-game'
 import { NoKingGame } from './no-king-game/no-king-game'
 import { ReactionPairsGame } from './reaction-pairs/reaction-pairs-game'
 import { WhoWillPayGame } from './who-will-pay/who-will-pay-game'
+import { WordWolfGame } from './word-wolf/word-wolf-game'
 
 export type GameMeta = {
 	id: string
@@ -245,6 +246,27 @@ export const games: readonly GameMeta[] = [
 			'④ 受けた人は「ダウト！」か「信じて振る」。ダウトで嘘なら宣言者、本当ならダウトした人がライフ-1。ライフ0で負け！',
 		],
 		Component: DautDiceGame,
+	},
+	{
+		id: 'word-wolf',
+		title: 'ワードウルフ',
+		tagline: 'ひとりだけ違うお題、誰だ？',
+		emoji: '🐺',
+		gradient: ['#6C5CE7', '#4834D4'],
+		minPlayers: 3,
+		maxPlayers: 12,
+		requiresPlayers: true,
+		premium: true,
+		catchCopy: 'みんな同じお題…のはずが1人だけ違う！\n会話で見抜け、バレずに逃げ切れ！',
+		summary:
+			'このゲームは、全員に配られたお題のうち1人だけ微妙に違うお題を持つ「ワードウルフ」を探すゲームです！議論で多数派を探り、投票でウルフを当てよう。ウルフは吊られても市民のお題を言い当てれば逆転勝ち！',
+		howToPlay: [
+			'① メンバーを登録（3〜12名）して、議論時間とお題パックを選ぼう！',
+			'② スマホを回して、自分のお題を長押しでこっそり確認（1人だけ違うお題！）',
+			'③ 議論タイム！お互いに質問して、ひとりだけ違う人（ウルフ）を探そう',
+			'④ 投票で最多票の正体を発表！ウルフなら市民の勝ち。ただしウルフが市民のお題を当てたら逆転勝ち！',
+		],
+		Component: WordWolfGame,
 	},
 ]
 
