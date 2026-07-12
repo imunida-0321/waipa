@@ -127,7 +127,6 @@ function CardCell({
 					</MatchCrossfade>
 				) : (
 					<>
-						{/* 現状 reducer がジョーカーを即 removed にするためこの表面は実プレイでは出ない（将来の jokerAnim フェーズ用に保持） */}
 						<Image
 							source={
 								isJoker

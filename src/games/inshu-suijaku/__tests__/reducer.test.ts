@@ -125,29 +125,37 @@ it('成立: matchAnim → punish → punishDone で除外・獲得カウント�
 	expect(s.turnIndex).toBe(1)
 })
 
-it('ジョーカー1枚目: 即 punish・場から除外・手番は2枚目をめくれず終了', () => {
+it('ジョーカー1枚目: 短いリビール演出（jokerAnim）を挟んで punish・手番は2枚目をめくれず終了', () => {
 	let s = reduce(playState(), { type: 'flip', cardId: 'joker-1' })
-	expect(s.phase).toBe('punish')
+	expect(s.phase).toBe('jokerAnim')
 	expect(s.punish?.kind).toBe('joker')
 	expect(s.punish?.playerIndex).toBe(0)
-	expect(s.cards.find((c) => c.id === 'joker-1')?.state).toBe('removed')
-	expect(s.flippedIds).toEqual([])
+	expect(s.cards.find((c) => c.id === 'joker-1')?.state).toBe('revealed')
+	expect(s.flippedIds).toEqual(['joker-1'])
+	// jokerAnim 中の flip は無効
+	expect(reduce(s, { type: 'flip', cardId: 'p1-a' })).toBe(s)
+	s = reduce(s, { type: 'jokerAnimDone' })
+	expect(s.phase).toBe('punish')
 	s = reduce(s, { type: 'punishDone' })
 	expect(s.phase).toBe('play')
+	expect(s.cards.find((c) => c.id === 'joker-1')?.state).toBe('removed')
 	expect(s.turnIndex).toBe(1)
 	expect(s.scores).toEqual([0, 0, 0])
 })
 
-it('ジョーカー2枚目: 1枚目は裏に戻る', () => {
+it('ジョーカー2枚目: 1枚目は裏に戻り jokerAnim へ', () => {
 	let s = reduce(playState(), { type: 'flip', cardId: 'p1-a' })
 	s = reduce(s, { type: 'flip', cardId: 'joker-1' })
-	expect(s.phase).toBe('punish')
+	expect(s.phase).toBe('jokerAnim')
 	expect(s.cards.find((c) => c.id === 'p1-a')?.state).toBe('hidden')
-	expect(s.cards.find((c) => c.id === 'joker-1')?.state).toBe('removed')
+	expect(s.cards.find((c) => c.id === 'joker-1')?.state).toBe('revealed')
+	expect(s.flippedIds).toEqual(['joker-1'])
 })
 
 it('punish 表示中の flip は無効', () => {
-	const s = reduce(playState(), { type: 'flip', cardId: 'joker-1' })
+	let s = reduce(playState(), { type: 'flip', cardId: 'joker-1' })
+	s = reduce(s, { type: 'jokerAnimDone' })
+	expect(s.phase).toBe('punish')
 	expect(reduce(s, { type: 'flip', cardId: 'p1-a' })).toBe(s)
 })
 

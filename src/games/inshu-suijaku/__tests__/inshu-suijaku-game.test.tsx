@@ -1,7 +1,7 @@
 import { act, fireEvent, render } from '@testing-library/react-native'
 import type { Card } from '../engine'
 import { MATCH_ANIM_MS } from '../card-grid'
-import { MISMATCH_MS, InshuSuijakuGame } from '../inshu-suijaku-game'
+import { JOKER_ANIM_MS, MISMATCH_MS, InshuSuijakuGame } from '../inshu-suijaku-game'
 
 jest.mock('@/lib/sound', () => ({ playSound: jest.fn(), registerSound: jest.fn() }))
 jest.mock('@/lib/haptics', () => ({
@@ -139,9 +139,12 @@ it('不成立: 約1.5秒後に裏へ戻り次の人へ', async () => {
 it('ジョーカー → 特大罰 → 全ペア消化で結果発表まで通る', async () => {
 	const utils = await render(<InshuSuijakuGame />)
 	await startGame(utils)
-	// あか: ジョーカー（本人実行・手番終了）
+	// あか: ジョーカー（本人実行・手番終了）。短いリビール演出を挟んで punish へ
 	await act(async () => {
 		fireEvent.press(utils.getByLabelText('カード5'))
+	})
+	await act(async () => {
+		jest.advanceTimersByTime(JOKER_ANIM_MS)
 	})
 	expect(utils.getByText(/特大罰/)).toBeTruthy()
 	expect(utils.getByText(/あかさんが実行！/)).toBeTruthy()

@@ -13,6 +13,7 @@ import { ResultScreen } from './result-screen'
 import { SizeSelect } from './size-select'
 
 export const MISMATCH_MS = 1500
+export const JOKER_ANIM_MS = 600
 
 const rng: Rng = () => Math.random()
 
@@ -34,6 +35,14 @@ export function InshuSuijakuGame() {
 		if (state.phase !== 'matchAnim') return
 		haptics.success()
 		const t = setTimeout(() => dispatch({ type: 'matchAnimDone' }), MATCH_ANIM_MS)
+		return () => clearTimeout(t)
+	}, [state.phase])
+
+	// ジョーカーの短いリビール演出（約0.6秒）→ punish オーバーレイ
+	useEffect(() => {
+		if (state.phase !== 'jokerAnim') return
+		haptics.heavy()
+		const t = setTimeout(() => dispatch({ type: 'jokerAnimDone' }), JOKER_ANIM_MS)
 		return () => clearTimeout(t)
 	}, [state.phase])
 

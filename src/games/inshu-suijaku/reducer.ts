@@ -1,6 +1,6 @@
 import { createDeck, isMatch, type BoardSize, type Card, type Rng } from './engine'
 
-export type Phase = 'size' | 'play' | 'matchAnim' | 'punish' | 'result'
+export type Phase = 'size' | 'play' | 'matchAnim' | 'jokerAnim' | 'punish' | 'result'
 
 export type Punish = {
 	kind: 'pair' | 'joker'
@@ -25,6 +25,7 @@ export type Action =
 	| { type: 'flip'; cardId: string }
 	| { type: 'hideMismatch' }
 	| { type: 'matchAnimDone' }
+	| { type: 'jokerAnimDone' }
 	| { type: 'punishDone' }
 	| { type: 'retry'; rng: Rng }
 
@@ -76,6 +77,8 @@ export function reduce(state: GameState, action: Action): GameState {
 			return hideMismatch(state)
 		case 'matchAnimDone':
 			return state.phase === 'matchAnim' ? { ...state, phase: 'punish' } : state
+		case 'jokerAnimDone':
+			return state.phase === 'jokerAnim' ? { ...state, phase: 'punish' } : state
 		case 'punishDone':
 			return punishDone(state)
 		case 'retry':
@@ -92,24 +95,24 @@ function flip(state: GameState, cardId: string): GameState {
 	const card = state.cards.find((c) => c.id === cardId)
 	if (!card || card.state !== 'hidden') return state
 
-	// ジョーカー: めくった瞬間に特大罰（本人実行）。場から除外し、1枚目があれば裏に戻す
+	// ジョーカー: めくった瞬間に特大罰（本人実行）。1枚目があれば裏に戻し、短いリビール演出（jokerAnim）を挟んで punish へ
 	if (card.rank === 'JOKER') {
 		const cards = setCardState(
 			setCardState(state.cards, state.flippedIds, 'hidden'),
 			[cardId],
-			'removed',
+			'revealed',
 		)
 		return {
 			...state,
 			cards,
-			flippedIds: [],
+			flippedIds: [cardId],
 			punish: {
 				kind: 'joker',
 				punishmentId: card.punishmentId,
 				text: card.punishment,
 				playerIndex: state.turnIndex,
 			},
-			phase: 'punish',
+			phase: 'jokerAnim',
 		}
 	}
 
@@ -150,10 +153,8 @@ function hideMismatch(state: GameState): GameState {
 
 function punishDone(state: GameState): GameState {
 	if (state.phase !== 'punish' || !state.punish) return state
-	const cards =
-		state.punish.kind === 'pair'
-			? setCardState(state.cards, state.flippedIds, 'removed')
-			: state.cards // ジョーカーは flip 時に除外済み
+	// pair/joker とも punishDone のタイミングで flippedIds（ペア2枚 or ジョーカー1枚）を場から除外する
+	const cards = setCardState(state.cards, state.flippedIds, 'removed')
 	return {
 		...state,
 		cards,
