@@ -8,11 +8,19 @@
 1. `0001_create_topics.sql` — topics テーブル＋RLS ポリシー作成
 2. `0002_seed_topics.sql` — 初期お題データ投入（125件）
 3. `0003_seed_batsu_topics.sql` — リアクション神経衰弱の罰お題（30件）
+4. `0004_create_word_pairs.sql` — word_pairs テーブル＋RLS ポリシー作成
+5. `0005_seed_word_pairs.sql` — ワードウルフのお題ペア投入（80件）
 
 適用後の確認（anon キーで無料お題だけ読めること）:
 
 ```bash
 curl "https://ltkkzucuzngtavpreixq.supabase.co/rest/v1/topics?select=pack&limit=5" \
+  -H "apikey: $EXPO_PUBLIC_SUPABASE_ANON_KEY" \
+  -H "Authorization: Bearer $EXPO_PUBLIC_SUPABASE_ANON_KEY"
+```
+
+```bash
+curl "https://ltkkzucuzngtavpreixq.supabase.co/rest/v1/word_pairs?select=id,pack,word_a,word_b&is_premium=eq.false&limit=1" \
   -H "apikey: $EXPO_PUBLIC_SUPABASE_ANON_KEY" \
   -H "Authorization: Bearer $EXPO_PUBLIC_SUPABASE_ANON_KEY"
 ```
@@ -31,6 +39,18 @@ curl "https://ltkkzucuzngtavpreixq.supabase.co/rest/v1/topics?select=pack&limit=
 - お題本文の `{B}` はアプリ側で「実行役以外のランダムな参加者番号」に置換する
 - プレミアムパックは RLS で読み取り不可（解放経路は #収益2 で実装）
 - お題の追加はダッシュボードから INSERT するだけでアプリに反映される（アプリはキャッシュ付きフェッチ）
+
+## ワードウルフのお題ペア構成
+
+| pack     | 用途           | 件数 | is_premium |
+| -------- | -------------- | ---- | ---------- |
+| `food`   | たべもの       | 20   | false      |
+| `place`  | ばしょ         | 20   | false      |
+| `aruaru` | あるある       | 20   | false      |
+| `adult`  | おとなの夜     | 20   | false      |
+
+- word_a / word_b のどちらが多数派かはテーブルでは固定せず、アプリ側で 50/50 スワップして決める
+- 全て is_premium=false で配信（プレミアム限定パックは追加時に is_premium=true にする）
 
 ## セキュリティ
 
