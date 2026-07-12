@@ -62,7 +62,7 @@ jest.mock('@/games/daut-dice/dice-roll-3d', () => ({
 
 describe('ゲームレジストリ', () => {
 	it('MVP の8ゲーム＋プレミアム2本（バーストチキン・ダウトダイス）が登録されている', () => {
-		expect(games).toHaveLength(10)
+		expect(games).toHaveLength(11)
 	})
 
 	it('id が一意', () => {
