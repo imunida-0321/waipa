@@ -155,6 +155,36 @@ it('「詳しい遊び方を見る」でモーダルが開き、最終ページ�
 	expect(getByText('ゲームスタート')).toBeTruthy() // イントロに留まる
 })
 
+it('requiresPlayers: 保存済み人数が maxPlayers 超ならゲートで切り詰められる', async () => {
+	await playersStore.setCount(10)
+	const { getByText, getAllByPlaceholderText } = await render(
+		<GameScreen meta={{ ...baseMeta, requiresPlayers: true }} />,
+	)
+	await act(async () => {
+		fireEvent.press(getByText('ゲームスタート'))
+	})
+	await waitFor(() => {
+		expect(getAllByPlaceholderText('プレイヤー名を入力...')).toHaveLength(8)
+	})
+	expect(playersStore.getState().count).toBe(8)
+	expect(getByText('このゲームは2〜8人用のため人数を調整しました')).toBeTruthy()
+})
+
+it('requiresPlayers: 保存済み人数が minPlayers 未満ならゲートで引き上げられる', async () => {
+	// beforeEach で count=2。minPlayers=3 のゲームに入る
+	const { getByText, getAllByPlaceholderText } = await render(
+		<GameScreen meta={{ ...baseMeta, minPlayers: 3, requiresPlayers: true }} />,
+	)
+	await act(async () => {
+		fireEvent.press(getByText('ゲームスタート'))
+	})
+	await waitFor(() => {
+		expect(getAllByPlaceholderText('プレイヤー名を入力...')).toHaveLength(3)
+	})
+	expect(playersStore.getState().count).toBe(3)
+	expect(getByText('このゲームは3〜8人用のため人数を調整しました')).toBeTruthy()
+})
+
 it('イントロの×で router.back が呼ばれる', async () => {
 	// eslint-disable-next-line @typescript-eslint/no-require-imports
 	const { router } = require('expo-router')
