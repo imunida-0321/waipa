@@ -19,3 +19,16 @@ export function scoreFromDrag(dragPx: number, trackPx: number): number {
 	if (trackPx <= 0) return 0
 	return Math.min(SCORE_MAX, Math.max(0, Math.round((dragPx / trackPx) * SCORE_MAX)))
 }
+
+export type PlayerResult = {
+	score: number
+	exploded: boolean
+}
+
+// 爆発者がいれば爆発者全員、いなければ最低スコア全員（同率含む）が負け
+export function decideLosers(results: PlayerResult[]): number[] {
+	const exploded = results.flatMap((r, i) => (r.exploded ? [i] : []))
+	if (exploded.length > 0) return exploded
+	const min = Math.min(...results.map((r) => r.score))
+	return results.flatMap((r, i) => (r.score === min ? [i] : []))
+}
