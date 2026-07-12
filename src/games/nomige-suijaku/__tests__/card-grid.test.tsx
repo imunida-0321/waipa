@@ -67,7 +67,7 @@ it('disabled 中・hidden 以外のカードは onFlip されない', async () =
 		fireEvent.press(utils.getByLabelText('カード2'))
 	})
 	await act(async () => {
-		fireEvent.press(utils.getByLabelText('カード1'))
+		fireEvent.press(utils.getByLabelText('7♥'))
 	})
 	expect(onFlip).not.toHaveBeenCalled()
 })

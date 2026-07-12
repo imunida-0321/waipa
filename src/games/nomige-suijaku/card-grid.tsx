@@ -66,7 +66,7 @@ function CardCell({
 	onPress: () => void
 }) {
 	if (card.state === 'removed') {
-		return <View style={[styles.cell, { width }, styles.removed]} accessibilityLabel={`カード${position}`} />
+		return <View style={[styles.cell, { width }, styles.removed]} />
 	}
 	if (card.state === 'hidden') {
 		return (
@@ -93,7 +93,7 @@ function CardCell({
 	const isJoker = card.rank === 'JOKER'
 	return (
 		<View
-			accessibilityLabel={`カード${position}`}
+			accessibilityLabel={isJoker ? 'ジョーカー' : `${card.rank}${card.suit}`}
 			style={[styles.cell, { width }]}
 		>
 			<FlipIn style={[styles.face, isJoker && styles.jokerFace]}>
@@ -106,7 +106,11 @@ function CardCell({
 				) : (
 					<>
 						<Image
-							source={isJoker ? JOKER_IMAGE : cardImageSource(card.rank, card.suit as Suit)}
+							source={
+								isJoker
+									? JOKER_IMAGE
+									: cardImageSource(card.rank, card.suit as Suit)
+							}
 							style={styles.image}
 							contentFit="contain"
 						/>
