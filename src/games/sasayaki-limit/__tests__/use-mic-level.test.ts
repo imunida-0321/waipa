@@ -75,4 +75,14 @@ describe('useMicLevel', () => {
 		expect(mockRecorder.stop).toHaveBeenCalled()
 		expect(mockDelete).toHaveBeenCalled()
 	})
+	it('アンマウント時に録音モードを解除する', async () => {
+		const { unmount } = await renderHook(() => useMicLevel())
+		await act(async () => {
+			unmount()
+		})
+		expect(mockSetAudioMode).toHaveBeenCalledWith({
+			allowsRecording: false,
+			playsInSilentMode: true,
+		})
+	})
 })

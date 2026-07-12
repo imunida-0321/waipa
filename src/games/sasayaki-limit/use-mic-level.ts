@@ -70,6 +70,13 @@ export function useMicLevel(intervalMs: number = METER_INTERVAL_MS) {
 			? recorderState.metering
 			: SILENCE_DB
 
+	// アンマウント時に録音モードを解除（以後の SE 再生ルーティングを通常に戻す）
+	useEffect(() => {
+		return () => {
+			setAudioModeAsync({ allowsRecording: false, playsInSilentMode: true }).catch(() => {})
+		}
+	}, [])
+
 	return {
 		permission,
 		requestPermission,

@@ -55,7 +55,8 @@ export function SasayakiLimitGame() {
 
 	// キャリブレーション・計測中はマイクを回す
 	const shouldRecord =
-		stage === 'calibration' || (stage === 'playing' && state.phase === 'measuring')
+		mic.meteringSupported !== false &&
+		(stage === 'calibration' || (stage === 'playing' && state.phase === 'measuring'))
 	useEffect(() => {
 		if (!shouldRecord) return
 		mic.start()

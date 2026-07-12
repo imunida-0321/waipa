@@ -57,6 +57,12 @@ describe('SasayakiLimitGame', () => {
 		const { getByText } = await render(<SasayakiLimitGame />)
 		expect(getByText(/この端末ではマイクを利用できません/)).toBeTruthy()
 	})
+	it('metering 非対応端末ではマイクを回さない', async () => {
+		mockMic = { ...mockMic, meteringSupported: false }
+		const { getByText } = await render(<SasayakiLimitGame />)
+		expect(getByText(/この端末ではマイクを利用できません/)).toBeTruthy()
+		expect(mockStart).not.toHaveBeenCalled()
+	})
 	it('キャリブレーション → speech → 3秒計測 → 判定まで流れる', async () => {
 		const { getByText } = await render(<SasayakiLimitGame />)
 		// キャリブレーション（3秒）
