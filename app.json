@@ -32,6 +32,12 @@
 					"image": "./assets/images/splash-icon.png",
 					"imageWidth": 76
 				}
+			],
+			[
+				"expo-audio",
+				{
+					"microphonePermission": "声の大きさを測るゲームでマイクを使用します。録音は保存されません。"
+				}
 			]
 		],
 		"experiments": {
