@@ -29,6 +29,8 @@ jest.mock('react-native-reanimated', () => {
 		useSharedValue: jest.fn((initial: number) => ({ value: initial })),
 		useAnimatedStyle: jest.fn(() => ({})),
 		withTiming: jest.fn((toValue: number) => toValue),
+		withSpring: jest.fn((toValue: number) => toValue),
+		withDelay: jest.fn((_delay: number, animation: unknown) => animation),
 		getUseOfValueInStyleWarning: jest.fn(),
 	}
 })

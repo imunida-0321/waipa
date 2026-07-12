@@ -10,6 +10,19 @@ jest.mock('expo-linear-gradient', () => {
 	const { View } = require('react-native')
 	return { LinearGradient: View }
 })
+jest.mock('react-native-reanimated', () => {
+	// eslint-disable-next-line @typescript-eslint/no-require-imports
+	const { View, Text } = require('react-native')
+	return {
+		__esModule: true,
+		default: { View, Text },
+		useSharedValue: jest.fn((initial: number) => ({ value: initial })),
+		useAnimatedStyle: jest.fn(() => ({})),
+		withTiming: jest.fn((toValue: number) => toValue),
+		withSpring: jest.fn((toValue: number) => toValue),
+		withDelay: jest.fn((_delay: number, animation: unknown) => animation),
+	}
+})
 
 it('ペア成立: 罰全文＋煽り＋実行した！で onDone', async () => {
 	const onDone = jest.fn()
