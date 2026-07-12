@@ -43,7 +43,14 @@ function card(id: string, overrides: Partial<Card> = {}): Card {
 const deck = [
 	card('p1-a'),
 	card('p1-b'),
-	card('joker-1', { pairId: null, rank: 'JOKER', suit: null, punishmentId: 's01', punishment: 'グラスの残りを飲み干す（無理は禁物！）', state: 'hidden' }),
+	card('joker-1', {
+		pairId: null,
+		rank: 'JOKER',
+		suit: null,
+		punishmentId: 's01',
+		punishment: 'グラスの残りを飲み干す（無理は禁物！）',
+		state: 'hidden',
+	}),
 ]
 
 it('hidden カードのタップで onFlip が呼ばれる', async () => {
@@ -82,9 +89,7 @@ it('秘匿: revealed でも罰テキストは描画されない', async () => {
 })
 
 it('成立演出: matchAnimIds のカードにだけ罰テキストがうっすら出る', async () => {
-	const revealed = deck.map((c) =>
-		c.pairId === 'p1' ? { ...c, state: 'revealed' as const } : c,
-	)
+	const revealed = deck.map((c) => (c.pairId === 'p1' ? { ...c, state: 'revealed' as const } : c))
 	const utils = await render(
 		<CardGrid
 			cards={revealed}

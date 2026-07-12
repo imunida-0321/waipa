@@ -172,7 +172,7 @@ const styles = StyleSheet.create({
 		borderRadius: radii.sm,
 		overflow: 'hidden',
 	},
-	fill: { ...StyleSheet.absoluteFillObject },
+	fill: { ...StyleSheet.absoluteFill },
 	back: { flex: 1, padding: 3 },
 	backInner: {
 		flex: 1,
@@ -183,10 +183,10 @@ const styles = StyleSheet.create({
 	},
 	backText: { fontSize: 12, fontWeight: '800', color: colors.accentFrom },
 	face: { backgroundColor: NS.cardFace, borderRadius: radii.sm },
-	image: { ...StyleSheet.absoluteFillObject },
+	image: { ...StyleSheet.absoluteFill },
 	jokerFace: { borderWidth: 2, borderColor: NS.rose },
 	jokerTint: {
-		...StyleSheet.absoluteFillObject,
+		...StyleSheet.absoluteFill,
 		backgroundColor: 'rgba(80, 20, 90, 0.45)',
 		justifyContent: 'flex-end',
 		alignItems: 'center',

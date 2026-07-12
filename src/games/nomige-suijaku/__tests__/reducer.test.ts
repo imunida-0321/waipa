@@ -1,11 +1,7 @@
 import type { Card } from '../engine'
 import { initialState, isMismatchShown, reduce, type GameState } from '../reducer'
 
-function pairCard(
-	id: string,
-	pairId: string,
-	overrides: Partial<Card> = {},
-): Card {
+function pairCard(id: string, pairId: string, overrides: Partial<Card> = {}): Card {
 	return {
 		id,
 		pairId,
@@ -39,8 +35,18 @@ function playState(overrides: Partial<GameState> = {}): GameState {
 		cards: [
 			pairCard('p1-a', 'p1'),
 			pairCard('p1-b', 'p1'),
-			pairCard('p2-a', 'p2', { rank: 'Q', suit: '♦', punishmentId: 'n07', punishment: '全員と乾杯して1杯' }),
-			pairCard('p2-b', 'p2', { rank: 'Q', suit: '♦', punishmentId: 'n07', punishment: '全員と乾杯して1杯' }),
+			pairCard('p2-a', 'p2', {
+				rank: 'Q',
+				suit: '♦',
+				punishmentId: 'n07',
+				punishment: '全員と乾杯して1杯',
+			}),
+			pairCard('p2-b', 'p2', {
+				rank: 'Q',
+				suit: '♦',
+				punishmentId: 'n07',
+				punishment: '全員と乾杯して1杯',
+			}),
 			jokerCard('joker-1'),
 		],
 		playerCount: 3,

@@ -58,10 +58,18 @@ export const SPECIAL_PUNISHMENTS: readonly Punishment[] = [
 	{ id: 's02', text: '全員のグラスにドリンクを注いで乾杯の音頭、自分は3杯', type: 'special' },
 	{ id: 's03', text: '次のドリンクを全員分おごる宣言、できなければグラス半分', type: 'special' },
 	{ id: 's04', text: '全員に一発芸、スベったら追加で2杯', type: 'special' },
-	{ id: 's05', text: '好きな人（または推し）を実名で発表、言えなければグラス半分', type: 'special' },
+	{
+		id: 's05',
+		text: '好きな人（または推し）を実名で発表、言えなければグラス半分',
+		type: 'special',
+	},
 	{ id: 's06', text: 'LINEの最新トーク画面を見せる、拒否ならグラス半分', type: 'special' },
 	{ id: 's07', text: 'ゲーム終了まで王様キャラで話す、素に戻ったら1杯', type: 'special' },
-	{ id: 's08', text: '全員から質問を1つずつ受けて正直に答える、パスは1回につき1杯', type: 'special' },
+	{
+		id: 's08',
+		text: '全員から質問を1つずつ受けて正直に答える、パスは1回につき1杯',
+		type: 'special',
+	},
 	{ id: 's09', text: '電話帳の5番目の人との思い出を語る、拒否ならグラス半分', type: 'special' },
 	{ id: 's10', text: '幹事（いなければ最年長）に感謝を全力で伝えてグラス半分', type: 'special' },
 ]

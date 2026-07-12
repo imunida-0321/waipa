@@ -1,8 +1,4 @@
-import {
-	LUCKY_PUNISHMENT_ID,
-	NORMAL_PUNISHMENTS,
-	SPECIAL_PUNISHMENTS,
-} from '../punishments'
+import { LUCKY_PUNISHMENT_ID, NORMAL_PUNISHMENTS, SPECIAL_PUNISHMENTS } from '../punishments'
 
 it('通常罰は40個・特大罰は10個ある', () => {
 	expect(NORMAL_PUNISHMENTS).toHaveLength(40)

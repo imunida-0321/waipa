@@ -38,7 +38,8 @@ export function PunishReveal({ punish, playerName, playerIndex, onDone }: Props)
 			</View>
 			{isLucky ? (
 				<Text style={styles.aori}>
-					<Text style={{ color: nameColor }}>{playerName}さん</Text>、ラッキー！全員から拍手！
+					<Text style={{ color: nameColor }}>{playerName}さん</Text>
+					、ラッキー！全員から拍手！
 				</Text>
 			) : isJoker ? (
 				<Text style={styles.aori}>
@@ -56,7 +57,7 @@ export function PunishReveal({ punish, playerName, playerIndex, onDone }: Props)
 
 const styles = StyleSheet.create({
 	backdrop: {
-		...StyleSheet.absoluteFillObject,
+		...StyleSheet.absoluteFill,
 		backgroundColor: 'rgba(10,8,24,0.94)',
 		alignItems: 'stretch',
 		justifyContent: 'center',

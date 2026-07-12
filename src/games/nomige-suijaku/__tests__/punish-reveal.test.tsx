@@ -15,7 +15,12 @@ it('ペア成立: 罰全文＋煽り＋実行した！で onDone', async () => {
 	const onDone = jest.fn()
 	const utils = await render(
 		<PunishReveal
-			punish={{ kind: 'pair', punishmentId: 'n07', text: '全員と乾杯して1杯', playerIndex: 0 }}
+			punish={{
+				kind: 'pair',
+				punishmentId: 'n07',
+				text: '全員と乾杯して1杯',
+				playerIndex: 0,
+			}}
 			playerName="あか"
 			playerIndex={0}
 			onDone={onDone}
