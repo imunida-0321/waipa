@@ -11,7 +11,9 @@ type Props = {
 
 export function CalibrationScreen({ levelDb, onConfirm }: Props) {
 	const levelRef = useRef(levelDb)
-	levelRef.current = levelDb
+	useEffect(() => {
+		levelRef.current = levelDb
+	})
 	const [floorDb, setFloorDb] = useState<number | null>(null)
 	const [progress, setProgress] = useState(0)
 	const [runId, setRunId] = useState(0)

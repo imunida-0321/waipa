@@ -40,18 +40,17 @@ export function SasayakiLimitGame() {
 	const usedIdsRef = useRef<string[]>([])
 	const peakRef = useRef(0)
 	const levelDbRef = useRef(mic.levelDb)
-	levelDbRef.current = mic.levelDb
-
-	// マイク権限（初回マウント時にリクエスト）
 	useEffect(() => {
-		if (stage !== 'permission' || mic.permission !== 'pending') return
+		levelDbRef.current = mic.levelDb
+	})
+
+	// マイク権限（初回マウント時にリクエスト。許可済みなら即 resolve される）
+	useEffect(() => {
+		if (stage !== 'permission' || mic.permission === 'denied') return
 		mic.requestPermission().then((granted) => {
 			if (granted) setStage('calibration')
 		})
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [stage, mic.permission])
-	useEffect(() => {
-		if (stage === 'permission' && mic.permission === 'granted') setStage('calibration')
 	}, [stage, mic.permission])
 
 	// キャリブレーション・計測中はマイクを回す
@@ -78,8 +77,6 @@ export function SasayakiLimitGame() {
 	// 3秒計測: METER_INTERVAL_MS ごとにサンプリングし、終了で measured を dispatch
 	useEffect(() => {
 		if (stage !== 'playing' || state.phase !== 'measuring' || range == null) return
-		peakRef.current = 0
-		setLiveLevel(0)
 		const sampler = setInterval(() => {
 			const norm = normalizeDb(levelDbRef.current, range)
 			peakRef.current = Math.max(peakRef.current, norm)
@@ -93,7 +90,6 @@ export function SasayakiLimitGame() {
 			clearInterval(sampler)
 			clearTimeout(finish)
 		}
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [stage, state.phase, range])
 
 	if (mic.permission === 'denied') {
@@ -202,7 +198,11 @@ export function SasayakiLimitGame() {
 			{state.phase === 'speech' && (
 				<Pressable
 					style={styles.mainButton}
-					onPress={() => dispatch({ type: 'startMeasure' })}
+					onPress={() => {
+						peakRef.current = 0
+						setLiveLevel(0)
+						dispatch({ type: 'startMeasure' })
+					}}
 				>
 					<Text style={styles.mainButtonLabel}>タップして発声スタート</Text>
 				</Pressable>

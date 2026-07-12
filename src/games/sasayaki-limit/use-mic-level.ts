@@ -57,6 +57,8 @@ export function useMicLevel(intervalMs: number = METER_INTERVAL_MS) {
 		}
 		if (recordStartRef.current == null) recordStartRef.current = Date.now()
 		if (typeof recorderState.metering === 'number') {
+			// ネイティブ録音状態（外部システム）のポーリング結果をラッチする正当な同期
+			// eslint-disable-next-line react-hooks/set-state-in-effect
 			setMeteringSupported(true)
 		} else if (Date.now() - recordStartRef.current > METERING_DETECT_MS) {
 			setMeteringSupported(false)
