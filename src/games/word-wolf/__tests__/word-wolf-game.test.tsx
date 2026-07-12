@@ -101,3 +101,42 @@ it('設定→配布→議論→投票→発表→逆転→結果まで通しで�
 	expect(ui.getByText(/あか/)).toBeTruthy() // ウルフの正体公開
 	expect(ui.getByText('もう一回')).toBeTruthy()
 })
+
+it('通常投票が全員同票のとき決選投票を経て決着し reveal に進む', async () => {
+	const ui = await render(<WordWolfGame />)
+
+	// setup
+	await press(ui, 'はじめる')
+
+	// deal ×3
+	await dealOne(ui, false)
+	await dealOne(ui, false)
+	await dealOne(ui, true)
+
+	// discuss → スキップ（2度押し）
+	await press(ui, '投票へすすむ')
+	await press(ui, 'もう一度タップで投票へ！')
+
+	// 通常投票: あか→あお / あお→き / き→あか（全員バラバラ＝全員同票）
+	await voteOne(ui, 'あお')
+	await voteOne(ui, 'き')
+	await voteOne(ui, 'あか')
+
+	// 決選投票が成立せず、再議論（runoff-discuss）へ
+	expect(ui.getByText(/決選投票/)).toBeTruthy()
+
+	// runoff-discuss もスキップ（2度押し）で再投票へ
+	await press(ui, '投票へすすむ')
+	await press(ui, 'もう一度タップで投票へ！')
+
+	// 再投票: あか→あお / あお→あか / き→あか ⇒ あか（ウルフ）に2票集中して決着
+	await voteOne(ui, 'あお')
+	await voteOne(ui, 'あか')
+	await voteOne(ui, 'あか')
+
+	// reveal（ドラムロール2秒）
+	await act(async () => {
+		jest.advanceTimersByTime(2000)
+	})
+	expect(ui.getByText(/🐺 ウルフ！/)).toBeTruthy()
+})
