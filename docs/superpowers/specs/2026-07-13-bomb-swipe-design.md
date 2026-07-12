@@ -59,7 +59,7 @@
 ```
 src/games/bomb-swipe/
   engine.ts            … 地雷生成・爆発判定・敗者判定の純関数
-  gauge.tsx            … Reanimated + Gesture Handler Pan のスワイプゲージ
+  gauge.tsx            … スワイプゲージ（RN 標準 responder。gesture-handler の Gesture API は本コードベース未導入のため使わない）
   bomb-swipe-game.tsx  … フェーズ管理（intro / turn / handoff / result）
   theme.ts             … MINE_MIN / MINE_MAX・色などの調整定数
 ```
