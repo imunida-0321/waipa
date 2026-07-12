@@ -76,3 +76,15 @@ it('最下位（同数含む）がハイライトされ、ボタンが動く', a
 	})
 	expect(onHome).toHaveBeenCalled()
 })
+
+it('全員同点なら最下位バッジは出ない', async () => {
+	const utils = await render(
+		<ResultScreen
+			names={['あか', 'あお', 'みどり']}
+			scores={[1, 1, 1]}
+			onRetry={jest.fn()}
+			onHome={jest.fn()}
+		/>,
+	)
+	expect(utils.queryByText('最下位')).toBeNull()
+})

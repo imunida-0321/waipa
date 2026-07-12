@@ -84,6 +84,12 @@ async function startGame(utils: Awaited<ReturnType<typeof render>>) {
 		fireEvent.press(utils.getByText('スタート'))
 	})
 	expect(utils.getByText(/あかさんの番/)).toBeTruthy()
+	// テスト環境では onLayout が自動発火しないため、実測相当のレイアウトを手動で発火する
+	await act(async () => {
+		fireEvent(utils.getByTestId('ns-card-grid'), 'layout', {
+			nativeEvent: { layout: { x: 0, y: 0, width: 360, height: 600 } },
+		})
+	})
 }
 
 it('サイズ選択 → play: 秘匿された盤面が出る', async () => {

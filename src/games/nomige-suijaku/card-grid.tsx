@@ -1,12 +1,12 @@
 import { Image } from 'expo-image'
 import { LinearGradient } from 'expo-linear-gradient'
-import { useEffect, type ReactNode } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import {
 	Pressable,
 	StyleSheet,
 	Text,
 	View,
-	type DimensionValue,
+	type LayoutChangeEvent,
 	type StyleProp,
 	type ViewStyle,
 } from 'react-native'
@@ -20,6 +20,23 @@ import { NS } from './theme'
 const FLIP_MS = 200
 export const MATCH_ANIM_MS = 1000
 
+// 素材（250×360）に合わせた縦長比率。セル高さ = 幅 / CARD_ASPECT
+const CARD_ASPECT = 0.7
+
+// グリッド実測サイズから、幅フィットと高さフィットの小さい方でセル幅を決める
+export function cellWidthFor(
+	containerW: number,
+	containerH: number,
+	columns: number,
+	cardCount: number,
+	gap: number,
+): number {
+	const rows = Math.ceil(cardCount / columns)
+	const byWidth = (containerW - gap * (columns - 1)) / columns
+	const byHeight = ((containerH - gap * (rows - 1)) / rows) * CARD_ASPECT
+	return Math.max(0, Math.floor(Math.min(byWidth, byHeight)))
+}
+
 type Props = {
 	cards: Card[]
 	columns: number
@@ -30,24 +47,29 @@ type Props = {
 
 // 盤面グリッド。カードの状態はすべて props（reducer の cards）から描画する
 export function CardGrid({ cards, columns, matchAnimIds, onFlip, disabled = false }: Props) {
-	// columns 列に収まるセル幅（%）。gap ぶんの余白を引く
-	const widthPercent: DimensionValue = `${Math.floor(100 / columns) - 2}%`
+	const [size, setSize] = useState({ width: 0, height: 0 })
+	const onLayout = (e: LayoutChangeEvent) => {
+		const { width, height } = e.nativeEvent.layout
+		setSize({ width, height })
+	}
+	const cellWidth = cellWidthFor(size.width, size.height, columns, cards.length, spacing.sm)
 	return (
-		<View style={styles.grid}>
-			{cards.map((card, i) => (
-				<CardCell
-					key={card.id}
-					card={card}
-					position={i + 1}
-					width={widthPercent}
-					matchAnim={matchAnimIds.includes(card.id)}
-					onPress={() => {
-						if (disabled || card.state !== 'hidden') return
-						haptics.tap()
-						onFlip(card.id)
-					}}
-				/>
-			))}
+		<View testID="ns-card-grid" style={styles.grid} onLayout={onLayout}>
+			{cellWidth > 0 &&
+				cards.map((card, i) => (
+					<CardCell
+						key={card.id}
+						card={card}
+						position={i + 1}
+						width={cellWidth}
+						matchAnim={matchAnimIds.includes(card.id)}
+						onPress={() => {
+							if (disabled || card.state !== 'hidden') return
+							haptics.tap()
+							onFlip(card.id)
+						}}
+					/>
+				))}
 		</View>
 	)
 }
@@ -61,7 +83,7 @@ function CardCell({
 }: {
 	card: Card
 	position: number
-	width: DimensionValue
+	width: number
 	matchAnim: boolean
 	onPress: () => void
 }) {
@@ -105,6 +127,7 @@ function CardCell({
 					</MatchCrossfade>
 				) : (
 					<>
+						{/* 現状 reducer がジョーカーを即 removed にするためこの表面は実プレイでは出ない（将来の jokerAnim フェーズ用に保持） */}
 						<Image
 							source={
 								isJoker
@@ -168,7 +191,7 @@ const styles = StyleSheet.create({
 		flex: 1,
 	},
 	cell: {
-		aspectRatio: 0.7, // 素材（250×360）に合わせた縦長
+		aspectRatio: CARD_ASPECT, // 素材（250×360）に合わせた縦長
 		borderRadius: radii.sm,
 		overflow: 'hidden',
 	},

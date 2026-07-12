@@ -28,14 +28,17 @@ type Props = {
 
 export function ResultScreen({ names, scores, onRetry, onHome }: Props) {
 	const rows = buildRanking(names, scores)
-	const minScore = Math.min(...scores)
+	const rowScores = rows.map((r) => r.score)
+	const minScore = Math.min(...rowScores)
+	const maxScore = Math.max(...rowScores)
+	const allTied = minScore === maxScore
 
 	return (
 		<View style={styles.container}>
 			<Text style={styles.heading}>🏆 結果発表</Text>
 			<ScrollView contentContainerStyle={styles.list}>
 				{rows.map((row) => {
-					const isLast = row.score === minScore
+					const isLast = !allTied && row.score === minScore
 					return (
 						<View key={row.index} style={[styles.row, isLast && styles.lastRow]}>
 							<Text style={styles.rank}>{row.rank}位</Text>
