@@ -120,6 +120,14 @@ it('名前未入力があると「つぎへ」でエラーバナーが出て onP
 	expect(onProceed).not.toHaveBeenCalled()
 })
 
+it('minPlayers 未満の人数で開始すると自動的に minPlayers までクランプされる', async () => {
+	await playersStore.setCount(2)
+	await render(<PlayerSetupSheet onProceed={jest.fn()} minPlayers={3} />)
+	await waitFor(() => {
+		expect(playersStore.getState().count).toBe(3)
+	})
+})
+
 it('×を押すと router.back が呼ばれる', async () => {
 	const { getByLabelText } = await render(<PlayerSetupSheet onProceed={jest.fn()} />)
 	fireEvent.press(getByLabelText('閉じる'))
