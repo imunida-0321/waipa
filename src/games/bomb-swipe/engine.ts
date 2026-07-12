@@ -32,3 +32,57 @@ export function decideLosers(results: PlayerResult[]): number[] {
 	const min = Math.min(...results.map((r) => r.score))
 	return results.flatMap((r, i) => (r.score === min ? [i] : []))
 }
+
+export type Phase = 'handoff' | 'swiping' | 'safe' | 'exploded' | 'result'
+
+export type State = {
+	phase: Phase
+	turnIndex: number
+	playerCount: number
+	mines: number[]
+	results: (PlayerResult | null)[]
+}
+
+export type Action =
+	| { type: 'startSwipe' }
+	| { type: 'release'; score: number }
+	| { type: 'next' }
+	| { type: 'restart'; rng: Rng }
+
+export function createInitialState(playerCount: number, rng: Rng): State {
+	return {
+		phase: 'handoff',
+		turnIndex: 0,
+		playerCount,
+		mines: Array.from({ length: playerCount }, () => pickMine(rng)),
+		results: Array(playerCount).fill(null),
+	}
+}
+
+export function reduce(state: State, action: Action): State {
+	switch (action.type) {
+		case 'startSwipe': {
+			if (state.phase !== 'handoff') return state
+			return { ...state, phase: 'swiping' }
+		}
+		case 'release': {
+			if (state.phase !== 'swiping') return state
+			const exploded = isExploded(action.score, state.mines[state.turnIndex])
+			const results = state.results.map((r, i) =>
+				i === state.turnIndex ? { score: action.score, exploded } : r,
+			)
+			return { ...state, results, phase: exploded ? 'exploded' : 'safe' }
+		}
+		case 'next': {
+			if (state.phase !== 'safe' && state.phase !== 'exploded') return state
+			if (state.turnIndex + 1 < state.playerCount) {
+				return { ...state, phase: 'handoff', turnIndex: state.turnIndex + 1 }
+			}
+			return { ...state, phase: 'result' }
+		}
+		case 'restart': {
+			if (state.phase !== 'result') return state
+			return createInitialState(state.playerCount, action.rng)
+		}
+	}
+}
