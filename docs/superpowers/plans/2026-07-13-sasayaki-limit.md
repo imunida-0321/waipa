@@ -25,10 +25,12 @@
 ### Task 1: engine.ts — ゾーン計算・判定・集計の純関数
 
 **Files:**
+
 - Create: `src/games/sasayaki-limit/engine.ts`
 - Test: `src/games/sasayaki-limit/__tests__/engine.test.ts`
 
 **Interfaces:**
+
 - Produces: `Rng`, `Zone {low,high}`, `Judgement 'low'|'ok'|'high'`, `VoiceRange {floorDb,ceilDb}`, `median(samples)`, `voiceRange(noiseFloorDb)`, `normalizeDb(db, range)`, `zoneWidthForRound(round)`, `makeZone(width, rng)`, `judge(peakNorm, zone)`, `tallyLosers(successCounts)`, 定数 `ROUNDS=3` `MEASURE_MS=3000` `CALIBRATION_MS=3000` `METER_INTERVAL_MS=50` `SILENCE_DB=-160` `SUDDEN_DEATH_ZONE_WIDTH=0.15`
 
 - [ ] **Step 1: 失敗するテストを書く**
@@ -233,10 +235,12 @@ git commit -m "feat: ささやきリミットのゾーン計算・判定エン�
 ### Task 2: topics.ts — whisper パックのフォールバックと抽選
 
 **Files:**
+
 - Create: `src/games/sasayaki-limit/topics.ts`
 - Test: `src/games/sasayaki-limit/__tests__/topics.test.ts`
 
 **Interfaces:**
+
 - Consumes: `Topic`（`@/lib/topics-store`）、`Rng`（Task 1）
 - Produces: `FALLBACK_WHISPER_TOPICS: readonly Topic[]`（20本）、`pickWhisperTopic(topics: Topic[], usedIds: string[], rng: Rng): Topic`
 
@@ -342,17 +346,19 @@ git commit -m "feat: ささやきリミットの whisper お題フォールバ�
 ### Task 3: reducer.ts — ターン進行のステートマシン
 
 **Files:**
+
 - Create: `src/games/sasayaki-limit/reducer.ts`
 - Test: `src/games/sasayaki-limit/__tests__/reducer.test.ts`
 
 **Interfaces:**
+
 - Consumes: Task 1 の `judge` / `makeZone` / `tallyLosers` / `zoneWidthForRound` / `ROUNDS` / `SUDDEN_DEATH_ZONE_WIDTH` / `Rng` / `Zone` / `Judgement`
 - Produces:
-  - `Phase = 'speech' | 'measuring' | 'judged' | 'round-result' | 'sudden-death-intro' | 'result'`
-  - `GameState { phase, playerCount, round, turnPos, activePlayers: number[], zone, successCounts: number[], lastJudgement, lastPeak, suddenDeath, sdFailed: number[], losers: number[] }`
-  - `Action = {type:'startMeasure'} | {type:'measured'; peakNorm:number} | {type:'next'; rng:Rng} | {type:'nextRound'; rng:Rng} | {type:'sdStart'} | {type:'retry'; rng:Rng}`
-  - `initialState(playerCount: number, rng: Rng): GameState`、`reduce(state, action): GameState`
-  - 現在の発声者は `state.activePlayers[state.turnPos]`（プレイヤー index）
+    - `Phase = 'speech' | 'measuring' | 'judged' | 'round-result' | 'sudden-death-intro' | 'result'`
+    - `GameState { phase, playerCount, round, turnPos, activePlayers: number[], zone, successCounts: number[], lastJudgement, lastPeak, suddenDeath, sdFailed: number[], losers: number[] }`
+    - `Action = {type:'startMeasure'} | {type:'measured'; peakNorm:number} | {type:'next'; rng:Rng} | {type:'nextRound'; rng:Rng} | {type:'sdStart'} | {type:'retry'; rng:Rng}`
+    - `initialState(playerCount: number, rng: Rng): GameState`、`reduce(state, action): GameState`
+    - 現在の発声者は `state.activePlayers[state.turnPos]`（プレイヤー index）
 
 - [ ] **Step 1: 失敗するテストを書く**
 
@@ -529,7 +535,8 @@ import {
 	type Zone,
 } from './engine'
 
-export type Phase = 'speech' | 'measuring' | 'judged' | 'round-result' | 'sudden-death-intro' | 'result'
+export type Phase =
+	'speech' | 'measuring' | 'judged' | 'round-result' | 'sudden-death-intro' | 'result'
 
 export type GameState = {
 	phase: Phase
@@ -604,13 +611,26 @@ export function reduce(state: GameState, action: Action): GameState {
 			} else if (judgement === 'ok') {
 				successCounts[player] += 1
 			}
-			return { ...state, phase: 'judged', lastJudgement: judgement, lastPeak: action.peakNorm, successCounts, sdFailed }
+			return {
+				...state,
+				phase: 'judged',
+				lastJudgement: judgement,
+				lastPeak: action.peakNorm,
+				successCounts,
+				sdFailed,
+			}
 		}
 		case 'next': {
 			if (state.phase !== 'judged') return state
 			// まだ発声していない人がいる
 			if (state.turnPos + 1 < state.activePlayers.length) {
-				return { ...state, phase: 'speech', turnPos: state.turnPos + 1, lastJudgement: null, lastPeak: null }
+				return {
+					...state,
+					phase: 'speech',
+					turnPos: state.turnPos + 1,
+					lastJudgement: null,
+					lastPeak: null,
+				}
 			}
 			// サドンデス周回の決着判定
 			if (state.suddenDeath) {
@@ -674,12 +694,14 @@ git commit -m "feat: ささやきリミットのターン進行 reducer を追�
 ### Task 4: マイク層 — app 設定と use-mic-level.ts
 
 **Files:**
+
 - Modify: `app.json`（plugins に expo-audio を追加）
 - Modify: `package.json`（`npx expo install expo-file-system` で追加）
 - Create: `src/games/sasayaki-limit/use-mic-level.ts`
 - Test: `src/games/sasayaki-limit/__tests__/use-mic-level.test.ts`
 
 **Interfaces:**
+
 - Consumes: `METER_INTERVAL_MS`, `SILENCE_DB`（Task 1）
 - Produces: `useMicLevel(intervalMs?)` → `{ permission: 'pending'|'granted'|'denied', requestPermission(): Promise<boolean>, start(): Promise<void>, stop(): Promise<void>, levelDb: number, isRecording: boolean, meteringSupported: boolean | null }`
 
@@ -748,7 +770,10 @@ describe('useMicLevel', () => {
 			await result.current.requestPermission()
 		})
 		expect(result.current.permission).toBe('granted')
-		expect(mockSetAudioMode).toHaveBeenCalledWith({ allowsRecording: true, playsInSilentMode: true })
+		expect(mockSetAudioMode).toHaveBeenCalledWith({
+			allowsRecording: true,
+			playsInSilentMode: true,
+		})
 	})
 	it('拒否されると denied になる', async () => {
 		mockGranted = false
@@ -885,11 +910,13 @@ git commit -m "feat: expo-audio metering ラッパーとマイク権限設定を
 ### Task 5: theme.ts と volume-gauge.tsx — リアルタイム音量ゲージ
 
 **Files:**
+
 - Create: `src/games/sasayaki-limit/theme.ts`
 - Create: `src/games/sasayaki-limit/volume-gauge.tsx`
 - Test: `src/games/sasayaki-limit/__tests__/volume-gauge.test.tsx`
 
 **Interfaces:**
+
 - Consumes: `Zone`, `METER_INTERVAL_MS`（Task 1）
 - Produces: `SL`（カラートークン）、`VolumeGauge({ level, peak, zone, active })`（level/peak は 0..1 正規化値、peak は null 可）
 
@@ -915,7 +942,9 @@ jest.mock('react-native-reanimated', () => {
 describe('VolumeGauge', () => {
 	const zone = { low: 0.3, high: 0.6 }
 	it('ゲージ・ゾーン帯が描画される', () => {
-		const { getByTestId } = render(<VolumeGauge level={0} peak={null} zone={zone} active={false} />)
+		const { getByTestId } = render(
+			<VolumeGauge level={0} peak={null} zone={zone} active={false} />,
+		)
 		expect(getByTestId('volume-gauge')).toBeTruthy()
 		expect(getByTestId('zone-band')).toBeTruthy()
 	})
@@ -990,7 +1019,10 @@ export function VolumeGauge({ level, peak, zone, active }: Props) {
 			/>
 			<Animated.View style={[styles.fill, fillStyle, { backgroundColor: barColor }]} />
 			{peak != null && (
-				<View style={[styles.peakMarker, { bottom: `${peak * 100}%` }]} testID="peak-marker" />
+				<View
+					style={[styles.peakMarker, { bottom: `${peak * 100}%` }]}
+					testID="peak-marker"
+				/>
 			)}
 		</View>
 	)
@@ -1056,10 +1088,12 @@ git commit -m "feat: ささやきリミットのリアルタイム音量ゲー�
 ### Task 6: calibration-screen.tsx — 環境音キャリブレーション
 
 **Files:**
+
 - Create: `src/games/sasayaki-limit/calibration-screen.tsx`
 - Test: `src/games/sasayaki-limit/__tests__/calibration-screen.test.tsx`
 
 **Interfaces:**
+
 - Consumes: `CALIBRATION_MS`, `METER_INTERVAL_MS`, `median`（Task 1）
 - Produces: `CalibrationScreen({ levelDb, onConfirm })` — 3秒サンプリング後「再計測」「スタート」を表示し、スタートで `onConfirm(noiseFloorDb: number)` を呼ぶ
 
@@ -1093,7 +1127,9 @@ describe('CalibrationScreen', () => {
 		expect(onConfirm).toHaveBeenCalledWith(-42)
 	})
 	it('再計測でサンプリングをやり直す', async () => {
-		const { getByText, queryByText } = render(<CalibrationScreen levelDb={-42} onConfirm={jest.fn()} />)
+		const { getByText, queryByText } = render(
+			<CalibrationScreen levelDb={-42} onConfirm={jest.fn()} />,
+		)
 		await act(async () => {
 			jest.advanceTimersByTime(CALIBRATION_MS + 100)
 		})
@@ -1225,10 +1261,12 @@ git commit -m "feat: ささやきリミットの環境音キャリブレーシ�
 ### Task 7: result-screen.tsx — 最終結果と敗者発表
 
 **Files:**
+
 - Create: `src/games/sasayaki-limit/result-screen.tsx`
 - Test: `src/games/sasayaki-limit/__tests__/result-screen.test.tsx`
 
 **Interfaces:**
+
 - Consumes: `SL`（Task 5）
 - Produces: `ResultScreen({ names, successCounts, losers, onRetry })` — 成功数ランキング表示＋敗者発表＋「もう一回」ボタン
 
@@ -1352,10 +1390,12 @@ git commit -m "feat: ささやきリミットの結果発表画面を追加（#6
 ### Task 8: sasayaki-limit-game.tsx — ルート結線（権限→キャリブレーション→プレイ）
 
 **Files:**
+
 - Create: `src/games/sasayaki-limit/sasayaki-limit-game.tsx`
 - Test: `src/games/sasayaki-limit/__tests__/sasayaki-limit-game.test.tsx`
 
 **Interfaces:**
+
 - Consumes: Task 1〜7 の全て、`usePlayers`/`getDisplayNames`（`@/lib/players-store`）、`useTopics`（`@/lib/topics-store`）
 - Produces: `SasayakiLimitGame`（registry の Component）
 
@@ -1472,7 +1512,11 @@ import { VolumeGauge } from './volume-gauge'
 
 type Stage = 'permission' | 'calibration' | 'playing'
 
-const JUDGEMENT_LABELS = { low: '🔻 小さすぎ…', ok: '✅ 緑ゾーン内！', high: '🔺 大きすぎ！' } as const
+const JUDGEMENT_LABELS = {
+	low: '🔻 小さすぎ…',
+	ok: '✅ 緑ゾーン内！',
+	high: '🔺 大きすぎ！',
+} as const
 
 export function SasayakiLimitGame() {
 	const players = usePlayers()
@@ -1503,7 +1547,8 @@ export function SasayakiLimitGame() {
 	}, [stage, mic.permission])
 
 	// キャリブレーション・計測中はマイクを回す
-	const shouldRecord = stage === 'calibration' || (stage === 'playing' && state.phase === 'measuring')
+	const shouldRecord =
+		stage === 'calibration' || (stage === 'playing' && state.phase === 'measuring')
 	useEffect(() => {
 		if (!shouldRecord) return
 		mic.start()
@@ -1548,7 +1593,8 @@ export function SasayakiLimitGame() {
 			<View style={styles.center}>
 				<Text style={styles.guardTitle}>🎤 マイクの許可が必要です</Text>
 				<Text style={styles.guardText}>
-					このゲームは声の大きさで遊びます。{'\n'}設定からマイクを許可してね。{'\n'}録音は保存されません。
+					このゲームは声の大きさで遊びます。{'\n'}設定からマイクを許可してね。{'\n'}
+					録音は保存されません。
 				</Text>
 				<Pressable style={styles.mainButton} onPress={() => Linking.openSettings()}>
 					<Text style={styles.mainButtonLabel}>設定を開く</Text>
@@ -1560,7 +1606,9 @@ export function SasayakiLimitGame() {
 		return (
 			<View style={styles.center}>
 				<Text style={styles.guardTitle}>この端末ではマイクを利用できません</Text>
-				<Text style={styles.guardText}>音量の計測に対応していないため、このゲームは遊べません。</Text>
+				<Text style={styles.guardText}>
+					音量の計測に対応していないため、このゲームは遊べません。
+				</Text>
 			</View>
 		)
 	}
@@ -1603,7 +1651,10 @@ export function SasayakiLimitGame() {
 					))}
 				</View>
 				<Text style={styles.guardText}>次のラウンドはゾーンが狭くなるよ！</Text>
-				<Pressable style={styles.mainButton} onPress={() => dispatch({ type: 'nextRound', rng: Math.random })}>
+				<Pressable
+					style={styles.mainButton}
+					onPress={() => dispatch({ type: 'nextRound', rng: Math.random })}
+				>
 					<Text style={styles.mainButtonLabel}>ラウンド {state.round + 1} へ</Text>
 				</Pressable>
 			</View>
@@ -1641,15 +1692,23 @@ export function SasayakiLimitGame() {
 				/>
 			</View>
 			{state.phase === 'speech' && (
-				<Pressable style={styles.mainButton} onPress={() => dispatch({ type: 'startMeasure' })}>
+				<Pressable
+					style={styles.mainButton}
+					onPress={() => dispatch({ type: 'startMeasure' })}
+				>
 					<Text style={styles.mainButtonLabel}>タップして発声スタート</Text>
 				</Pressable>
 			)}
-			{state.phase === 'measuring' && <Text style={styles.measuringLabel}>🎤 いまだ！言え！</Text>}
+			{state.phase === 'measuring' && (
+				<Text style={styles.measuringLabel}>🎤 いまだ！言え！</Text>
+			)}
 			{state.phase === 'judged' && state.lastJudgement != null && (
 				<>
 					<Text style={styles.judgement}>{JUDGEMENT_LABELS[state.lastJudgement]}</Text>
-					<Pressable style={styles.mainButton} onPress={() => dispatch({ type: 'next', rng: Math.random })}>
+					<Pressable
+						style={styles.mainButton}
+						onPress={() => dispatch({ type: 'next', rng: Math.random })}
+					>
 						<Text style={styles.mainButtonLabel}>つぎの人へ</Text>
 					</Pressable>
 				</>
@@ -1699,11 +1758,13 @@ git commit -m "feat: ささやきリミットのゲーム本体を結線（#65�
 ### Task 9: registry 追加・registry テスト更新・CLAUDE.md 追記
 
 **Files:**
+
 - Modify: `src/games/registry.ts`（import 追加＋ games 配列末尾にエントリ追加）
 - Modify: `src/games/__tests__/registry.test.ts`（件数 12→13）
 - Modify: `CLAUDE.md`（収録ゲーム候補に追記）
 
 **Interfaces:**
+
 - Consumes: `SasayakiLimitGame`（Task 8）
 
 - [ ] **Step 1: registry テストの期待値を先に更新（失敗を確認）**
@@ -1711,9 +1772,9 @@ git commit -m "feat: ささやきリミットのゲーム本体を結線（#65�
 `src/games/__tests__/registry.test.ts` の該当テストを差し替え:
 
 ```ts
-	it('MVP の8ゲーム＋プレミアム5本（バーストチキン・ダウトダイス・ワードウルフ・飲酒衰弱・ささやきリミット）が登録されている', () => {
-		expect(games).toHaveLength(13)
-	})
+it('MVP の8ゲーム＋プレミアム5本（バーストチキン・ダウトダイス・ワードウルフ・飲酒衰弱・ささやきリミット）が登録されている', () => {
+	expect(games).toHaveLength(13)
+})
 ```
 
 Run: `npm test -- src/games/__tests__/registry.test.ts`
@@ -1778,9 +1839,11 @@ git commit -m "feat: ささやきリミットを registry に追加（プレミ�
 ### Task 10: Supabase seed — whisper パック配信
 
 **Files:**
+
 - Create: `supabase/migrations/0006_seed_whisper_topics.sql`
 
 **Interfaces:**
+
 - Consumes: 既存 `public.topics` テーブル（`pack`, `text`, `is_premium` は default false）
 - Produces: pack `'whisper'` のお題30件（先頭20件は Task 2 のフォールバックと同一文言・同一順序）
 

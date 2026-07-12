@@ -48,17 +48,17 @@ intro（遊び方・プレミアムゲートは registry 側）
 
 ## ファイル構成（src/games/sasayaki-limit/）
 
-| ファイル | 役割 |
-| --- | --- |
+| ファイル                  | 役割                                                                                     |
+| ------------------------- | ---------------------------------------------------------------------------------------- |
 | `sasayaki-limit-game.tsx` | フェーズ分岐のルート（reducer 方式）。権限リクエスト・permission-denied 案内もここで分岐 |
-| `engine.ts` | ノイズフロア・ゾーン生成・判定・敗者集計の純関数 |
-| `reducer.ts` | フェーズ遷移（calibration → rounds → result → sudden-death） |
-| `use-mic-level.ts` | expo-audio ラッパー（権限・metering ポーリング・録音ファイル破棄） |
-| `volume-gauge.tsx` | 縦型リアルタイムゲージ（Reanimated。緑ゾーン内グロー、ピークマーカー残留） |
-| `calibration-screen.tsx` | 環境音計測 UI（プログレス＋再計測） |
-| `result-screen.tsx` | 中間・最終結果、敗者発表 |
-| `topics.ts` | ローカルフォールバックお題（pack: 'whisper'、約20本） |
-| `theme.ts` | ゲーム内カラートークン |
+| `engine.ts`               | ノイズフロア・ゾーン生成・判定・敗者集計の純関数                                         |
+| `reducer.ts`              | フェーズ遷移（calibration → rounds → result → sudden-death）                             |
+| `use-mic-level.ts`        | expo-audio ラッパー（権限・metering ポーリング・録音ファイル破棄）                       |
+| `volume-gauge.tsx`        | 縦型リアルタイムゲージ（Reanimated。緑ゾーン内グロー、ピークマーカー残留）               |
+| `calibration-screen.tsx`  | 環境音計測 UI（プログレス＋再計測）                                                      |
+| `result-screen.tsx`       | 中間・最終結果、敗者発表                                                                 |
+| `topics.ts`               | ローカルフォールバックお題（pack: 'whisper'、約20本）                                    |
+| `theme.ts`                | ゲーム内カラートークン                                                                   |
 
 - ゲージ配色: 小さすぎ＝青系 / 緑ゾーン＝グリーン（グロー演出）/ 大きすぎ＝赤系。全体は濃紺×ネオンの既存デザイントークン踏襲
 - metering が取得できない環境（Web・一部シミュレータ）は「この端末ではマイクを利用できません」ガード表示
