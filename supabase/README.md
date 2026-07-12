@@ -42,12 +42,12 @@ curl "https://ltkkzucuzngtavpreixq.supabase.co/rest/v1/word_pairs?select=id,pack
 
 ## ワードウルフのお題ペア構成
 
-| pack     | 用途           | 件数 | is_premium |
-| -------- | -------------- | ---- | ---------- |
-| `food`   | たべもの       | 20   | false      |
-| `place`  | ばしょ         | 20   | false      |
-| `aruaru` | あるある       | 20   | false      |
-| `adult`  | おとなの夜     | 20   | false      |
+| pack     | 用途       | 件数 | is_premium |
+| -------- | ---------- | ---- | ---------- |
+| `food`   | たべもの   | 20   | false      |
+| `place`  | ばしょ     | 20   | false      |
+| `aruaru` | あるある   | 20   | false      |
+| `adult`  | おとなの夜 | 20   | false      |
 
 - word_a / word_b のどちらが多数派かはテーブルでは固定せず、アプリ側で 50/50 スワップして決める
 - 全て is_premium=false で配信（プレミアム限定パックは追加時に is_premium=true にする）
