@@ -29,13 +29,7 @@ export function DeclareScreen({ playerName, onDeclare }: Props) {
 			<View style={styles.body}>
 				<Text style={styles.turn}>📲 {playerName}さんにスマホを渡して</Text>
 				<Text style={styles.hint}>宣言はまわりに見せないでね</Text>
-				<GradientButton
-					title="受け取った！"
-					onPress={() => {
-						haptics.tap()
-						setStep('choose')
-					}}
-				/>
+				<GradientButton title="受け取った！" onPress={() => setStep('choose')} />
 			</View>
 		)
 	}

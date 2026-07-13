@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import { GradientButton } from '@/components/ui/gradient-button'
-import { haptics } from '@/lib/haptics'
 import { playSound } from '@/lib/sound'
 import { colors, radii, spacing, typography } from '@/theme/tokens'
 import { OP } from './theme'
@@ -56,7 +55,6 @@ export function ForeheadScreen({ playerName, playerColor, card, onDone }: Props)
 				<GradientButton
 					title="受け取った！額当て準備"
 					onPress={() => {
-						haptics.tap()
 						setSeconds(PREP_SECONDS)
 						setStep('countdown')
 					}}

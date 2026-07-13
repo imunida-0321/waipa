@@ -2,7 +2,6 @@ import { router } from 'expo-router'
 import { useReducer } from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import { GradientButton } from '@/components/ui/gradient-button'
-import { haptics } from '@/lib/haptics'
 import { getDisplayNames, usePlayers } from '@/lib/players-store'
 import { playerColor } from '@/theme/player-colors'
 import { spacing, typography } from '@/theme/tokens'
@@ -27,10 +26,7 @@ export function OdekoPokerGame() {
 					</Text>
 					<GradientButton
 						title="カードを配る"
-						onPress={() => {
-							haptics.tap()
-							dispatch({ type: 'start', rng: Math.random })
-						}}
+						onPress={() => dispatch({ type: 'start', rng: Math.random })}
 					/>
 				</View>
 			)}
