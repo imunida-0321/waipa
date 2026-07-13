@@ -26,23 +26,19 @@
 ### Task 1: engine 判定純関数（pickMine / isExploded / scoreFromDrag）
 
 **Files:**
+
 - Create: `src/games/bomb-swipe/engine.ts`
 - Test: `src/games/bomb-swipe/__tests__/engine.test.ts`
 
 **Interfaces:**
+
 - Produces: `Rng = () => number` / `MINE_MIN: 60` / `MINE_MAX: 95` / `SCORE_MAX: 100` / `pickMine(rng: Rng): number` / `isExploded(score: number, mine: number): boolean` / `scoreFromDrag(dragPx: number, trackPx: number): number`
 
 - [ ] **Step 1: 失敗するテストを書く**
 
 ```typescript
 // src/games/bomb-swipe/__tests__/engine.test.ts
-import {
-	MINE_MAX,
-	MINE_MIN,
-	isExploded,
-	pickMine,
-	scoreFromDrag,
-} from '../engine'
+import { MINE_MAX, MINE_MIN, isExploded, pickMine, scoreFromDrag } from '../engine'
 
 describe('pickMine', () => {
 	it('rng=0 で下限、rng≒1 で上限になる', () => {
@@ -137,10 +133,12 @@ git add src/games/bomb-swipe && git commit -m "feat: 爆弾スワイプの判定
 ### Task 2: engine 敗者判定（decideLosers）
 
 **Files:**
+
 - Modify: `src/games/bomb-swipe/engine.ts`
 - Test: `src/games/bomb-swipe/__tests__/engine.test.ts`（追記）
 
 **Interfaces:**
+
 - Produces: `PlayerResult = { score: number; exploded: boolean }` / `decideLosers(results: PlayerResult[]): number[]`（敗者のプレイヤーindex配列）
 
 - [ ] **Step 1: 失敗するテストを追記**
@@ -214,16 +212,18 @@ git add src/games/bomb-swipe && git commit -m "feat: 爆弾スワイプの敗者
 ### Task 3: engine 状態遷移 reducer
 
 **Files:**
+
 - Modify: `src/games/bomb-swipe/engine.ts`
 - Test: `src/games/bomb-swipe/__tests__/engine.test.ts`（追記）
 
 **Interfaces:**
+
 - Produces:
-  - `Phase = 'handoff' | 'swiping' | 'safe' | 'exploded' | 'result'`
-  - `State = { phase: Phase; turnIndex: number; playerCount: number; mines: number[]; results: (PlayerResult | null)[] }`
-  - `Action = { type: 'startSwipe' } | { type: 'release'; score: number } | { type: 'next' } | { type: 'restart'; rng: Rng }`
-  - `createInitialState(playerCount: number, rng: Rng): State`
-  - `reduce(state: State, action: Action): State`
+    - `Phase = 'handoff' | 'swiping' | 'safe' | 'exploded' | 'result'`
+    - `State = { phase: Phase; turnIndex: number; playerCount: number; mines: number[]; results: (PlayerResult | null)[] }`
+    - `Action = { type: 'startSwipe' } | { type: 'release'; score: number } | { type: 'next' } | { type: 'restart'; rng: Rng }`
+    - `createInitialState(playerCount: number, rng: Rng): State`
+    - `reduce(state: State, action: Action): State`
 
 - [ ] **Step 1: 失敗するテストを追記**
 
@@ -375,15 +375,17 @@ git add src/games/bomb-swipe && git commit -m "feat: 爆弾スワイプの状態
 ### Task 4: theme.ts とスワイプゲージ（gauge.tsx）
 
 **Files:**
+
 - Create: `src/games/bomb-swipe/theme.ts`
 - Create: `src/games/bomb-swipe/gauge.tsx`
 - Test: `src/games/bomb-swipe/__tests__/gauge.test.tsx`
 
 **Interfaces:**
+
 - Consumes: `scoreFromDrag(dragPx, trackPx)`（Task 1）
 - Produces:
-  - `theme.ts`: `BS = { red: '#FF4D4F', maskRed: 'rgba(255,45,45,0.9)', gaugeFrom: '#FFC53D', gaugeTo: '#FF4D4F' }`
-  - `gauge.tsx`: `SwipeGauge({ onScoreChange, onRelease }: { onScoreChange: (score: number) => void; onRelease: (score: number) => void })` — testID `swipe-gauge`（責務: タッチ追跡とスコア表示のみ。判定・演出は親）
+    - `theme.ts`: `BS = { red: '#FF4D4F', maskRed: 'rgba(255,45,45,0.9)', gaugeFrom: '#FFC53D', gaugeTo: '#FF4D4F' }`
+    - `gauge.tsx`: `SwipeGauge({ onScoreChange, onRelease }: { onScoreChange: (score: number) => void; onRelease: (score: number) => void })` — testID `swipe-gauge`（責務: タッチ追跡とスコア表示のみ。判定・演出は親）
 
 - [ ] **Step 1: 失敗するテストを書く**
 
@@ -564,10 +566,12 @@ git add src/games/bomb-swipe && git commit -m "feat: 爆弾スワイプのスワ
 ### Task 5: リザルト画面（round-result.tsx）
 
 **Files:**
+
 - Create: `src/games/bomb-swipe/round-result.tsx`
 - Test: `src/games/bomb-swipe/__tests__/round-result.test.tsx`
 
 **Interfaces:**
+
 - Consumes: `State` / `PlayerResult` / `decideLosers`（Task 2, 3）
 - Produces: `RoundResult({ state, names, onRetry, onHome }: { state: State; names: string[]; onRetry: () => void; onHome: () => void })`
 
@@ -602,7 +606,12 @@ const base: State = {
 
 it('スコア順ランキングと地雷位置の答え合わせを表示する', async () => {
 	const { getByText } = await render(
-		<RoundResult state={base} names={['あか', 'あお', 'きいろ']} onRetry={() => {}} onHome={() => {}} />,
+		<RoundResult
+			state={base}
+			names={['あか', 'あお', 'きいろ']}
+			onRetry={() => {}}
+			onHome={() => {}}
+		/>,
 	)
 	expect(getByText(/あか/)).toBeTruthy()
 	expect(getByText(/55/)).toBeTruthy()
@@ -612,7 +621,12 @@ it('スコア順ランキングと地雷位置の答え合わせを表示する'
 
 it('爆発者が敗者として表示される', async () => {
 	const { getByText } = await render(
-		<RoundResult state={base} names={['あか', 'あお', 'きいろ']} onRetry={() => {}} onHome={() => {}} />,
+		<RoundResult
+			state={base}
+			names={['あか', 'あお', 'きいろ']}
+			onRetry={() => {}}
+			onHome={() => {}}
+		/>,
 	)
 	expect(getByText(/あおさんの負け/)).toBeTruthy()
 })
@@ -627,7 +641,12 @@ it('爆発者ゼロなら同率最低の全員が敗者表示される', async (
 		],
 	}
 	const { getByText } = await render(
-		<RoundResult state={noBoom} names={['あか', 'あお', 'きいろ']} onRetry={() => {}} onHome={() => {}} />,
+		<RoundResult
+			state={noBoom}
+			names={['あか', 'あお', 'きいろ']}
+			onRetry={() => {}}
+			onHome={() => {}}
+		/>,
 	)
 	expect(getByText(/あか・あおさんの負け/)).toBeTruthy()
 })
@@ -636,7 +655,12 @@ it('もう一回とホームのボタンが動く', async () => {
 	const onRetry = jest.fn()
 	const onHome = jest.fn()
 	const { getByText } = await render(
-		<RoundResult state={base} names={['あか', 'あお', 'きいろ']} onRetry={onRetry} onHome={onHome} />,
+		<RoundResult
+			state={base}
+			names={['あか', 'あお', 'きいろ']}
+			onRetry={onRetry}
+			onHome={onHome}
+		/>,
 	)
 	fireEvent.press(getByText('もう一回'))
 	fireEvent.press(getByText('ホームへ'))
@@ -673,22 +697,20 @@ type Props = {
 export function RoundResult({ state, names, onRetry, onHome }: Props) {
 	const results = state.results as PlayerResult[] // result フェーズでは全員分確定済み
 	const losers = decideLosers(results)
-	const ranking = results
-		.map((r, i) => ({ ...r, index: i }))
-		.sort((a, b) => b.score - a.score)
+	const ranking = results.map((r, i) => ({ ...r, index: i })).sort((a, b) => b.score - a.score)
 
 	return (
 		<View style={styles.container}>
-			<Text style={styles.title}>
-				{losers.map((i) => names[i]).join('・')}さんの負け！
-			</Text>
+			<Text style={styles.title}>{losers.map((i) => names[i]).join('・')}さんの負け！</Text>
 			<View style={styles.list}>
 				{ranking.map((r) => (
 					<View
 						key={r.index}
 						style={[styles.row, losers.includes(r.index) && styles.loserRow]}
 					>
-						<View style={[styles.bar, { backgroundColor: playerColor(r.index).value }]} />
+						<View
+							style={[styles.bar, { backgroundColor: playerColor(r.index).value }]}
+						/>
 						<Text style={styles.name}>{names[r.index]}</Text>
 						<Text style={styles.mine}>地雷: {state.mines[r.index]}</Text>
 						<Text style={[styles.score, r.exploded && styles.explodedScore]}>
@@ -746,10 +768,12 @@ git add src/games/bomb-swipe && git commit -m "feat: 爆弾スワイプのリザ
 ### Task 6: ゲーム本体（bomb-swipe-game.tsx）
 
 **Files:**
+
 - Create: `src/games/bomb-swipe/bomb-swipe-game.tsx`
 - Test: `src/games/bomb-swipe/__tests__/bomb-swipe-game.test.tsx`
 
 **Interfaces:**
+
 - Consumes: `createInitialState` / `reduce` / `MINE_MIN` / `MINE_MAX`（Task 3）、`SwipeGauge`（Task 4）、`RoundResult`（Task 5）、`usePlayers` / `getDisplayNames`（`@/lib/players-store`）、`DrumrollReveal` / `useDrumroll` / `LottieEffect` / `lottieAssets`（`@/components/game/`）
 - Produces: `BombSwipeGame()`（default なし・named export。registry から参照）
 
@@ -962,7 +986,9 @@ export function BombSwipeGame() {
 					fallback={<Text style={styles.explosionEmoji}>💥</Text>}
 				/>
 				<Text style={styles.resultScore}>{result?.score}</Text>
-				<Text style={styles.title}>爆発！ 地雷は {state.mines[state.turnIndex]} だった…</Text>
+				<Text style={styles.title}>
+					爆発！ 地雷は {state.mines[state.turnIndex]} だった…
+				</Text>
 				<NextButton onPress={() => dispatch({ type: 'next' })} />
 			</View>
 		)
@@ -1090,11 +1116,13 @@ git add src/games/bomb-swipe && git commit -m "feat: 爆弾スワイプのゲー
 ### Task 7: registry 登録・CLAUDE.md 追記・全体検証
 
 **Files:**
+
 - Modify: `src/games/registry.ts`（import 追加＋配列末尾にエントリ追加）
 - Modify: `CLAUDE.md`（収録ゲーム候補に1行追記）
 - Test: 既存の registry テスト（`src/games/__tests__/`）が新エントリでも通ること
 
 **Interfaces:**
+
 - Consumes: `BombSwipeGame`（Task 6）
 
 - [ ] **Step 1: registry にエントリ追加**
@@ -1155,12 +1183,14 @@ git add src/games/registry.ts CLAUDE.md && git commit -m "feat: 爆弾スワイ�
 ### Task 8: 心音効果音（heartbeat.m4a、自作合成）
 
 **Files:**
+
 - Modify: `scripts/build-sounds.py`（heartbeat 生成を追加）
 - Create: `assets/sounds/heartbeat.m4a`
 - Modify: `src/app/_layout.tsx`（`registerSound('heartbeat', ...)` を1行追加）
 - Modify: `assets/sounds/README.md`（表に1行追加）
 
 **Interfaces:**
+
 - Consumes: Task 6 の `playSound('heartbeat')`（未収録の間は無音スキップで既に動作している）
 
 前提: このタスクは Python + soundfile + numpy + macOS `afconvert` が必要。環境がなければ**スキップし、README の「未収録（追加予定）」表に tick.m4a と同様の行を追記してコミットする**（ゲームは無音のまま成立する）。

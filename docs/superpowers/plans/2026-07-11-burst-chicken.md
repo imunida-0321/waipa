@@ -27,22 +27,24 @@
 ### Task 1: engine.ts — 純関数 reducer
 
 **Files:**
+
 - Create: `src/games/burst-chicken/engine.ts`
 - Test: `src/games/burst-chicken/__tests__/engine.test.ts`
 
 **Interfaces:**
+
 - Consumes: なし（依存ゼロの純関数モジュール）
 - Produces:
-  - `type Rng = () => number`
-  - `type Phase = 'playing' | 'exploded' | 'settled'`
-  - `type State = { phase: Phase; limit: number; total: number; turnIndex: number; startIndex: number; playerCount: number; contributions: number[]; losers: number[]; stopperIndex: number | null }`
-  - `type Action = { type: 'add'; amount: 1 | 2 | 3 } | { type: 'stop' } | { type: 'restart'; rng: Rng }`
-  - `LIMIT_MIN = 21` / `LIMIT_MAX = 30` / `STOP_UNLOCK = 15`
-  - `pickLimit(rng: Rng): number`
-  - `createInitialState(playerCount: number, rng: Rng, startIndex?: number): State`
-  - `canStop(state: State): boolean`
-  - `settle(contributions: number[], stopperIndex: number): number[]`
-  - `reduce(state: State, action: Action): State`
+    - `type Rng = () => number`
+    - `type Phase = 'playing' | 'exploded' | 'settled'`
+    - `type State = { phase: Phase; limit: number; total: number; turnIndex: number; startIndex: number; playerCount: number; contributions: number[]; losers: number[]; stopperIndex: number | null }`
+    - `type Action = { type: 'add'; amount: 1 | 2 | 3 } | { type: 'stop' } | { type: 'restart'; rng: Rng }`
+    - `LIMIT_MIN = 21` / `LIMIT_MAX = 30` / `STOP_UNLOCK = 15`
+    - `pickLimit(rng: Rng): number`
+    - `createInitialState(playerCount: number, rng: Rng, startIndex?: number): State`
+    - `canStop(state: State): boolean`
+    - `settle(contributions: number[], stopperIndex: number): number[]`
+    - `reduce(state: State, action: Action): State`
 
 - [ ] **Step 1: Write the failing test**
 
@@ -205,9 +207,7 @@ export type State = {
 }
 
 export type Action =
-	| { type: 'add'; amount: 1 | 2 | 3 }
-	| { type: 'stop' }
-	| { type: 'restart'; rng: Rng }
+	{ type: 'add'; amount: 1 | 2 | 3 } | { type: 'stop' } | { type: 'restart'; rng: Rng }
 
 // 秘密の上限: 21〜30 の整数を一様ランダムで決める
 export function pickLimit(rng: Rng): number {
@@ -250,7 +250,13 @@ export function reduce(state: State, action: Action): State {
 			)
 			if (total > state.limit) {
 				// バースト: 積んだ本人が負け。手番はそのまま（敗者表示に使う）
-				return { ...state, total, contributions, phase: 'exploded', losers: [state.turnIndex] }
+				return {
+					...state,
+					total,
+					contributions,
+					phase: 'exploded',
+					losers: [state.turnIndex],
+				}
 			}
 			return {
 				...state,
@@ -299,10 +305,12 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 ### Task 2: tension.ts — 緊張演出の純関数
 
 **Files:**
+
 - Create: `src/games/burst-chicken/tension.ts`
 - Test: `src/games/burst-chicken/__tests__/tension.test.ts`
 
 **Interfaces:**
+
 - Consumes: なし
 - Produces: `tensionLevel(total: number): number`（0〜1、合計に対して単調非減少）、`TENSION_START = 15` / `TENSION_FULL = 30`
 
@@ -373,11 +381,13 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 ### Task 3: premium 解放判定スタブ＋ GameMeta.premium フラグ
 
 **Files:**
+
 - Create: `src/lib/premium.ts`
 - Modify: `src/games/registry.ts`（`GameMeta` 型に `premium?: boolean` を追加するだけ。エントリ追加は Task 9）
 - Test: `src/lib/__tests__/premium.test.ts`
 
 **Interfaces:**
+
 - Consumes: なし
 - Produces: `isPremiumUnlocked(): boolean`（`@/lib/premium`）、`GameMeta.premium?: boolean`
 
@@ -444,10 +454,12 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 ### Task 4: 共通ロックモーダル premium-lock-modal.tsx
 
 **Files:**
+
 - Create: `src/components/home/premium-lock-modal.tsx`
 - Test: `src/components/home/__tests__/premium-lock-modal.test.tsx`
 
 **Interfaces:**
+
 - Consumes: `GradientButton`（`@/components/ui/gradient-button`、props: `title: string; onPress: () => void`）
 - Produces: `PremiumLockModal`（props: `{ visible: boolean; gameTitle: string; onClose: () => void }`）
 
@@ -585,10 +597,12 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 ### Task 5: game-card のロック中マスク＋👑バッジ
 
 **Files:**
+
 - Modify: `src/components/home/game-card.tsx`
 - Test: `src/components/home/__tests__/game-card.test.tsx`（既存に追記）
 
 **Interfaces:**
+
 - Consumes: `GameMeta.premium`（Task 3）、`isPremiumUnlocked()`（Task 3）
 - Produces: ロック中は `testID="premium-lock-mask"` のマスク＋「👑 プレミアム」バッジをサムネイルに重ねる GameCard
 
@@ -619,7 +633,10 @@ describe('プレミアムロック表示', () => {
 
 	it('premium かつ未解放: cardThumbnail ありでもマスクを重ねる', async () => {
 		const { getByTestId } = await render(
-			<GameCard game={{ ...baseGame, premium: true, cardThumbnail: 1 }} onPress={jest.fn()} />,
+			<GameCard
+				game={{ ...baseGame, premium: true, cardThumbnail: 1 }}
+				onPress={jest.fn()}
+			/>,
 		)
 		expect(getByTestId('card-thumb-image')).toBeTruthy()
 		expect(getByTestId('premium-lock-mask')).toBeTruthy()
@@ -771,10 +788,12 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 ### Task 6: game-grid のタップ分岐（ロック中→モーダル）
 
 **Files:**
+
 - Modify: `src/components/home/game-grid.tsx`
 - Test: `src/components/home/__tests__/game-grid.test.tsx`（既存に追記）
 
 **Interfaces:**
+
 - Consumes: `PremiumLockModal`（Task 4）、`isPremiumUnlocked()`（Task 3）、`GameMeta.premium`
 - Produces: ロック中カードのタップでモーダル表示（遷移なし）、解放時は従来どおり `router.push`
 
@@ -924,11 +943,13 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 ### Task 7: theme.ts＋ゲーム本体（playing フェーズ）
 
 **Files:**
+
 - Create: `src/games/burst-chicken/theme.ts`
 - Create: `src/games/burst-chicken/burst-chicken-game.tsx`
 - Test: `src/games/burst-chicken/__tests__/burst-chicken-game.test.tsx`
 
 **Interfaces:**
+
 - Consumes: Task 1 の `createInitialState` / `reduce` / `canStop` / `LIMIT_MIN` / `LIMIT_MAX`、Task 2 の `tensionLevel`、既存の `usePlayers` / `getDisplayNames`（`@/lib/players-store`）、`playerColor`（`@/theme/player-colors`）、`playSound` / `haptics`
 - Produces: `BurstChickenGame`（props なし。Task 8 でリザルトを拡張、Task 9 で registry に登録）
 
@@ -1090,7 +1111,9 @@ export function BurstChickenGame() {
 
 			<View style={styles.totalBlock}>
 				<Text style={styles.totalLabel}>いまの合計</Text>
-				<Text style={[styles.totalValue, tension > 0 && styles.totalDanger]}>{state.total}</Text>
+				<Text style={[styles.totalValue, tension > 0 && styles.totalDanger]}>
+					{state.total}
+				</Text>
 			</View>
 
 			<View style={styles.turnRow}>
@@ -1198,12 +1221,14 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 ### Task 8: 終了フロー（爆発・精算・リザルト・もう一回）
 
 **Files:**
+
 - Create: `src/games/burst-chicken/round-result.tsx`
 - Modify: `src/games/burst-chicken/burst-chicken-game.tsx`（Task 7 のプレースホルダを差し替え）
 - Test: `src/games/burst-chicken/__tests__/round-result.test.tsx`
 - Test: `src/games/burst-chicken/__tests__/burst-chicken-game.test.tsx`（追記）
 
 **Interfaces:**
+
 - Consumes: Task 1 の `State`、`DrumrollReveal`（`@/components/game/drumroll-reveal`、props: `{ phase: DrumrollPhase; lottie?: boolean; children }`）、`useDrumroll()`（`@/components/game/use-drumroll`、returns `{ phase, start, reset }`）、`LottieEffect` / `lottieAssets.explosion`（`@/components/game/lottie-effect` / `lottie-assets`）、`GradientButton`
 - Produces: `RoundResult`（props: `{ state: State; names: string[]; onRetry: () => void; onHome: () => void }`）— L 答え合わせ＋貢献ランキング＋敗者＋もう一回/ホームへ
 
@@ -1259,7 +1284,12 @@ it('バースト: 敗者名・上限の答え合わせ・全員の貢献を表�
 
 it('精算タイ: タイ全員の名前を敗者として表示する', async () => {
 	const { getByText } = await render(
-		<RoundResult state={settledTieState} names={names} onRetry={jest.fn()} onHome={jest.fn()} />,
+		<RoundResult
+			state={settledTieState}
+			names={names}
+			onRetry={jest.fn()}
+			onHome={jest.fn()}
+		/>,
 	)
 	expect(getByText(/あかさん、あおさんの負け/)).toBeTruthy()
 	expect(getByText(/上限は 28 だった/)).toBeTruthy()
@@ -1320,9 +1350,14 @@ export function RoundResult({ state, names, onRetry, onHome }: Props) {
 			<View style={styles.rankingCard}>
 				{ranking.map(({ points, index }) => (
 					<View key={index} style={styles.rankingRow}>
-						<View style={[styles.colorBar, { backgroundColor: playerColor(index).value }]} />
+						<View
+							style={[styles.colorBar, { backgroundColor: playerColor(index).value }]}
+						/>
 						<Text
-							style={[styles.rankingName, state.losers.includes(index) && styles.rankingLoser]}
+							style={[
+								styles.rankingName,
+								state.losers.includes(index) && styles.rankingLoser,
+							]}
 							numberOfLines={1}
 						>
 							{names[index]}
@@ -1355,7 +1390,12 @@ const styles = StyleSheet.create({
 	rankingName: { ...typography.body, color: colors.text, flex: 1 },
 	rankingLoser: { color: BC.red, fontWeight: '800' },
 	rankingPoints: { ...typography.body, color: colors.textMuted },
-	homeLink: { ...typography.body, color: colors.textMuted, textAlign: 'center', padding: spacing.sm },
+	homeLink: {
+		...typography.body,
+		color: colors.textMuted,
+		textAlign: 'center',
+		padding: spacing.sm,
+	},
 })
 ```
 
@@ -1428,60 +1468,60 @@ import { RoundResult } from './round-result'
 コンポーネント本体に追加（`const stop = ...` の後）:
 
 ```tsx
-	const drum = useDrumroll()
+const drum = useDrumroll()
 
-	// バースト: 爆発音＋強バイブ。精算: ドラムロール開始
-	useEffect(() => {
-		if (state.phase === 'exploded') {
-			playSound('explosion')
-			haptics.heavy()
-		}
-		if (state.phase === 'settled') {
-			drum.start()
-		}
-	}, [state.phase, drum.start])
-
-	const retry = () => {
-		drum.reset()
-		dispatch({ type: 'restart', rng: Math.random })
+// バースト: 爆発音＋強バイブ。精算: ドラムロール開始
+useEffect(() => {
+	if (state.phase === 'exploded') {
+		playSound('explosion')
+		haptics.heavy()
 	}
+	if (state.phase === 'settled') {
+		drum.start()
+	}
+}, [state.phase, drum.start])
+
+const retry = () => {
+	drum.reset()
+	dispatch({ type: 'restart', rng: Math.random })
+}
 ```
 
 `if (state.phase !== 'playing')` のプレースホルダを差し替え:
 
 ```tsx
-	if (state.phase === 'exploded') {
-		return (
-			<View style={[styles.container, styles.explodedBg]}>
-				<LottieEffect
-					source={lottieAssets.explosion}
-					style={styles.explosionLottie}
-					fallback={<Text style={styles.explosionEmoji}>💥</Text>}
-				/>
+if (state.phase === 'exploded') {
+	return (
+		<View style={[styles.container, styles.explodedBg]}>
+			<LottieEffect
+				source={lottieAssets.explosion}
+				style={styles.explosionLottie}
+				fallback={<Text style={styles.explosionEmoji}>💥</Text>}
+			/>
+			<RoundResult
+				state={state}
+				names={names}
+				onRetry={retry}
+				onHome={() => router.replace('/')}
+			/>
+		</View>
+	)
+}
+
+if (state.phase === 'settled') {
+	return (
+		<View style={styles.container}>
+			<DrumrollReveal phase={drum.phase === 'idle' ? 'rolling' : drum.phase}>
 				<RoundResult
 					state={state}
 					names={names}
 					onRetry={retry}
 					onHome={() => router.replace('/')}
 				/>
-			</View>
-		)
-	}
-
-	if (state.phase === 'settled') {
-		return (
-			<View style={styles.container}>
-				<DrumrollReveal phase={drum.phase === 'idle' ? 'rolling' : drum.phase}>
-					<RoundResult
-						state={state}
-						names={names}
-						onRetry={retry}
-						onHome={() => router.replace('/')}
-					/>
-				</DrumrollReveal>
-			</View>
-		)
-	}
+			</DrumrollReveal>
+		</View>
+	)
+}
 ```
 
 styles に追加:
@@ -1513,11 +1553,13 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 ### Task 9: registry 登録＋CLAUDE.md 追記＋全体検証
 
 **Files:**
+
 - Modify: `src/games/registry.ts`（burst-chicken エントリ追加）
 - Modify: `CLAUDE.md`（収録ゲーム候補に追記）
 - Test: 既存の registry / home 系テストが壊れないことの確認
 
 **Interfaces:**
+
 - Consumes: `BurstChickenGame`（Task 7/8）、`GameMeta.premium`（Task 3）
 - Produces: ホームに🐔カードが並び、`/game/burst-chicken` で遊べる状態（開発ビルド）
 
