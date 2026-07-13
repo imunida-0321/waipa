@@ -263,6 +263,8 @@ export const games: readonly GameMeta[] = [
 		catchCopy: 'みんな同じお題…のはずが1人だけ違う！\n会話で見抜け、バレずに逃げ切れ！',
 		summary:
 			'このゲームは、全員に配られたお題のうち1人だけ微妙に違うお題を持つ「ワードウルフ」を探すゲームです！議論で多数派を探り、投票でウルフを当てよう。ウルフは吊られても市民のお題を言い当てれば逆転勝ち！',
+		thumbnail: require('@/assets/images/word-wolf/intro.jpg'),
+		cardThumbnail: require('@/assets/images/word-wolf/card.jpg'),
 		howToPlay: [
 			'① メンバーを登録（3〜12名）して、議論時間とお題パックを選ぼう！',
 			'② スマホを回して、自分のお題を長押しでこっそり確認（1人だけ違うお題！）',
