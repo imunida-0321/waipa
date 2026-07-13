@@ -15,6 +15,7 @@
 | `event.m4a`     | きまぐれ◯× イベントカットイン | [Digital Audio](https://kenney.nl/assets/digital-audio) `phaserUp1.ogg`           |
 | `spin.m4a`      | ルーレット回転（3.5秒）       | Interface Sounds `click_002.ogg` を加工生成（下記）                               |
 | `drumroll.m4a`  | ドラムロール（2.0秒）         | 自作合成（フィルタードノイズのスネアロール）                                      |
+| `heartbeat.m4a` | 爆弾スワイプの心音（スコアに応じ間隔短縮） | 自作合成（低域サイン2連打）。素材由来なし（CC0 扱い）                             |
 
 ### 未収録（追加予定）
 
@@ -28,10 +29,14 @@
   減速カーブ上に `click_002` のチック音を44回配置して生成。回転アニメと体感が同期する。
 - `drumroll.m4a`: `use-drumroll.ts` の `durationMs=2000` に合わせた2.0秒。
   ノイズ＋バンドパスのスネア打を約36打/秒で並べ、クレッシェンドさせたもの。素材由来なし（自作、CC0 扱い）。
+- `heartbeat.m4a`: 爆弾スワイプの心音（lub-dub）約0.25秒。55Hz/90ms（lub）→60ms無音→
+  45Hz/70ms・0.7倍（dub）の指数減衰サイン波2連打、ピーク-3dBFSに正規化。素材由来なし（自作、CC0 扱い）。
+  スコアに応じた再生間隔の短縮はゲーム側（`playSound('heartbeat')` の呼び出し頻度）で制御する。
 
-生成スクリプトは [`scripts/build-sounds.py`](../../scripts/build-sounds.py)（要 Python + `soundfile` + `numpy`、
-Kenney の各 zip を展開したディレクトリで実行）。元 OGG → WAV 変換は `soundfile`、
-AAC 変換は macOS `afconvert -f m4af -d aac -b 96000`。
+生成スクリプトは [`scripts/build-sounds.py`](../../scripts/build-sounds.py)（要 Python + `soundfile` + `numpy`）。
+Kenney 由来の素材（tap/explosion/reveal/event/spin）は Kenney の各 zip を展開したディレクトリが必要だが、
+`drumroll` / `heartbeat` は完全自作合成のため zip が無くても単体で生成できる（無い場合は該当区間だけ
+スキップする）。元 OGG → WAV 変換は `soundfile`、AAC 変換は macOS `afconvert -f m4af -d aac -b 96000`。
 
 ## 差し替えたいとき
 
