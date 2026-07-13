@@ -47,3 +47,20 @@ it('カウントダウン終了でカードが大表示され、5秒後に onDon
 	})
 	expect(onDone).toHaveBeenCalledTimes(1)
 })
+
+it('onDone は1回だけ。表示終了後に時間が経っても再発火しない', async () => {
+	const onDone = jest.fn()
+	const { getByText } = await render(<ForeheadScreen {...props} onDone={onDone} />)
+	await act(async () => fireEvent.press(getByText(/受け取った/)))
+	await act(async () => {
+		jest.advanceTimersByTime(PREP_SECONDS * 1000)
+	})
+	await act(async () => {
+		jest.advanceTimersByTime(SHOW_SECONDS * 1000)
+	})
+	expect(onDone).toHaveBeenCalledTimes(1)
+	await act(async () => {
+		jest.advanceTimersByTime(3000)
+	})
+	expect(onDone).toHaveBeenCalledTimes(1)
+})

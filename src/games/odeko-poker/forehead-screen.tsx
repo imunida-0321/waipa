@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import { GradientButton } from '@/components/ui/gradient-button'
 import { haptics } from '@/lib/haptics'
@@ -23,6 +23,7 @@ type Props = {
 export function ForeheadScreen({ playerName, playerColor, card, onDone }: Props) {
 	const [step, setStep] = useState<Step>('handoff')
 	const [seconds, setSeconds] = useState(PREP_SECONDS)
+	const done = useRef(false)
 
 	useEffect(() => {
 		if (step === 'handoff') return
@@ -36,7 +37,8 @@ export function ForeheadScreen({ playerName, playerColor, card, onDone }: Props)
 			playSound('reveal')
 			setStep('showing')
 			setSeconds(SHOW_SECONDS)
-		} else if (step === 'showing') {
+		} else if (step === 'showing' && !done.current) {
+			done.current = true
 			onDone()
 		}
 	}, [seconds, step, onDone])
