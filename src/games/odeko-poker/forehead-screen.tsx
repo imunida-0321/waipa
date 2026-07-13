@@ -35,6 +35,7 @@ export function ForeheadScreen({ playerName, playerColor, card, onDone }: Props)
 		if (seconds > 0) return
 		if (step === 'countdown') {
 			playSound('reveal')
+			// カウントダウン完了→カード表示への1回きりのステップ遷移。タイマー起点の正当な連鎖更新
 			// eslint-disable-next-line react-hooks/set-state-in-effect
 			setStep('showing')
 			setSeconds(SHOW_SECONDS)

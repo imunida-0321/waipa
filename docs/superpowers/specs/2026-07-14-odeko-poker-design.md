@@ -35,9 +35,8 @@ intro（遊び方・プレミアムゲートは registry 側）
  → declare × player p (1..n):（1台回し）
      handoff（「◯◯さんにスマホを渡して」）
       → 「勝負」/「降りる」の2ボタンを長押しで確定
-      → 確定した瞬間に中立画面（「OK！次の人へ」）へ切り替え
- → drumroll（共通 drumroll-reveal 流用）
- → result（全カード＋宣言公開 → 敗者ドン／一人勝ち／全員負け＋ヘタレ賞バッジ）
+      → 確定した瞬間に次の人の handoff（中立画面を兼ねる）へ切り替え
+ → result（ドラムロール〔共通 drumroll-reveal 流用、result-screen 内〕→ 全カード＋宣言公開 → 敗者ドン／一人勝ち／全員負け＋ヘタレ賞バッジ）
      → 「次のラウンド」→ deal に戻り再配布 ／ 「終了」→ ホームへ
 ```
 
@@ -57,16 +56,16 @@ intro（遊び方・プレミアムゲートは registry 側）
 
 ## ファイル構成（src/games/odeko-poker/）
 
-| ファイル               | 役割                                                                       |
-| ---------------------- | -------------------------------------------------------------------------- |
-| `odeko-poker-game.tsx` | フェーズ分岐のルート（reducer 方式）                                       |
-| `engine.ts`            | カード配布・勝敗判定・ヘタレ賞判定の純関数                                 |
-| `reducer.ts`           | フェーズ遷移（deal → forehead×n → declare×n → drumroll → result → 再配布） |
-| `forehead-screen.tsx`  | 額当て確認UI（handoff → カウントダウン3秒 → カード大表示5秒 → 自動送り）   |
-| `declare-screen.tsx`   | 長押し秘密宣言UI（handoff → 長押し確定 → 中立画面）                        |
-| `result-screen.tsx`    | ドラムロール → 全カード公開 → 敗者ドン／一人勝ち／全員負け・ヘタレ賞演出   |
-| `theme.ts`             | 配色トークン                                                               |
-| `__tests__/`           | engine・reducer・各画面のテスト                                            |
+| ファイル               | 役割                                                                     |
+| ---------------------- | ------------------------------------------------------------------------ |
+| `odeko-poker-game.tsx` | フェーズ分岐のルート（reducer 方式）                                     |
+| `engine.ts`            | カード配布・勝敗判定・ヘタレ賞判定の純関数                               |
+| `reducer.ts`           | フェーズ遷移（deal → forehead×n → declare×n → result → 再配布）          |
+| `forehead-screen.tsx`  | 額当て確認UI（handoff → カウントダウン3秒 → カード大表示5秒 → 自動送り） |
+| `declare-screen.tsx`   | 長押し秘密宣言UI（handoff → 長押し確定 → 次の人の handoff へ）           |
+| `result-screen.tsx`    | ドラムロール → 全カード公開 → 敗者ドン／一人勝ち／全員負け・ヘタレ賞演出 |
+| `theme.ts`             | 配色トークン                                                             |
+| `__tests__/`           | engine・reducer・各画面のテスト                                          |
 
 ## registry 追加
 
