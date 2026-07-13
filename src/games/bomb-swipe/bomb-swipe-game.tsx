@@ -1,5 +1,5 @@
 import { router } from 'expo-router'
-import { useEffect, useReducer, useState } from 'react'
+import { useEffect, useReducer, useRef, useState } from 'react'
 import { Pressable, StyleSheet, Text, View } from 'react-native'
 import { DrumrollReveal } from '@/components/game/drumroll-reveal'
 import { lottieAssets } from '@/components/game/lottie-assets'
@@ -25,6 +25,10 @@ export function BombSwipeGame() {
 	)
 	// スワイプ中の緊張演出用。ゲージ内部と重複して持つが、親は演出にだけ使う
 	const [liveScore, setLiveScore] = useState(0)
+	// 直近で心音を鳴らした10点バケット（Math.floor(score / 10)）。
+	// responderMove は同じバケット内でも高頻度に呼ばれるため、バケットが
+	// 上昇して跨いだ瞬間だけ鳴らす（手番開始・リリース時にリセット）
+	const lastHeartbeatBucket = useRef(0)
 
 	const drum = useDrumroll()
 
@@ -44,15 +48,19 @@ export function BombSwipeGame() {
 
 	const onScoreChange = (score: number) => {
 		setLiveScore(score)
-		// 10点刻みで心音＋軽バイブ（連続バイブは端末負荷が高いため間引く）
-		if (score > 0 && score % 10 === 0) {
+		// 10点バケットを跨いで上昇したときだけ心音＋軽バイブ（同一バケット内の
+		// 連打や、跨いだのに鳴らない取りこぼしを防ぐため % ではなくバケット比較で判定）
+		const bucket = Math.floor(score / 10)
+		if (score > 0 && bucket > lastHeartbeatBucket.current) {
 			playSound('heartbeat')
 			haptics.tap()
 		}
+		lastHeartbeatBucket.current = bucket
 	}
 
 	const onRelease = (score: number) => {
 		setLiveScore(0)
+		lastHeartbeatBucket.current = 0
 		dispatch({ type: 'release', score })
 	}
 
@@ -134,6 +142,7 @@ export function BombSwipeGame() {
 				accessibilityRole="button"
 				onPress={() => {
 					haptics.tap()
+					lastHeartbeatBucket.current = 0
 					dispatch({ type: 'startSwipe' })
 				}}
 				style={({ pressed }) => [styles.startBtn, pressed && styles.pressed]}

@@ -31,7 +31,7 @@ jest.mock('react-native-reanimated', () => {
 		withSpring: jest.fn((v: number) => v),
 		// round-result.tsx が playerColor(...).value をスタイル内で直接参照するため、
 		// reanimated babel プラグインが挿入するチェック関数もモックしておく（round-result.test.tsx と同様）
-		getUseOfValueInStyleWarning: jest.fn(() => undefined),
+		getUseOfValueInStyleWarning: jest.fn(() => ''),
 	}
 })
 // ゲージは単体テスト済みのためモックし、離した位置を直接注入する
@@ -40,8 +40,24 @@ jest.mock('../gauge', () => {
 	// eslint-disable-next-line @typescript-eslint/no-require-imports
 	const { Pressable, Text } = require('react-native')
 	return {
-		SwipeGauge: ({ onRelease }: { onRelease: (score: number) => void }) => (
+		SwipeGauge: ({
+			onScoreChange,
+			onRelease,
+		}: {
+			onScoreChange: (score: number) => void
+			onRelease: (score: number) => void
+		}) => (
 			<>
+				{/* onScoreChange を直接注入するための任意スコアボタン群（バケット跨ぎ検証用） */}
+				<Pressable testID="mock-score-15" onPress={() => onScoreChange(15)}>
+					<Text>score15</Text>
+				</Pressable>
+				<Pressable testID="mock-score-18" onPress={() => onScoreChange(18)}>
+					<Text>score18</Text>
+				</Pressable>
+				<Pressable testID="mock-score-25" onPress={() => onScoreChange(25)}>
+					<Text>score25</Text>
+				</Pressable>
 				<Pressable testID="mock-release-50" onPress={() => onRelease(50)}>
 					<Text>release50</Text>
 				</Pressable>
@@ -94,6 +110,30 @@ it('地雷ちょうどで離すと爆発表示になり explosion が鳴る', as
 	await press(getByTestId('mock-release-60'))
 	expect(getByText(/爆発/)).toBeTruthy()
 	expect(playSound).toHaveBeenCalledWith('explosion')
+})
+
+it('同一10点バケット内の連続 onScoreChange では心音が1回だけ、バケットを跨ぐと再度鳴る', async () => {
+	// eslint-disable-next-line @typescript-eslint/no-require-imports
+	const { playSound } = require('@/lib/sound')
+	// eslint-disable-next-line @typescript-eslint/no-require-imports
+	const { haptics } = require('@/lib/haptics')
+	const { getByText, getByTestId } = await render(<BombSwipeGame />)
+	await press(getByText(/スワイプ開始/)) // このボタン押下自体でも haptics.tap が1回呼ばれる
+
+	const heartbeatCalls = () =>
+		(playSound as jest.Mock).mock.calls.filter(([sound]) => sound === 'heartbeat').length
+	const tapCallsBeforeScoring = (haptics.tap as jest.Mock).mock.calls.length
+
+	// score 15 → 18 はどちらもバケット1（floor(score/10)）: 心音は最初の1回だけ
+	await press(getByTestId('mock-score-15'))
+	await press(getByTestId('mock-score-18'))
+	expect(heartbeatCalls()).toBe(1)
+	expect((haptics.tap as jest.Mock).mock.calls.length - tapCallsBeforeScoring).toBe(1)
+
+	// score 25 はバケット2に跨ぐため再度鳴る
+	await press(getByTestId('mock-score-25'))
+	expect(heartbeatCalls()).toBe(2)
+	expect((haptics.tap as jest.Mock).mock.calls.length - tapCallsBeforeScoring).toBe(2)
 })
 
 it('全員終了でリザルトに敗者と答え合わせが表示される', async () => {

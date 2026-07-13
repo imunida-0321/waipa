@@ -92,7 +92,7 @@ for k in range(n_hits):
 write('drumroll', fade_out(roll, 60))
 
 # --- heartbeat: 「ドクッ」1拍ぶんの心音（lub-dub）約 0.25秒 ---
-# 爆弾スワイプのスコアに応じて use-bomb-swipe-game.ts 側が
+# 爆弾スワイプのスコアに応じて bomb-swipe-game.tsx 側が
 # playSound('heartbeat') の呼び出し間隔を詰めることでテンポを演出するため、
 # 素材自体はループさせず単発の1拍でよい
 LUB_MS, GAP_MS, DUB_MS = 90, 60, 70

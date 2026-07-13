@@ -24,7 +24,7 @@ jest.mock('react-native-reanimated', () => {
 		withRepeat: jest.fn((toValue: number) => toValue),
 		withDelay: jest.fn((_delay: number, toValue: number) => toValue),
 		Easing: { out: jest.fn(() => jest.fn()), cubic: jest.fn(), linear: jest.fn() },
-		getUseOfValueInStyleWarning: jest.fn(() => undefined),
+		getUseOfValueInStyleWarning: jest.fn(() => ''),
 	}
 })
 jest.mock('@/theme/player-colors', () => ({

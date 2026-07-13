@@ -23,22 +23,27 @@ export function RoundResult({ state, names, onRetry, onHome }: Props) {
 		<View style={styles.container}>
 			<Text style={styles.title}>{losers.map((i) => names[i]).join('・')}さんの負け！</Text>
 			<View style={styles.list}>
-				{ranking.map((r) => (
-					<View
-						key={r.index}
-						style={[styles.row, losers.includes(r.index) && styles.loserRow]}
-					>
+				{ranking.map((r) => {
+					// playerColor(...).value は shared value ではない通常のプロパティだが、
+					// JSX の style 属性内で `.value` に直接アクセスすると reanimated/worklets の
+					// babel プラグインが「inline style での shared value 直接参照」と誤検知し、
+					// console.warn を挿入してしまう。style 属性の外で変数に受けて回避する
+					const barColor = playerColor(r.index).value
+					return (
 						<View
-							style={[styles.bar, { backgroundColor: playerColor(r.index).value }]}
-						/>
-						<Text style={styles.name}>{names[r.index]}</Text>
-						<Text style={styles.mine}>地雷: {state.mines[r.index]}</Text>
-						<Text style={[styles.score, r.exploded && styles.explodedScore]}>
-							{r.exploded ? '💥' : ''}
-							{r.score}
-						</Text>
-					</View>
-				))}
+							key={r.index}
+							style={[styles.row, losers.includes(r.index) && styles.loserRow]}
+						>
+							<View style={[styles.bar, { backgroundColor: barColor }]} />
+							<Text style={styles.name}>{names[r.index]}</Text>
+							<Text style={styles.mine}>地雷: {state.mines[r.index]}</Text>
+							<Text style={[styles.score, r.exploded && styles.explodedScore]}>
+								{r.exploded ? '💥' : ''}
+								{r.score}
+							</Text>
+						</View>
+					)
+				})}
 			</View>
 			<GradientButton title="もう一回" onPress={onRetry} />
 			<SecondaryButton title="ホームへ" onPress={onHome} />
