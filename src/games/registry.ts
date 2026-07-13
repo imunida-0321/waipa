@@ -1,6 +1,7 @@
 import type { ComponentType } from 'react'
 import { BombGame } from './bomb-216/bomb-game'
 import { BombRelayGame } from './bomb-relay/bomb-relay-game'
+import { BombSwipeGame } from './bomb-swipe/bomb-swipe-game'
 import { BurstChickenGame } from './burst-chicken/burst-chicken-game'
 import { ChinchiroGame } from './chinchiro/chinchiro-game'
 import { DautDiceGame } from './daut-dice/daut-dice-game'
@@ -289,6 +290,27 @@ export const games: readonly GameMeta[] = [
 			'④ ジョーカーは引いた本人が特大罰！全ペア消化で獲得ペア数ランキングを発表！',
 		],
 		Component: InshuSuijakuGame,
+	},
+	{
+		id: 'bomb-swipe',
+		title: '爆弾スワイプ',
+		tagline: 'どこまで攻める？地雷を踏んだら即アウト！',
+		emoji: '🧨',
+		gradient: ['#FF4D4F', '#7B1E1E'],
+		minPlayers: 2,
+		maxPlayers: 12,
+		requiresPlayers: true,
+		premium: true,
+		catchCopy: '攻めるほど高得点、でも地雷を踏んだら爆発！\nビビって低スコアでも負け！',
+		summary:
+			'このゲームは、ゲージを上にスワイプして離した位置がスコアになる度胸試しです！60〜95のどこかに隠された地雷を踏むと爆発して負け。爆発者がいなければ一番スコアが低い人が負けになります！',
+		howToPlay: [
+			'① 一緒に遊ぶメンバーを登録しよう！（2〜12名）',
+			'② 自分の番が来たら、ゲージを下から上へスワイプ！',
+			'③ 指を離した位置がスコア（0〜100）。ただし地雷（60〜95のどこか）を踏むと爆発！',
+			'④ 爆発した人が負け！誰も爆発しなかったら最低スコアの人が負け！',
+		],
+		Component: BombSwipeGame,
 	},
 ]
 
