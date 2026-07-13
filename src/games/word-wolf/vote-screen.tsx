@@ -26,13 +26,7 @@ export function VoteScreen({ voterIndex, voterName, names, candidates, onVote }:
 			<View style={styles.container}>
 				<Text style={styles.title}>🗳️ 投票タイム</Text>
 				<Text style={styles.instruction}>{voterName}さんにスマホを渡してください</Text>
-				<GradientButton
-					title="投票する"
-					onPress={() => {
-						haptics.tap()
-						setStage('choose')
-					}}
-				/>
+				<GradientButton title="投票する" onPress={() => setStage('choose')} />
 			</View>
 		)
 	}

@@ -45,12 +45,15 @@ export function DautDiceGame() {
 	const names = getDisplayNames(players)
 	const [state, dispatch] = useReducer(reduce, players.count, initialState)
 
+	// haptics はボタン経由なら GradientButton 内蔵の tap に任せる（シェイク時のみ明示発火）
 	const doRoll = () => {
-		haptics.tap()
 		playSound('diceRoll1')
 		dispatch({ type: 'roll', rng })
 	}
-	useShake(state.phase === 'roll', doRoll)
+	useShake(state.phase === 'roll', () => {
+		haptics.tap()
+		doRoll()
+	})
 
 	return (
 		<View style={styles.container}>

@@ -1,5 +1,4 @@
 import { useCallback, useReducer } from 'react'
-import { haptics } from '@/lib/haptics'
 import { useTopics } from '@/lib/topics-store'
 import { CountSelect } from './count-select'
 import { DealPass } from './deal-pass'
@@ -22,10 +21,7 @@ export function NoKingGame() {
 			<CountSelect
 				count={state.playerCount}
 				onChangeCount={(count) => dispatch({ type: 'setCount', count })}
-				onDeal={() => {
-					haptics.tap()
-					dispatch({ type: 'deal', rng })
-				}}
+				onDeal={() => dispatch({ type: 'deal', rng })}
 			/>
 		)
 	}
@@ -37,10 +33,7 @@ export function NoKingGame() {
 				dealIndex={state.dealIndex}
 				playerCount={state.playerCount}
 				number={state.numbers[state.dealIndex]}
-				onConfirm={() => {
-					haptics.tap()
-					dispatch({ type: 'confirmNumber', topics: kingTopics, rng })
-				}}
+				onConfirm={() => dispatch({ type: 'confirmNumber', topics: kingTopics, rng })}
 			/>
 		)
 	}
@@ -54,10 +47,7 @@ export function NoKingGame() {
 			skipsLeft={state.skipsLeft}
 			onSkip={() => dispatch({ type: 'skip', topics: kingTopics, rng })}
 			onRevealDone={onRevealDone}
-			onNextRound={() => {
-				haptics.tap()
-				dispatch({ type: 'nextRound', rng })
-			}}
+			onNextRound={() => dispatch({ type: 'nextRound', rng })}
 		/>
 	)
 }

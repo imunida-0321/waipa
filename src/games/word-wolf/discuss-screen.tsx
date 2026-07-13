@@ -76,7 +76,6 @@ export function DiscussScreen({ seconds, isRunoff = false, onDone }: Props) {
 			<GradientButton
 				title={confirming ? 'もう一度タップで投票へ！' : '投票へすすむ'}
 				onPress={() => {
-					haptics.tap()
 					if (confirming) finish()
 					else setConfirming(true)
 				}}
