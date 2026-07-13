@@ -48,12 +48,7 @@ export function InshuSuijakuGame() {
 
 	if (state.phase === 'size') {
 		return (
-			<SizeSelect
-				onStart={(size) => {
-					haptics.tap()
-					dispatch({ type: 'start', size, rng })
-				}}
-			/>
+			<SizeSelect onStart={(size) => dispatch({ type: 'start', size, rng })} />
 		)
 	}
 

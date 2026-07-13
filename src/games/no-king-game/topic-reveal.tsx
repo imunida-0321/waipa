@@ -4,7 +4,6 @@ import { DrumrollReveal } from '@/components/game/drumroll-reveal'
 import { useDrumroll } from '@/components/game/use-drumroll'
 import { GradientButton } from '@/components/ui/gradient-button'
 import { PillButton } from '@/components/ui/pill-button'
-import { haptics } from '@/lib/haptics'
 import { colors, radii, spacing, typography } from '@/theme/tokens'
 import { NKG } from './theme'
 
@@ -33,7 +32,6 @@ export function TopicReveal({
 	const drumroll = useDrumroll()
 
 	const startReveal = () => {
-		haptics.tap()
 		drumroll.start()
 	}
 
@@ -54,13 +52,7 @@ export function TopicReveal({
 			{drumroll.phase === 'idle' && (
 				<>
 					{skipsLeft > 0 ? (
-						<PillButton
-							title={`お題をスキップ（残り${skipsLeft}回）`}
-							onPress={() => {
-								haptics.tap()
-								onSkip()
-							}}
-						/>
+						<PillButton title={`お題をスキップ（残り${skipsLeft}回）`} onPress={onSkip} />
 					) : (
 						<Text style={styles.skipExhausted}>スキップは使い切りました</Text>
 					)}

@@ -69,7 +69,6 @@ export function BombRelayGame() {
 
 	const start = () => {
 		fuseRef.current = pickFuseMs(Math.random)
-		haptics.tap()
 		setPhase('ticking')
 	}
 
