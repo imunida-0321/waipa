@@ -1,5 +1,4 @@
 import { act, fireEvent, render } from '@testing-library/react-native'
-import { Text } from 'react-native'
 import type { Judgement } from '../engine'
 import { ResultScreen } from '../result-screen'
 
@@ -61,7 +60,12 @@ async function renderRevealed(judgement: Judgement, declarations: ('fight' | 'fo
 }
 
 it('ドラムロール中はカードを公開しない', async () => {
-	const j: Judgement = { outcome: 'normal', loserIndices: [0], winnerIndex: null, hetareIndex: null }
+	const j: Judgement = {
+		outcome: 'normal',
+		loserIndices: [0],
+		winnerIndex: null,
+		hetareIndex: null,
+	}
 	const { queryByText } = await render(
 		<ResultScreen
 			names={names}
@@ -76,7 +80,12 @@ it('ドラムロール中はカードを公開しない', async () => {
 })
 
 it('normal: 敗者の名前と全カード・全宣言が公開される', async () => {
-	const j: Judgement = { outcome: 'normal', loserIndices: [0], winnerIndex: null, hetareIndex: null }
+	const j: Judgement = {
+		outcome: 'normal',
+		loserIndices: [0],
+		winnerIndex: null,
+		hetareIndex: null,
+	}
 	const { getByText, getAllByText } = await renderRevealed(j, ['fight', 'fight', 'fight'])
 	expect(getByText(/あかさんの負け/)).toBeTruthy()
 	expect(getByText('5')).toBeTruthy()
@@ -98,7 +107,12 @@ it('solo-fight: 一人勝ちの発表になり、負けなし', async () => {
 })
 
 it('all-fold: 全員負けの発表', async () => {
-	const j: Judgement = { outcome: 'all-fold', loserIndices: [0, 1, 2], winnerIndex: null, hetareIndex: 1 }
+	const j: Judgement = {
+		outcome: 'all-fold',
+		loserIndices: [0, 1, 2],
+		winnerIndex: null,
+		hetareIndex: 1,
+	}
 	const { getByText } = await renderRevealed(j, ['fold', 'fold', 'fold'])
 	expect(getByText(/全員降り/)).toBeTruthy()
 })
@@ -111,7 +125,12 @@ it('ヘタレ賞のバッジと説明が表示される', async () => {
 })
 
 it('「次のラウンド」で onNextRound が呼ばれる', async () => {
-	const j: Judgement = { outcome: 'all-fold', loserIndices: [0, 1, 2], winnerIndex: null, hetareIndex: null }
+	const j: Judgement = {
+		outcome: 'all-fold',
+		loserIndices: [0, 1, 2],
+		winnerIndex: null,
+		hetareIndex: null,
+	}
 	const { getByText, onNextRound } = await renderRevealed(j, ['fold', 'fold', 'fold'])
 	await act(async () => fireEvent.press(getByText(/次のラウンド/)))
 	expect(onNextRound).toHaveBeenCalledTimes(1)

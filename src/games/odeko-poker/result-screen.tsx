@@ -61,14 +61,18 @@ export function ResultScreen({
 					const isHetare = judgement.hetareIndex === i
 					return (
 						<View key={i} style={[styles.row, isLoser && styles.rowLoser]}>
-							<View style={[styles.colorBar, { backgroundColor: playerColor(i).value }]} />
+							<View
+								style={[styles.colorBar, { backgroundColor: playerColor(i).value }]}
+							/>
 							<Text style={styles.name} numberOfLines={1}>
 								{name}
 							</Text>
 							<View
 								style={[
 									styles.chip,
-									declarations[i] === 'fight' ? styles.chipFight : styles.chipFold,
+									declarations[i] === 'fight'
+										? styles.chipFight
+										: styles.chipFold,
 								]}
 							>
 								<Text style={styles.chipText}>
