@@ -19,9 +19,7 @@ export type State = {
 }
 
 export type Action =
-	| { type: 'add'; amount: 1 | 2 | 3 }
-	| { type: 'stop' }
-	| { type: 'restart'; rng: Rng }
+	{ type: 'add'; amount: 1 | 2 | 3 } | { type: 'stop' } | { type: 'restart'; rng: Rng }
 
 // 秘密の上限: 21〜30 の整数を一様ランダムで決める
 export function pickLimit(rng: Rng): number {
@@ -64,7 +62,13 @@ export function reduce(state: State, action: Action): State {
 			)
 			if (total > state.limit) {
 				// バースト: 積んだ本人が負け。手番はそのまま（敗者表示に使う）
-				return { ...state, total, contributions, phase: 'exploded', losers: [state.turnIndex] }
+				return {
+					...state,
+					total,
+					contributions,
+					phase: 'exploded',
+					losers: [state.turnIndex],
+				}
 			}
 			return {
 				...state,

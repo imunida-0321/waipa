@@ -23,10 +23,12 @@
 ### Task 1: engine.ts — 盤面・着手・勝敗判定の純粋関数
 
 **Files:**
+
 - Create: `src/games/kimagure-ox/engine.ts`
 - Test: `src/games/kimagure-ox/__tests__/engine.test.ts`
 
 **Interfaces:**
+
 - Consumes: なし（最初のタスク）
 - Produces: `type Mark = 'o' | 'x'` / `type Cell = Mark | null` / `type Board = readonly Cell[]`（長さ9） / `type Winner = Mark | 'draw' | null` / `emptyBoard(): Board` / `canPlace(board, blocked: number | null, index: number): boolean` / `place(board, index, mark): Board` / `judge(board, blocked: number | null): Winner`
 
@@ -44,8 +46,7 @@ git checkout develop && git pull && git checkout -b feature/12-kimagure-ox
 import { canPlace, emptyBoard, judge, place, type Cell } from '../engine'
 
 // 'o.x......' 形式の文字列から盤面を作るヘルパ（. は空きマス）
-const B = (s: string): Cell[] =>
-	[...s].map((c) => (c === 'o' ? 'o' : c === 'x' ? 'x' : null))
+const B = (s: string): Cell[] => [...s].map((c) => (c === 'o' ? 'o' : c === 'x' ? 'x' : null))
 
 describe('emptyBoard', () => {
 	it('9マスすべて null', () => {
@@ -178,10 +179,12 @@ git commit -m "feat: きまぐれ◯× の盤面エンジンを追加 (#12)"
 ### Task 2: events.ts — きまぐれイベント4種の定義・抽選・適用
 
 **Files:**
+
 - Create: `src/games/kimagure-ox/events.ts`
 - Test: `src/games/kimagure-ox/__tests__/events.test.ts`
 
 **Interfaces:**
+
 - Consumes: Task 1 の `Board` / `Mark`
 - Produces: `type EventId = 'shuffle' | 'block' | 'vanish' | 'double'` / `type Rng = () => number` / `EVENT_META: Record<EventId, { name: string; emoji: string }>` / `EVENT_CHANCE = 0.3` / `MIN_MOVES_BEFORE_EVENT = 3` / `applicableEvents(board, blocked): EventId[]` / `pickEvent({ board, blocked, moveCount, lastEvent, rng }): EventId | null` / `type EventResult = { board: Board; blocked: number | null; extraMoves: number }` / `applyEvent(id, board, blocked, rng): EventResult`
 
@@ -193,8 +196,7 @@ git commit -m "feat: きまぐれ◯× の盤面エンジンを追加 (#12)"
 import type { Cell } from '../engine'
 import { applicableEvents, applyEvent, pickEvent, type Rng } from '../events'
 
-const B = (s: string): Cell[] =>
-	[...s].map((c) => (c === 'o' ? 'o' : c === 'x' ? 'x' : null))
+const B = (s: string): Cell[] => [...s].map((c) => (c === 'o' ? 'o' : c === 'x' ? 'x' : null))
 
 // 固定値列を順に返す乱数（使い切ったら 0.999）
 const seq = (...values: number[]): Rng => {
@@ -350,7 +352,8 @@ export function applyEvent(
 	blocked: number | null,
 	rng: Rng,
 ): EventResult {
-	if (id === 'shuffle') return { board: shuffleBoard(board, blocked, rng), blocked, extraMoves: 0 }
+	if (id === 'shuffle')
+		return { board: shuffleBoard(board, blocked, rng), blocked, extraMoves: 0 }
 	if (id === 'block') {
 		const empties = emptyIndexes(board, blocked)
 		return { board, blocked: empties[Math.floor(rng() * empties.length)], extraMoves: 0 }
@@ -399,10 +402,12 @@ git commit -m "feat: きまぐれイベント4種の抽選・適用ロジック�
 ### Task 3: reducer.ts — ゲーム状態機械
 
 **Files:**
+
 - Create: `src/games/kimagure-ox/reducer.ts`
 - Test: `src/games/kimagure-ox/__tests__/reducer.test.ts`
 
 **Interfaces:**
+
 - Consumes: Task 1 の `Board` / `Mark` / `Winner` / `emptyBoard` / `canPlace` / `place` / `judge`、Task 2 の `EventId` / `Rng` / `pickEvent` / `applyEvent`
 - Produces: `type Phase = 'intro' | 'playing' | 'cutin' | 'finished'` / `type GameState = { board: Board; turn: Mark; blocked: number | null; extraMoves: number; moveCount: number; lastEvent: EventId | null; pendingEvent: EventId | null; phase: Phase; winner: Winner }` / `type Action = { type: 'start' } | { type: 'tap'; index: number; rng: Rng } | { type: 'cutinDone'; rng: Rng } | { type: 'retry'; rng: Rng }` / `initialState(rng: Rng): GameState` / `reduce(state: GameState, action: Action): GameState`
 
@@ -415,8 +420,7 @@ import type { Cell } from '../engine'
 import type { Rng } from '../events'
 import { initialState, reduce, type GameState } from '../reducer'
 
-const B = (s: string): Cell[] =>
-	[...s].map((c) => (c === 'o' ? 'o' : c === 'x' ? 'x' : null))
+const B = (s: string): Cell[] => [...s].map((c) => (c === 'o' ? 'o' : c === 'x' ? 'x' : null))
 
 const seq = (...values: number[]): Rng => {
 	let i = 0
@@ -509,10 +513,10 @@ describe('cutinDone', () => {
 		expect(s.pendingEvent).toBeNull()
 	})
 	it('double は次の手番に extraMoves を与える', () => {
-		const s = reduce(
-			playing({ pendingEvent: 'double', phase: 'cutin' }),
-			{ type: 'cutinDone', rng: seq() },
-		)
+		const s = reduce(playing({ pendingEvent: 'double', phase: 'cutin' }), {
+			type: 'cutinDone',
+			rng: seq(),
+		})
 		expect(s.extraMoves).toBe(1)
 	})
 	it('シャッフルで3並びになったら即 finished（イベントでも勝敗判定）', () => {
@@ -605,7 +609,8 @@ function tap(state: GameState, index: number, rng: Rng): GameState {
 		lastEvent: state.lastEvent,
 		rng,
 	})
-	if (event) return { ...state, board, moveCount, turn, extraMoves, pendingEvent: event, phase: 'cutin' }
+	if (event)
+		return { ...state, board, moveCount, turn, extraMoves, pendingEvent: event, phase: 'cutin' }
 	return { ...state, board, moveCount, turn, extraMoves }
 }
 
@@ -645,11 +650,13 @@ git commit -m "feat: きまぐれ◯× の状態機械 reducer を追加 (#12)"
 ### Task 4: theme.ts + board.tsx — 3×3盤面 UI
 
 **Files:**
+
 - Create: `src/games/kimagure-ox/theme.ts`
 - Create: `src/games/kimagure-ox/board.tsx`
 - Test: `src/games/kimagure-ox/__tests__/board.test.tsx`
 
 **Interfaces:**
+
 - Consumes: Task 1 の `Board`
 - Produces: `KOX = { o: '#4ECDC4', x: '#E85BF7' }` / `BoardView({ board, blocked, disabled, onCellPress }: { board: Board; blocked: number | null; disabled: boolean; onCellPress: (index: number) => void })`（各マスは `testID="cell-0"`〜`"cell-8"`）
 
@@ -662,13 +669,17 @@ import { fireEvent, render } from '@testing-library/react-native'
 import { BoardView } from '../board'
 import { emptyBoard, type Cell } from '../engine'
 
-const B = (s: string): Cell[] =>
-	[...s].map((c) => (c === 'o' ? 'o' : c === 'x' ? 'x' : null))
+const B = (s: string): Cell[] => [...s].map((c) => (c === 'o' ? 'o' : c === 'x' ? 'x' : null))
 
 it('9マスが描画され、空きマスのタップで onCellPress が呼ばれる', () => {
 	const onCellPress = jest.fn()
 	const { getByTestId } = render(
-		<BoardView board={emptyBoard()} blocked={null} disabled={false} onCellPress={onCellPress} />,
+		<BoardView
+			board={emptyBoard()}
+			blocked={null}
+			disabled={false}
+			onCellPress={onCellPress}
+		/>,
 	)
 	fireEvent.press(getByTestId('cell-4'))
 	expect(onCellPress).toHaveBeenCalledWith(4)
@@ -796,10 +807,12 @@ git commit -m "feat: きまぐれ◯× の盤面 UI を追加 (#12)"
 ### Task 5: event-cutin.tsx — イベントカットイン演出
 
 **Files:**
+
 - Create: `src/games/kimagure-ox/event-cutin.tsx`
 - Test: `src/games/kimagure-ox/__tests__/event-cutin.test.tsx`
 
 **Interfaces:**
+
 - Consumes: Task 2 の `EventId` / `EVENT_META`、共通の `playSound` / `haptics`
 - Produces: `EventCutin({ event, onDone }: { event: EventId; onDone: () => void })` / `CUTIN_DURATION_MS = 1400`
 
@@ -955,10 +968,12 @@ git commit -m "feat: きまぐれイベントのカットイン演出を追加 (
 ### Task 6: kimagure-ox-game.tsx — ゲーム本体の結線
 
 **Files:**
+
 - Create: `src/games/kimagure-ox/kimagure-ox-game.tsx`
 - Test: `src/games/kimagure-ox/__tests__/kimagure-ox-game.test.tsx`
 
 **Interfaces:**
+
 - Consumes: Task 3 の `initialState` / `reduce`、Task 4 の `BoardView` / `KOX`、Task 5 の `EventCutin`、共通の `ResultOverlay`（`@/components/game/result-overlay`、props: `visible` / `onRetry` / `onHome` / children）、`GradientButton`（`@/components/ui/gradient-button`、props: `title` / `onPress`）
 - Produces: `KimagureOxGame()`（props なし。Task 7 で registry に登録される）
 
@@ -1167,9 +1182,11 @@ git commit -m "feat: きまぐれ◯× ゲーム本体を実装 (#12)"
 ### Task 7: registry 差し替え・全体検証・PR
 
 **Files:**
+
 - Modify: `src/games/registry.ts:68-80`（kimagure-ox のエントリ）
 
 **Interfaces:**
+
 - Consumes: Task 6 の `KimagureOxGame`
 - Produces: ホーム画面のカードから きまぐれ◯× が起動可能になる
 

@@ -70,19 +70,16 @@ export const LIMIT_MAX = 30
 export const STOP_UNLOCK = 15
 
 type Phase = 'playing' | 'exploded' | 'settled'
-type Action =
-	| { type: 'add'; amount: 1 | 2 | 3 }
-	| { type: 'stop' }
-	| { type: 'restart'; rng: Rng }
+type Action = { type: 'add'; amount: 1 | 2 | 3 } | { type: 'stop' } | { type: 'restart'; rng: Rng }
 
 type State = {
 	phase: Phase
-	limit: number            // 秘密の上限 L（UI には出さない）
+	limit: number // 秘密の上限 L（UI には出さない）
 	total: number
-	turnIndex: number        // players 配列への index
-	startIndex: number       // このラウンドの開始プレイヤー（restart でローテーション）
-	contributions: number[]  // players と同順の累計貢献ポイント
-	losers: number[]         // 敗者の index（バースト1人 or 精算の1人以上）
+	turnIndex: number // players 配列への index
+	startIndex: number // このラウンドの開始プレイヤー（restart でローテーション）
+	contributions: number[] // players と同順の累計貢献ポイント
+	losers: number[] // 敗者の index（バースト1人 or 精算の1人以上）
 }
 ```
 
@@ -92,17 +89,17 @@ type State = {
 
 ## エッジケース
 
-| ケース                         | 対応                                                                 |
-| ------------------------------ | -------------------------------------------------------------------- |
-| 合計 = L ちょうど              | セーフ（超過のみバースト）                                           |
-| 解禁前のストップ宣言           | reducer が無視＋UI はボタン非表示（二重ガード）                      |
-| 精算タイ（宣言者含む）         | 宣言者の単独負け                                                     |
-| 精算タイ（宣言者以外）         | タイ全員負け                                                         |
-| 誰もストップしない             | 合計は必ず L（≤30）超過に到達するため自然終了（無限ループなし）      |
-| 爆発/精算演出中の連打          | オーバーレイでブロック                                               |
-| 音 OFF 設定                    | 既存 settings 経由（playSound / haptics が各自ガード）               |
-| unmount（戻る・ホームへ）      | 演出タイマーを全て clear                                             |
-| 開発ビルドのプレミアム判定     | `isPremiumUnlocked()` が true → ロックなしでプレイ可                 |
+| ケース                     | 対応                                                            |
+| -------------------------- | --------------------------------------------------------------- |
+| 合計 = L ちょうど          | セーフ（超過のみバースト）                                      |
+| 解禁前のストップ宣言       | reducer が無視＋UI はボタン非表示（二重ガード）                 |
+| 精算タイ（宣言者含む）     | 宣言者の単独負け                                                |
+| 精算タイ（宣言者以外）     | タイ全員負け                                                    |
+| 誰もストップしない         | 合計は必ず L（≤30）超過に到達するため自然終了（無限ループなし） |
+| 爆発/精算演出中の連打      | オーバーレイでブロック                                          |
+| 音 OFF 設定                | 既存 settings 経由（playSound / haptics が各自ガード）          |
+| unmount（戻る・ホームへ）  | 演出タイマーを全て clear                                        |
+| 開発ビルドのプレミアム判定 | `isPremiumUnlocked()` が true → ロックなしでプレイ可            |
 
 ## テスト方針
 
