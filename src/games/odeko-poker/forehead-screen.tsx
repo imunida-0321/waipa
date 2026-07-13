@@ -35,6 +35,7 @@ export function ForeheadScreen({ playerName, playerColor, card, onDone }: Props)
 		if (seconds > 0) return
 		if (step === 'countdown') {
 			playSound('reveal')
+			// eslint-disable-next-line react-hooks/set-state-in-effect
 			setStep('showing')
 			setSeconds(SHOW_SECONDS)
 		} else if (step === 'showing' && !done.current) {
