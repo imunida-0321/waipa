@@ -139,6 +139,8 @@ export const games: readonly GameMeta[] = [
 		catchCopy: 'お題も実行役もランダムに決定！\n王様がいないから、誰も文句なし！',
 		summary:
 			'このゲームは、全員に秘密の番号を配り、お題と「実行する番号」をランダムに発表する王様ゲーム風パーティーゲームです！王様がいないので、誰も文句は言えません！',
+		thumbnail: require('@/assets/images/no-king-game/intro.jpg'),
+		cardThumbnail: require('@/assets/images/no-king-game/card.jpg'),
 		howToPlay: [
 			'① 人数を選んで「番号を配る」！スマホを回して各自こっそり番号を確認（長押しで表示）',
 			'② お題が発表されたら「運命のボタン」をタップ！',
@@ -263,6 +265,8 @@ export const games: readonly GameMeta[] = [
 		catchCopy: 'みんな同じお題…のはずが1人だけ違う！\n会話で見抜け、バレずに逃げ切れ！',
 		summary:
 			'このゲームは、全員に配られたお題のうち1人だけ微妙に違うお題を持つ「ワードウルフ」を探すゲームです！議論で多数派を探り、投票でウルフを当てよう。ウルフは吊られても市民のお題を言い当てれば逆転勝ち！',
+		thumbnail: require('@/assets/images/word-wolf/intro.jpg'),
+		cardThumbnail: require('@/assets/images/word-wolf/card.jpg'),
 		howToPlay: [
 			'① メンバーを登録（3〜12名）して、議論時間とお題パックを選ぼう！',
 			'② スマホを回して、自分のお題を長押しでこっそり確認（1人だけ違うお題！）',
@@ -284,6 +288,8 @@ export const games: readonly GameMeta[] = [
 		catchCopy: 'めくって揃えば罰ゲーム！\n誰にやらせるかは、あなた次第！',
 		summary:
 			'このゲームは、トランプの神経衰弱に罰ゲームを仕込んだ飲み会向けゲームです！ペアを揃えると隠されていた罰ゲームが発表され、揃えた人が実行者を指名。ジョーカーを引いたら特大罰を自分が実行！全ペア消化後、獲得ペア数のランキングを発表します！',
+		thumbnail: require('@/assets/images/inshu-suijaku/intro.jpg'),
+		cardThumbnail: require('@/assets/images/inshu-suijaku/card.jpg'),
 		howToPlay: [
 			'① メンバーを登録（2〜12名）して、盤面サイズ（小/中/大）を選ぼう！',
 			'② 順番にカードを2枚めくる神経衰弱！揃っても揃わなくても次の人へ',
