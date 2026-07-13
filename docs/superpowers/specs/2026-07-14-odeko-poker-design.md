@@ -18,10 +18,10 @@
 - **確認フェーズ**: 順番にスマホを額に当てて掲げる（画面は外向き、本人は見えない）。他の全員はその人のカードを覚える
 - **宣言フェーズ**: 順番に「勝負」か「降りる」を長押しで秘密宣言
 - **結果発表**: ドラムロール → 全カード＋全宣言を一斉公開 → 判定
-  - 勝負者 2人以上 → 勝負者の中で最弱カードの人が負け
-  - 勝負者 1人 → 負けなし（勝負者の一人勝ち）
-  - 全員降り → 全員負け
-  - ヘタレ賞: その回の最強カード保持者が降りていたら、負けと一緒に飲む
+    - 勝負者 2人以上 → 勝負者の中で最弱カードの人が負け
+    - 勝負者 1人 → 負けなし（勝負者の一人勝ち）
+    - 全員降り → 全員負け
+    - ヘタレ賞: その回の最強カード保持者が降りていたら、負けと一緒に飲む
 
 ## ゲームフロー（フェーズ）
 
@@ -48,11 +48,11 @@ intro（遊び方・プレミアムゲートは registry 側）
 
 - `dealCards(playerCount, rng)` → 1〜13 から重複なしで playerCount 枚（シャッフルの先頭 n 枚）
 - `judge(cards, declarations)` → `{ outcome, loserIndices, hetareIndex }`
-  - `outcome: 'normal' | 'solo-fight' | 'all-fold'`
-  - `normal`（勝負者2人以上）: 勝負者中の最弱カードの index が `loserIndices`
-  - `solo-fight`: `loserIndices = []`、勝者 index は宣言配列から導出
-  - `all-fold`: `loserIndices = 全員`
-  - `hetareIndex`: 全カード中の最大値保持者が `fold` なら その index、そうでなければ `null`（outcome に関係なく判定）
+    - `outcome: 'normal' | 'solo-fight' | 'all-fold'`
+    - `normal`（勝負者2人以上）: 勝負者中の最弱カードの index が `loserIndices`
+    - `solo-fight`: `loserIndices = []`、勝者 index は宣言配列から導出
+    - `all-fold`: `loserIndices = 全員`
+    - `hetareIndex`: 全カード中の最大値保持者が `fold` なら その index、そうでなければ `null`（outcome に関係なく判定）
 - 乱数は注入可能（`rng: () => number`）にしてテスト可能に
 
 ## ファイル構成（src/games/odeko-poker/）

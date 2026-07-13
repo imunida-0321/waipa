@@ -27,19 +27,21 @@
 ### Task 1: 判定エンジン（engine.ts）
 
 **Files:**
+
 - Create: `src/games/odeko-poker/engine.ts`
 - Test: `src/games/odeko-poker/__tests__/engine.test.ts`
 
 **Interfaces:**
+
 - Consumes: なし（純関数のみ）
 - Produces:
-  - `type Rng = () => number`
-  - `type Declaration = 'fight' | 'fold'`
-  - `type Outcome = 'normal' | 'solo-fight' | 'all-fold'`
-  - `type Judgement = { outcome: Outcome; loserIndices: number[]; winnerIndex: number | null; hetareIndex: number | null }`
-  - `dealCards(playerCount: number, rng: Rng): number[]`
-  - `judge(cards: number[], declarations: Declaration[]): Judgement`
-  - `CARD_MAX = 13`
+    - `type Rng = () => number`
+    - `type Declaration = 'fight' | 'fold'`
+    - `type Outcome = 'normal' | 'solo-fight' | 'all-fold'`
+    - `type Judgement = { outcome: Outcome; loserIndices: number[]; winnerIndex: number | null; hetareIndex: number | null }`
+    - `dealCards(playerCount: number, rng: Rng): number[]`
+    - `judge(cards: number[], declarations: Declaration[]): Judgement`
+    - `CARD_MAX = 13`
 
 - [ ] **Step 1: Write the failing test**
 
@@ -214,17 +216,19 @@ git commit -m "feat: おでこインディアンポーカーの判定エンジ�
 ### Task 2: フェーズ遷移（reducer.ts）
 
 **Files:**
+
 - Create: `src/games/odeko-poker/reducer.ts`
 - Test: `src/games/odeko-poker/__tests__/reducer.test.ts`
 
 **Interfaces:**
+
 - Consumes: Task 1 の `dealCards` / `judge` / `Declaration` / `Judgement` / `Rng`
 - Produces:
-  - `type Phase = 'deal' | 'forehead' | 'declare' | 'result'`
-  - `type GameState = { phase: Phase; playerCount: number; round: number; cards: number[]; turnIndex: number; declarations: Declaration[]; judgement: Judgement | null }`
-  - `type Action = { type: 'start'; rng: Rng } | { type: 'foreheadDone' } | { type: 'declare'; choice: Declaration } | { type: 'nextRound' }`
-  - `initialState(playerCount: number): GameState`
-  - `reduce(state: GameState, action: Action): GameState`
+    - `type Phase = 'deal' | 'forehead' | 'declare' | 'result'`
+    - `type GameState = { phase: Phase; playerCount: number; round: number; cards: number[]; turnIndex: number; declarations: Declaration[]; judgement: Judgement | null }`
+    - `type Action = { type: 'start'; rng: Rng } | { type: 'foreheadDone' } | { type: 'declare'; choice: Declaration } | { type: 'nextRound' }`
+    - `initialState(playerCount: number): GameState`
+    - `reduce(state: GameState, action: Action): GameState`
 
 - [ ] **Step 1: Write the failing test**
 
@@ -403,16 +407,18 @@ git commit -m "feat: おでこインディアンポーカーのフェーズ遷�
 ### Task 3: 額当て確認画面（theme.ts + forehead-screen.tsx）
 
 **Files:**
+
 - Create: `src/games/odeko-poker/theme.ts`
 - Create: `src/games/odeko-poker/forehead-screen.tsx`
 - Test: `src/games/odeko-poker/__tests__/forehead-screen.test.tsx`
 
 **Interfaces:**
+
 - Consumes: `@/components/ui/gradient-button` の `GradientButton`（props: `title`, `onPress`, `disabled?`）、`@/lib/haptics` の `haptics.tap()`、`@/lib/sound` の `playSound('reveal')`
 - Produces:
-  - `OP`（テーマ色オブジェクト）
-  - `ForeheadScreen({ playerName, playerColor, card, onDone }: { playerName: string; playerColor: string; card: number; onDone: () => void })`
-  - 定数 `PREP_SECONDS = 3` / `SHOW_SECONDS = 5`（テストから import する）
+    - `OP`（テーマ色オブジェクト）
+    - `ForeheadScreen({ playerName, playerColor, card, onDone }: { playerName: string; playerColor: string; card: number; onDone: () => void })`
+    - 定数 `PREP_SECONDS = 3` / `SHOW_SECONDS = 5`（テストから import する）
 
 - [ ] **Step 1: Write theme.ts**（テスト不要の定数のみ）
 
@@ -618,15 +624,17 @@ git commit -m "feat: おでこインディアンポーカーの額当て確認�
 ### Task 4: 秘密宣言画面（declare-screen.tsx）
 
 **Files:**
+
 - Create: `src/games/odeko-poker/declare-screen.tsx`
 - Test: `src/games/odeko-poker/__tests__/declare-screen.test.tsx`
 
 **Interfaces:**
+
 - Consumes: Task 1 の `Declaration`、Task 3 の `OP`、`GradientButton`、`haptics`
 - Produces:
-  - `DeclareScreen({ playerName, onDeclare }: { playerName: string; onDeclare: (choice: Declaration) => void })`
-  - 定数 `LONG_PRESS_MS = 600`
-  - 確定した瞬間に `onDeclare` が呼ばれ、親が turnIndex を進めて次の人の handoff（＝中立画面）に切り替わることで宣言は秘密になる
+    - `DeclareScreen({ playerName, onDeclare }: { playerName: string; onDeclare: (choice: Declaration) => void })`
+    - 定数 `LONG_PRESS_MS = 600`
+    - 確定した瞬間に `onDeclare` が呼ばれ、親が turnIndex を進めて次の人の handoff（＝中立画面）に切り替わることで宣言は秘密になる
 
 - [ ] **Step 1: Write the failing test**
 
@@ -777,13 +785,15 @@ git commit -m "feat: おでこインディアンポーカーの秘密宣言画�
 ### Task 5: 結果発表画面（result-screen.tsx）
 
 **Files:**
+
 - Create: `src/games/odeko-poker/result-screen.tsx`
 - Test: `src/games/odeko-poker/__tests__/result-screen.test.tsx`
 
 **Interfaces:**
+
 - Consumes: Task 1 の `Declaration` / `Judgement`、Task 3 の `OP`、共通の `DrumrollReveal`（`@/components/game/drumroll-reveal`）と `useDrumroll`（`@/components/game/use-drumroll`、演出 2000ms）、`@/theme/player-colors` の `playerColor(index)`
 - Produces:
-  - `ResultScreen({ names, cards, declarations, judgement, onNextRound, onHome }: { names: string[]; cards: number[]; declarations: Declaration[]; judgement: Judgement; onNextRound: () => void; onHome: () => void })`
+    - `ResultScreen({ names, cards, declarations, judgement, onNextRound, onHome }: { names: string[]; cards: number[]; declarations: Declaration[]; judgement: Judgement; onNextRound: () => void; onHome: () => void })`
 
 - [ ] **Step 1: Write the failing test**
 
@@ -827,7 +837,12 @@ async function renderRevealed(judgement: Judgement, declarations: ('fight' | 'fo
 }
 
 it('ドラムロール中はカードを公開しない', async () => {
-	const j: Judgement = { outcome: 'normal', loserIndices: [0], winnerIndex: null, hetareIndex: null }
+	const j: Judgement = {
+		outcome: 'normal',
+		loserIndices: [0],
+		winnerIndex: null,
+		hetareIndex: null,
+	}
 	const { queryByText } = await render(
 		<ResultScreen
 			names={names}
@@ -842,7 +857,12 @@ it('ドラムロール中はカードを公開しない', async () => {
 })
 
 it('normal: 敗者の名前と全カード・全宣言が公開される', async () => {
-	const j: Judgement = { outcome: 'normal', loserIndices: [0], winnerIndex: null, hetareIndex: null }
+	const j: Judgement = {
+		outcome: 'normal',
+		loserIndices: [0],
+		winnerIndex: null,
+		hetareIndex: null,
+	}
 	const { getByText, getAllByText } = await renderRevealed(j, ['fight', 'fight', 'fight'])
 	expect(getByText(/あかさんの負け/)).toBeTruthy()
 	expect(getByText('5')).toBeTruthy()
@@ -864,7 +884,12 @@ it('solo-fight: 一人勝ちの発表になり、負けなし', async () => {
 })
 
 it('all-fold: 全員負けの発表', async () => {
-	const j: Judgement = { outcome: 'all-fold', loserIndices: [0, 1, 2], winnerIndex: null, hetareIndex: 1 }
+	const j: Judgement = {
+		outcome: 'all-fold',
+		loserIndices: [0, 1, 2],
+		winnerIndex: null,
+		hetareIndex: 1,
+	}
 	const { getByText } = await renderRevealed(j, ['fold', 'fold', 'fold'])
 	expect(getByText(/全員降り/)).toBeTruthy()
 })
@@ -877,7 +902,12 @@ it('ヘタレ賞のバッジと説明が表示される', async () => {
 })
 
 it('「次のラウンド」で onNextRound が呼ばれる', async () => {
-	const j: Judgement = { outcome: 'all-fold', loserIndices: [0, 1, 2], winnerIndex: null, hetareIndex: null }
+	const j: Judgement = {
+		outcome: 'all-fold',
+		loserIndices: [0, 1, 2],
+		winnerIndex: null,
+		hetareIndex: null,
+	}
 	const { getByText, onNextRound } = await renderRevealed(j, ['fold', 'fold', 'fold'])
 	await act(async () => fireEvent.press(getByText(/次のラウンド/)))
 	expect(onNextRound).toHaveBeenCalledTimes(1)
@@ -957,14 +987,18 @@ export function ResultScreen({
 					const isHetare = judgement.hetareIndex === i
 					return (
 						<View key={i} style={[styles.row, isLoser && styles.rowLoser]}>
-							<View style={[styles.colorBar, { backgroundColor: playerColor(i).value }]} />
+							<View
+								style={[styles.colorBar, { backgroundColor: playerColor(i).value }]}
+							/>
 							<Text style={styles.name} numberOfLines={1}>
 								{name}
 							</Text>
 							<View
 								style={[
 									styles.chip,
-									declarations[i] === 'fight' ? styles.chipFight : styles.chipFold,
+									declarations[i] === 'fight'
+										? styles.chipFight
+										: styles.chipFold,
 								]}
 							>
 								<Text style={styles.chipText}>
@@ -1043,10 +1077,12 @@ git commit -m "feat: おでこインディアンポーカーの結果発表画�
 ### Task 6: ルートコンポーネント（odeko-poker-game.tsx）＋統合テスト
 
 **Files:**
+
 - Create: `src/games/odeko-poker/odeko-poker-game.tsx`
 - Test: `src/games/odeko-poker/__tests__/odeko-poker-game.test.tsx`
 
 **Interfaces:**
+
 - Consumes: Task 2 の `initialState` / `reduce`、Task 3〜5 の各画面、`@/lib/players-store` の `usePlayers` / `getDisplayNames`、`@/theme/player-colors` の `playerColor`、`expo-router` の `router.replace('/')`
 - Produces: `OdekoPokerGame()`（registry の `Component` に渡す。Task 7 が import する）
 
@@ -1234,10 +1270,12 @@ git commit -m "feat: おでこインディアンポーカーのルート画面�
 ### Task 7: registry 登録・CLAUDE.md 追記・全体検証
 
 **Files:**
+
 - Modify: `src/games/registry.ts`（import 追加＋ games 配列末尾に entry 追加）
 - Modify: `CLAUDE.md`（収録ゲーム候補に1行追記）
 
 **Interfaces:**
+
 - Consumes: Task 6 の `OdekoPokerGame`
 - Produces: ホームの2列グリッドに👑バッジ付きで表示され、プレミアムゲート（既存共通実装）で全体ロックされる
 
