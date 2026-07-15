@@ -23,8 +23,31 @@
 - AdMob — 広告（収益の主軸）
 - RevenueCat — プレミアム課金（月額 ¥150 / 年額 ¥1,100）
 
+## セットアップ
+
+必要なもの: Node.js 24 系 / npm
+
+```bash
+git clone https://github.com/imunida-0321/waipa.git
+cd waipa
+npm install
+cp .env.example .env   # Supabase の URL / anon キーを設定（実値はチーム内の安全な経路で受け取る）
+npm start              # Expo 開発サーバー起動（iOS: npm run ios / Android: npm run android）
+```
+
+AI 協働体制（Claude × Codex）で開発する場合は追加で:
+
+```bash
+brew install codex   # Codex CLI（コーダー役）
+codex login          # ChatGPT アカウントでログイン
+```
+
+オーケストレーター役の [Claude Code](https://claude.com/claude-code) も別途インストールしてください。
+
 ## 開発フロー
 
 - Issue ごとにブランチを切る
 - `develop` ベースで作業 → PR → `develop` へマージ
-- 詳細は [CLAUDE.md](CLAUDE.md) を参照
+- 詳細は [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md)（開発ガイド）を参照
+- AI を使わず手で開発する場合は [docs/DEVELOPMENT-MANUAL.md](docs/DEVELOPMENT-MANUAL.md)
+- AI エージェント向け規約: [CLAUDE.md](CLAUDE.md)（Claude Code）/ [AGENTS.md](AGENTS.md)（Codex CLI）
