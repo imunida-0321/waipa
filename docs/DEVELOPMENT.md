@@ -58,42 +58,7 @@ npm start              # Expo 開発サーバー起動
 
 ## AI を使わない開発フロー（手動開発）
 
-AI を介さず人間が直接コーディングする場合も、ブランチ運用と TDD は同じです。AI 分業との違いは「Claude がやっている検証を自分でやる」ことだけです。
-
-1. **Issue を確認してブランチを切る**
-
-   ```bash
-   git checkout develop && git pull
-   git checkout -b feature/<issue番号>-<短い名前>
-   ```
-
-2. **RED — 先にテストを書く**
-
-   ```bash
-   # 例: 新ゲームの engine を作る場合
-   #   src/games/<game-id>/__tests__/engine.test.ts にテストを書いてから
-   npx jest src/games/<game-id>/ --watch   # 失敗することを確認
-   ```
-
-3. **GREEN — テストを通す最小実装を書く** — watch モードのまま実装し、グリーンになるまで直す
-4. **REFACTOR** — テストを緑に保ったまま整理する
-5. **セルフチェック** — PR 前に以下をすべて通す
-
-   ```bash
-   npm test              # 全テスト
-   npm run typecheck     # 型チェック
-   npm run lint          # ESLint
-   npm run format:check  # フォーマット（崩れていたら npm run format）
-   ```
-
-6. **動作確認** — `npm start` で Expo を起動し、実機または Expo Go で該当ゲームを触って確認
-7. **PR を出す** — `develop` 宛て。変更概要・テスト結果・（UI 変更なら）スクリーンショットを本文に書く
-
-守るべき規約は AI と共通です:
-
-- コーディング規約: タブ幅4・セミコロンなし・シングルクォート（`npm run format` が整えてくれる）
-- テスト規約: [AGENTS.md](../AGENTS.md) の「テスト規約」（テストを実装に合わせない・`.skip` 残置禁止・fake timers 等）
-- 秘密情報（`.env` 系）をコミットしない
+AI を介さず人間が直接コーディングする場合の手順は、独立したガイド **[DEVELOPMENT-MANUAL.md](DEVELOPMENT-MANUAL.md)** にまとめています（セットアップからブランチ運用・TDD の進め方・セルフチェック・PR 作成まで、そのファイル単体で完結）。ブランチ運用・TDD・コーディング規約のルール自体は AI 利用時と共通です。
 
 ## TDD 運用（2026-07-15 導入）
 

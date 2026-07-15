@@ -27,5 +27,6 @@
 
 - Issue ごとにブランチを切る
 - `develop` ベースで作業 → PR → `develop` へマージ
-- 詳細は [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md)（人間向け開発ガイド）を参照
+- 詳細は [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md)（開発ガイド）を参照
+- AI を使わず手で開発する場合は [docs/DEVELOPMENT-MANUAL.md](docs/DEVELOPMENT-MANUAL.md)
 - AI エージェント向け規約: [CLAUDE.md](CLAUDE.md)（Claude Code）/ [AGENTS.md](AGENTS.md)（Codex CLI）
