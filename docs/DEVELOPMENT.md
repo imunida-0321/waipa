@@ -33,19 +33,7 @@ Codex CLI（コーダー）
 
 ## セットアップ
 
-必要なもの:
-
-- Node.js 24 系 / npm
-- Claude Code（オーケストレーター）
-- Codex CLI（コーダー）: `brew install codex` → `codex login`（ChatGPT アカウント）
-
-```bash
-git clone https://github.com/imunida-0321/waipa.git
-cd waipa
-npm install
-cp .env.example .env   # Supabase の URL / anon キーを設定（実値の共有はチーム内の安全な経路で）
-npm start              # Expo 開発サーバー起動
-```
+リポジトリ直下の [README.md](../README.md#セットアップ) を参照してください（AI 協働体制で使う Claude Code / Codex CLI の導入手順もそちらに記載）。
 
 ## 開発フロー
 

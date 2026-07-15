@@ -6,15 +6,7 @@ AI 協働体制での開発や、プロジェクト全体の構成・ゲーム�
 
 ## セットアップ
 
-必要なもの: Node.js 24 系 / npm（AI 用の Claude Code・Codex CLI は不要）
-
-```bash
-git clone https://github.com/imunida-0321/waipa.git
-cd waipa
-npm install
-cp .env.example .env   # Supabase の URL / anon キーを設定（実値はチーム内の安全な経路で受け取る）
-npm start              # Expo 開発サーバー起動（iOS: npm run ios / Android: npm run android）
-```
+リポジトリ直下の [README.md](../README.md#セットアップ) を参照してください。手動開発の場合、AI 用の追加セットアップ（Claude Code / Codex CLI）は不要です。
 
 ## 開発フロー
 
