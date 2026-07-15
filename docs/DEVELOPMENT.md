@@ -111,17 +111,7 @@ docs/
 
 ## 新しいゲームの追加方法
 
-アーキテクチャは「**純関数 engine + reducer + フェーズ分岐画面**」方式で統一しています（参照実装: [src/games/odeko-poker/](../src/games/odeko-poker/)、[src/games/daut-dice/](../src/games/daut-dice/)）。
-
-1. `src/games/<game-id>/` を作成
-   - `engine.ts` — 運要素・判定ロジックの純関数（UI 抜きで単体テストできる形にする）
-   - `reducer.ts` — フェーズ遷移とプレイヤー送り
-   - `<game-id>-game.tsx` — エントリコンポーネント（フェーズで画面を出し分け）
-   - `theme.ts` — ゲーム固有のカラー
-   - `__tests__/` — engine / reducer / 各画面のテスト
-2. `src/games/registry.ts` に `GameMeta` を登録（id・title・tagline・emoji・gradient・対応人数・`premium` フラグ等）
-3. 画像を用意する場合は `assets/images/<ゲームID>/intro.jpg`（1:1・512px）と `card.jpg`（1.3:1・1040×800、タイトル文字入り）
-4. タイマーを使うテストは `jest.useFakeTimers()` + `await act(async () => ...)`（React 19 では同期 act が失敗する。参照: kimagure-ox のテスト）
+独立したガイド **[ADDING-A-GAME.md](ADDING-A-GAME.md)** を参照してください。「純関数 engine + reducer + フェーズ分岐画面」アーキテクチャ、registry への登録（`GameMeta` の記入例つき）、画像の命名規則、チェックリストをまとめています。ゲームの追加に `src/app/` 側の変更は不要です（registry 駆動）。
 
 ## セキュリティ
 

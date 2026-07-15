@@ -107,4 +107,4 @@ npm run format:check  # フォーマット確認（崩れていたら npm run fo
 
 ## 新しいゲームを追加する場合
 
-ディレクトリ構成・「純関数 engine + reducer + フェーズ分岐画面」アーキテクチャ・registry 登録・画像の命名規則は [DEVELOPMENT.md の「新しいゲームの追加方法」](DEVELOPMENT.md#新しいゲームの追加方法) を参照してください（AI 利用の有無に関わらず同じ手順です）。
+[ADDING-A-GAME.md](ADDING-A-GAME.md) を参照してください（AI 利用の有無に関わらず同じ手順です）。
