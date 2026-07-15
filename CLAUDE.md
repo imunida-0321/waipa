@@ -86,6 +86,14 @@
 ・TestPlanはissue化する
 ・並列で進められるタスクはマルチエージェント（ワークツリー）で同時実行
 
+# TDD 運用（2026-07-15 導入）
+
+・テストファースト必須: RED（失敗するテスト＋失敗ログ確認）→ GREEN（最小実装＋パス確認）→ REFACTOR
+・テスト実行: `npx jest`（全体）/ `npx jest <path>`（個別）
+・禁止事項: テストを実装に合わせて書き換えて通す / `.skip`・`.only` の残置 / テストでの `any` / 実タイマー・`Date.now()` 依存（`jest.useFakeTimers()` を使う）
+・Codex への実装委任時は、指示を「① テスト作成（RED・失敗ログ提出）→ ② 実装（GREEN・パス確認）」の2段階に分けて投げ、Claude が各段階の実行ログを検証してから次へ進む（Evaluator 役）
+・詳細規約は AGENTS.md「テスト規約」を参照（Codex が自動読込）
+
 # セキュリティポリシー
 
 ・**`.env` / `.env.local` / `.env.*.local` / `.env.production` 等の本物の秘密情報ファイルは絶対に読まない**

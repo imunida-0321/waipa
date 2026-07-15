@@ -47,3 +47,4 @@ yarn-error.log*
 *.tsbuildinfo
 *.pem
 .claude/scheduled_tasks.lock
+coverage/
