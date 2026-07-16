@@ -53,6 +53,7 @@ export type Action =
 	| { type: 'start'; config: StartConfig; pair: WordPair; trigger: KanpaiTrigger; rng: Rng }
 	| { type: 'dealtOne' }
 	| { type: 'triggerRevealDone' }
+	| { type: 'kanpai' }
 	| { type: 'discussDone' }
 	| { type: 'vote'; target: number }
 	| { type: 'revealDone' }
@@ -141,6 +142,9 @@ export function reduce(state: GameState, action: Action): GameState {
 		case 'triggerRevealDone':
 			if (state.phase !== 'trigger-reveal') return state
 			return { ...state, phase: 'discuss' }
+		case 'kanpai':
+			if (state.phase !== 'discuss' && state.phase !== 'runoff-discuss') return state
+			return { ...state, kanpaiCount: state.kanpaiCount + 1 }
 		case 'discussDone': {
 			if (state.phase !== 'discuss' && state.phase !== 'runoff-discuss') return state
 			const all = Array.from({ length: state.playerCount }, (_, i) => i)

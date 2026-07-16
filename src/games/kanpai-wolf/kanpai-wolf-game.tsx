@@ -65,6 +65,9 @@ export function KanpaiWolfGame() {
 			return (
 				<DiscussScreen
 					seconds={state.discussSeconds}
+					trigger={state.trigger?.text ?? ''}
+					kanpaiCount={state.kanpaiCount}
+					onKanpai={() => dispatch({ type: 'kanpai' })}
 					onDone={() => dispatch({ type: 'discussDone' })}
 				/>
 			)
@@ -73,7 +76,10 @@ export function KanpaiWolfGame() {
 				<DiscussScreen
 					key={`runoff-${state.voteCandidates?.join('-') ?? 'all'}`}
 					seconds={RUNOFF_DISCUSS_SECONDS}
+					trigger={state.trigger?.text ?? ''}
+					kanpaiCount={state.kanpaiCount}
 					isRunoff
+					onKanpai={() => dispatch({ type: 'kanpai' })}
 					onDone={() => dispatch({ type: 'discussDone' })}
 				/>
 			)

@@ -284,4 +284,39 @@ describe('乾杯トリガー', () => {
 		const s = apply(toResult(), { type: 'retry', pair: pair2, trigger: trig, rng: rng0 })
 		expect(s.usedTriggerIds).toEqual(['t1'])
 	})
+
+	it('kanpai は discuss / runoff-discuss 中だけカウント +1', () => {
+		let s = toDiscuss(start(3))
+		s = apply(s, { type: 'kanpai' }, { type: 'kanpai' })
+		expect(s.kanpaiCount).toBe(2)
+		// vote 中は no-op
+		const voting = reduce(s, { type: 'discussDone' })
+		expect(reduce(voting, { type: 'kanpai' })).toBe(voting)
+	})
+
+	it('runoff-discuss 中の kanpai もカウントされ、retry で 0 に戻る', () => {
+		// 全員同票 → runoff-discuss へ
+		let s = apply(toDiscuss(start(3)), { type: 'discussDone' })
+		s = apply(
+			s,
+			{ type: 'vote', target: 1 },
+			{ type: 'vote', target: 2 },
+			{ type: 'vote', target: 0 },
+		)
+		expect(s.phase).toBe('runoff-discuss')
+		s = reduce(s, { type: 'kanpai' })
+		expect(s.kanpaiCount).toBe(1)
+		// 決着 → result → retry でリセット
+		s = apply(
+			s,
+			{ type: 'discussDone' },
+			{ type: 'vote', target: 1 },
+			{ type: 'vote', target: 0 },
+			{ type: 'vote', target: 0 },
+			{ type: 'revealDone' },
+			{ type: 'reversalJudged', guessed: false },
+			{ type: 'retry', pair: pair2, trigger: trig2, rng: rng0 },
+		)
+		expect(s.kanpaiCount).toBe(0)
+	})
 })
