@@ -1,11 +1,13 @@
 import {
 	assignRoles,
 	choosePair,
+	chooseTrigger,
 	FALLBACK_PAIRS,
 	judgeResult,
 	PACKS,
 	swapWords,
 	tallyVotes,
+	TRIGGERS,
 	type WordPair,
 } from '../engine'
 
@@ -90,5 +92,29 @@ describe('FALLBACK_PAIRS / PACKS', () => {
 				2,
 			)
 		}
+	})
+})
+
+describe('TRIGGERS', () => {
+	it('12個あり id が一意で text が非空', () => {
+		expect(TRIGGERS).toHaveLength(12)
+		expect(new Set(TRIGGERS.map((t) => t.id)).size).toBe(TRIGGERS.length)
+		for (const t of TRIGGERS) expect(t.text.length).toBeGreaterThan(0)
+	})
+})
+
+describe('chooseTrigger', () => {
+	it('rng で決定的に選べる', () => {
+		expect(chooseTrigger([], () => 0)).toBe(TRIGGERS[0])
+		expect(chooseTrigger([], () => 0.999)).toBe(TRIGGERS[TRIGGERS.length - 1])
+	})
+
+	it('使用済み id を除外して選ぶ', () => {
+		expect(chooseTrigger([TRIGGERS[0].id], () => 0)).toBe(TRIGGERS[1])
+	})
+
+	it('全て使用済みなら used を無視して選び直す', () => {
+		const all = TRIGGERS.map((t) => t.id)
+		expect(chooseTrigger(all, () => 0)).toBe(TRIGGERS[0])
 	})
 })

@@ -85,3 +85,28 @@ export function choosePair(
 	const candidates = fresh.length > 0 ? fresh : source
 	return candidates[Math.floor(rng() * candidates.length)]
 }
+
+export type KanpaiTrigger = { id: string; text: string }
+
+// 公開「乾杯ルール」。毎ラウンド1つだけ選ばれ、全員に発表される
+export const TRIGGERS: readonly KanpaiTrigger[] = [
+	{ id: 'question', text: '誰かが質問されたら全員乾杯' },
+	{ id: 'silence', text: '3秒沈黙したら全員一口' },
+	{ id: 'wakaru', text: '誰かが「わかる」と言ったらその人が一口' },
+	{ id: 'majority-look', text: '多数派っぽい発言をした人を指名して乾杯' },
+	{ id: 'before-doubt', text: 'ウルフだと思う人に質問する前に乾杯' },
+	{ id: 'laugh', text: '誰かが笑ったら全員乾杯' },
+	{ id: 'name-call', text: '名前を呼ばれた人は一口' },
+	{ id: 'maybe', text: '「たぶん」「かも」を言ったら本人が一口' },
+	{ id: 'repeat', text: '直前の人と同じ単語を使ったら全員乾杯' },
+	{ id: 'point', text: '誰かを指さしたら指した人が一口' },
+	{ id: 'agree-all', text: '全員がうなずいたら全員乾杯' },
+	{ id: 'keigo', text: '敬語を使ったら本人が一口' },
+]
+
+// 未使用トリガーから選ぶ。全て使用済みなら used を無視して選び直す（連戦の枯渇対策）
+export function chooseTrigger(usedIds: readonly string[], rng: Rng): KanpaiTrigger {
+	const fresh = TRIGGERS.filter((t) => !usedIds.includes(t.id))
+	const candidates = fresh.length > 0 ? fresh : TRIGGERS
+	return candidates[Math.floor(rng() * candidates.length)]
+}
