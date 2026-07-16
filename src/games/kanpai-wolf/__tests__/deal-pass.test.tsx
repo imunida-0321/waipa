@@ -34,7 +34,7 @@ it('タップで表示、もう一度タップで隠す', async () => {
 	expect(queryByText('ラーメン')).toBeNull()
 })
 
-it('一度表示し、隠すまで「次の人へ」は押せない', async () => {
+it('一度確認するまで「次の人へ」は押せない', async () => {
 	const onConfirm = jest.fn()
 	const { getByText, getByLabelText } = await render(
 		<DealPass
@@ -50,13 +50,6 @@ it('一度表示し、隠すまで「次の人へ」は押せない', async () =
 	})
 	expect(onConfirm).not.toHaveBeenCalled()
 	const pad = getByLabelText('タップで自分のお題を表示')
-	await act(async () => {
-		fireEvent.press(pad)
-	})
-	await act(async () => {
-		fireEvent.press(getByText('確認した（次の人へ）'))
-	})
-	expect(onConfirm).not.toHaveBeenCalled()
 	await act(async () => {
 		fireEvent.press(pad)
 	})

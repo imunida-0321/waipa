@@ -43,9 +43,6 @@ async function dealOne(ui: Awaited<ReturnType<typeof render>>, last: boolean) {
 	await act(async () => {
 		fireEvent.press(pad)
 	})
-	await act(async () => {
-		fireEvent.press(pad)
-	})
 	await press(ui, last ? '確認した（乾杯ルールへ！）' : '確認した（次の人へ）')
 }
 
@@ -68,10 +65,9 @@ it('設定→配布→議論→投票→発表→逆転→結果まで通しで�
 		fireEvent.press(pad)
 	})
 	expect(ui.getByText('うどん')).toBeTruthy()
-	await act(async () => {
-		fireEvent.press(pad)
-	})
 	await press(ui, '確認した（次の人へ）')
+	expect(ui.queryByText('うどん')).toBeNull()
+	expect(ui.getByText('タップで自分のお題を表示')).toBeTruthy()
 	await dealOne(ui, false)
 	await dealOne(ui, true)
 

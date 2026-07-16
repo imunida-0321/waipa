@@ -14,7 +14,7 @@ type Props = {
 }
 
 // 端末回しのお題確認。お題はタップで表示/非表示を切り替える（覗き見防止）。
-// 一度でも表示し、非表示に戻したら「確認した」で次の人へ渡せる
+// 一度表示したら「確認した」で次へ進める。次の人へは非表示で渡す
 export function DealPass({ dealIndex, playerCount, name, word, onConfirm }: Props) {
 	const [revealed, setRevealed] = useState(false)
 	const [viewed, setViewed] = useState(false)
@@ -54,7 +54,7 @@ export function DealPass({ dealIndex, playerCount, name, word, onConfirm }: Prop
 						: '確認した（乾杯ルールへ！）'
 				}
 				onPress={onConfirm}
-				disabled={!viewed || revealed}
+				disabled={!viewed}
 			/>
 		</View>
 	)
