@@ -96,6 +96,10 @@ it('設定→配布→議論→投票→発表→逆転→結果まで通しで�
 	expect(ui.getByText('ラーメン')).toBeTruthy()
 	await press(ui, '外した')
 
+	// kanpai-time
+	expect(ui.getByText('外したので乾杯！')).toBeTruthy()
+	await press(ui, '結果発表へ')
+
 	// result
 	expect(ui.getByText(/市民チームの勝利/)).toBeTruthy()
 	expect(ui.getByText(/あか/)).toBeTruthy() // ウルフの正体公開

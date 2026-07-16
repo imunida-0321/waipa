@@ -23,6 +23,10 @@ function apply(state: GameState, ...actions: Action[]): GameState {
 	return actions.reduce(reduce, state)
 }
 
+function kanpaiTimeDone(state: GameState): GameState {
+	return reduce(state, { type: 'kanpaiTimeDone' } as unknown as Action)
+}
+
 // deal を全員ぶん＋乾杯ルール発表を進めて discuss へ
 function toDiscuss(state: GameState): GameState {
 	let s = state
@@ -173,8 +177,34 @@ describe('reveal / reversal / result', () => {
 
 	it('逆転成功で wolf-reversal、失敗で citizens', () => {
 		const base = apply(toReveal(), { type: 'revealDone' })
-		expect(apply(base, { type: 'reversalJudged', guessed: true }).outcome).toBe('wolf-reversal')
-		expect(apply(base, { type: 'reversalJudged', guessed: false }).outcome).toBe('citizens')
+		const success = apply(base, { type: 'reversalJudged', guessed: true })
+		expect(success.phase).toBe('result')
+		expect(success.outcome).toBe('wolf-reversal')
+
+		let failure = apply(base, { type: 'reversalJudged', guessed: false })
+		expect(failure.phase).toBe('kanpai-time')
+		expect(failure.outcome).toBe('citizens')
+		failure = kanpaiTimeDone(failure)
+		expect(failure.phase).toBe('result')
+		expect(failure.outcome).toBe('citizens')
+	})
+
+	it('kanpaiTimeDone は kanpai-time 以外では no-op', () => {
+		const states = [
+			initialState(3),
+			start(3),
+			toDiscuss(start(3)),
+			apply(toDiscuss(start(3)), { type: 'discussDone' }),
+			toReveal(),
+			apply(toReveal(), { type: 'revealDone' }),
+			apply(apply(toReveal(), { type: 'revealDone' }), {
+				type: 'reversalJudged',
+				guessed: true,
+			}),
+		]
+		for (const state of states) {
+			expect(kanpaiTimeDone(state)).toBe(state)
+		}
 	})
 
 	it('ウルフ2人ラウンドで1人だけ吊っても reversal へ（市民勝ちルート）', () => {
@@ -221,6 +251,7 @@ describe('retry', () => {
 			{ type: 'vote', target: 0 },
 			{ type: 'revealDone' },
 			{ type: 'reversalJudged', guessed: false },
+			{ type: 'kanpaiTimeDone' } as unknown as Action,
 			{ type: 'retry', pair: pair2, trigger: trig2, rng: rng0 },
 		)
 		expect(s.phase).toBe('deal')
@@ -239,6 +270,7 @@ describe('retry', () => {
 			{ type: 'vote', target: 0 },
 			{ type: 'revealDone' },
 			{ type: 'reversalJudged', guessed: false },
+			{ type: 'kanpaiTimeDone' } as unknown as Action,
 			{ type: 'retry', pair, trigger: trig, rng: rng0 }, // p1 を再利用
 		)
 		expect(s.usedPairIds).toEqual(['p1'])
@@ -271,6 +303,7 @@ describe('乾杯トリガー', () => {
 			{ type: 'vote', target: 0 },
 			{ type: 'revealDone' },
 			{ type: 'reversalJudged', guessed: false },
+			{ type: 'kanpaiTimeDone' } as unknown as Action,
 		)
 	}
 
@@ -315,6 +348,7 @@ describe('乾杯トリガー', () => {
 			{ type: 'vote', target: 0 },
 			{ type: 'revealDone' },
 			{ type: 'reversalJudged', guessed: false },
+			{ type: 'kanpaiTimeDone' } as unknown as Action,
 			{ type: 'retry', pair: pair2, trigger: trig2, rng: rng0 },
 		)
 		expect(s.kanpaiCount).toBe(0)

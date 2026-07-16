@@ -4,6 +4,7 @@ import { getPairsByPack, useWordPairs } from '@/lib/word-pairs-store'
 import { DealPass } from './deal-pass'
 import { DiscussScreen } from './discuss-screen'
 import { choosePair, chooseTrigger } from './engine'
+import { KanpaiTimeScreen } from './kanpai-time-screen'
 import { currentVoter, initialState, reduce, type StartConfig } from './reducer'
 import { ResultScreen } from './result-screen'
 import { RevealOverlay } from './reveal-overlay'
@@ -117,6 +118,8 @@ export function KanpaiWolfGame() {
 				/>
 			)
 		}
+		case 'kanpai-time':
+			return <KanpaiTimeScreen onDone={() => dispatch({ type: 'kanpaiTimeDone' })} />
 		case 'result': {
 			if (state.outcome === null || !state.words) return null
 			return (

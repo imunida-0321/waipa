@@ -18,6 +18,7 @@ export type Phase =
 	| 'runoff-discuss'
 	| 'reveal'
 	| 'reversal'
+	| 'kanpai-time'
 	| 'result'
 
 export type Outcome = 'citizens' | 'wolf' | 'wolf-reversal'
@@ -58,6 +59,7 @@ export type Action =
 	| { type: 'vote'; target: number }
 	| { type: 'revealDone' }
 	| { type: 'reversalJudged'; guessed: boolean }
+	| { type: 'kanpaiTimeDone' }
 	| { type: 'retry'; pair: WordPair; trigger: KanpaiTrigger; rng: Rng }
 
 export function initialState(playerCount: number): GameState {
@@ -206,8 +208,11 @@ export function reduce(state: GameState, action: Action): GameState {
 			return {
 				...state,
 				outcome: action.guessed ? 'wolf-reversal' : 'citizens',
-				phase: 'result',
+				phase: action.guessed ? 'result' : 'kanpai-time',
 			}
+		case 'kanpaiTimeDone':
+			if (state.phase !== 'kanpai-time') return state
+			return { ...state, phase: 'result' }
 		case 'retry':
 			if (state.phase !== 'result') return state
 			return newRound(state, action.pair, action.trigger, action.rng)
