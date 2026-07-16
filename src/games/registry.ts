@@ -266,6 +266,8 @@ export const games: readonly GameMeta[] = [
 		catchCopy: '1人だけ違うお題を見抜け！\nただし今夜は「乾杯ルール」つき！',
 		summary:
 			'このゲームは、1人だけ微妙に違うお題を持つ「ウルフ」を会話で探す推理ゲームです！さらに毎ラウンド1つだけ「乾杯ルール」（例: 誰かが質問されたら全員乾杯）が公開され、議論中に条件が起きたらみんなで乾杯！ウルフは吊られても市民のお題を当てれば逆転勝ちです！',
+		thumbnail: require('@/assets/images/kanpai-wolf/intro.jpg'),
+		cardThumbnail: require('@/assets/images/kanpai-wolf/card.jpg'),
 		howToPlay: [
 			'① メンバーを登録（3〜12名）して、議論時間とお題パックを選ぼう！',
 			'② スマホを回して自分のお題をこっそり確認。最後に「今回の乾杯ルール」が発表！',
