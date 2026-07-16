@@ -39,12 +39,12 @@ async function press(ui: Awaited<ReturnType<typeof render>>, label: string | Reg
 }
 
 async function dealOne(ui: Awaited<ReturnType<typeof render>>, last: boolean) {
-	const pad = ui.getByLabelText('長押しで自分のお題を表示')
+	const pad = ui.getByLabelText('タップで自分のお題を表示')
 	await act(async () => {
-		fireEvent(pad, 'pressIn')
+		fireEvent.press(pad)
 	})
 	await act(async () => {
-		fireEvent(pad, 'pressOut')
+		fireEvent.press(pad)
 	})
 	await press(ui, last ? '確認した（乾杯ルールへ！）' : '確認した（次の人へ）')
 }
@@ -52,7 +52,7 @@ async function dealOne(ui: Awaited<ReturnType<typeof render>>, last: boolean) {
 async function voteOne(ui: Awaited<ReturnType<typeof render>>, targetName: string) {
 	await press(ui, '投票する')
 	await press(ui, targetName)
-	await press(ui, 'この人に投票（確定）')
+	await press(ui, '投票する')
 }
 
 it('設定→配布→議論→投票→発表→逆転→結果まで通しでプレイできる', async () => {
@@ -63,13 +63,13 @@ it('設定→配布→議論→投票→発表→逆転→結果まで通しで�
 	await press(ui, 'はじめる')
 
 	// deal ×3（ウルフは あか＝index 0。あか の長押しで「うどん」が見える）
-	const pad = ui.getByLabelText('長押しで自分のお題を表示')
+	const pad = ui.getByLabelText('タップで自分のお題を表示')
 	await act(async () => {
-		fireEvent(pad, 'pressIn')
+		fireEvent.press(pad)
 	})
 	expect(ui.getByText('うどん')).toBeTruthy()
 	await act(async () => {
-		fireEvent(pad, 'pressOut')
+		fireEvent.press(pad)
 	})
 	await press(ui, '確認した（次の人へ）')
 	await dealOne(ui, false)

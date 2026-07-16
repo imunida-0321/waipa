@@ -55,7 +55,7 @@ export function VoteScreen({ voterIndex, voterName, names, candidates, onVote }:
 				})}
 			</ScrollView>
 			<GradientButton
-				title="この人に投票（確定）"
+				title="投票する"
 				onPress={() => {
 					if (selected !== null) onVote(selected)
 				}}

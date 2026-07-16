@@ -13,10 +13,10 @@ type Props = {
 	onConfirm: () => void
 }
 
-// 端末回しのお題確認。お題は長押し中のみ表示（覗き見防止）。
-// 一度でも表示したら「確認した」で次の人へ渡せる
+// 端末回しのお題確認。お題はタップで表示/非表示を切り替える（覗き見防止）。
+// 一度でも表示し、非表示に戻したら「確認した」で次の人へ渡せる
 export function DealPass({ dealIndex, playerCount, name, word, onConfirm }: Props) {
-	const [pressing, setPressing] = useState(false)
+	const [revealed, setRevealed] = useState(false)
 	const [viewed, setViewed] = useState(false)
 
 	return (
@@ -28,25 +28,22 @@ export function DealPass({ dealIndex, playerCount, name, word, onConfirm }: Prop
 
 			<Pressable
 				accessibilityRole="button"
-				accessibilityLabel="長押しで自分のお題を表示"
-				onPressIn={() => {
+				accessibilityLabel="タップで自分のお題を表示"
+				onPress={() => {
 					haptics.tap()
-					setPressing(true)
-					setViewed(true)
+					if (!revealed) setViewed(true)
+					setRevealed(!revealed)
 				}}
-				onPressOut={() => setPressing(false)}
-				style={[styles.wordPad, pressing && styles.wordPadActive]}
+				style={[styles.wordPad, revealed && styles.wordPadActive]}
 			>
-				{pressing ? (
+				{revealed ? (
 					<>
 						<Text style={styles.wordLabel}>あなたのお題</Text>
 						<Text style={styles.word}>{word}</Text>
+						<Text style={styles.hint}>タップで隠す</Text>
 					</>
 				) : (
-					<>
-						<Text style={styles.holdEmoji}>🤫</Text>
-						<Text style={styles.holdText}>長押しで自分のお題を表示</Text>
-					</>
+					<Text style={styles.holdText}>タップで自分のお題を表示</Text>
 				)}
 			</Pressable>
 
@@ -57,7 +54,7 @@ export function DealPass({ dealIndex, playerCount, name, word, onConfirm }: Prop
 						: '確認した（乾杯ルールへ！）'
 				}
 				onPress={onConfirm}
-				disabled={!viewed || pressing}
+				disabled={!viewed || revealed}
 			/>
 		</View>
 	)
@@ -85,6 +82,6 @@ const styles = StyleSheet.create({
 	wordPadActive: { borderColor: KW.wolf },
 	wordLabel: { ...typography.caption },
 	word: { ...typography.hero, fontSize: 40, color: KW.wolf, textAlign: 'center' },
-	holdEmoji: { fontSize: 40 },
 	holdText: { ...typography.caption },
+	hint: { ...typography.caption, fontSize: 12 },
 })

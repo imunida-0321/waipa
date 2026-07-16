@@ -16,9 +16,9 @@ type Props = {
 }
 
 const HEADLINES: Record<Outcome, string> = {
-	citizens: '😇 市民チームの勝利！',
-	wolf: '🐺 ウルフの勝利！',
-	'wolf-reversal': '🐺 ウルフの逆転勝利！',
+	citizens: '市民チームの勝利！',
+	wolf: 'ウルフの勝利！',
+	'wolf-reversal': 'ウルフの逆転勝利！',
 }
 
 export function ResultScreen({ outcome, wolfNames, words, kanpaiCount, onRetry }: Props) {
@@ -26,9 +26,9 @@ export function ResultScreen({ outcome, wolfNames, words, kanpaiCount, onRetry }
 		<View style={styles.container}>
 			<Text style={styles.headline}>{HEADLINES[outcome]}</Text>
 			<View style={styles.card}>
-				<Text style={styles.row}>🐺 ウルフ: {wolfNames.join('・')}</Text>
-				<Text style={styles.row}>😇 市民のお題: {words.majority}</Text>
-				<Text style={styles.row}>🐺 ウルフのお題: {words.wolf}</Text>
+				<Text style={styles.row}>ウルフ: {wolfNames.join('・')}</Text>
+				<Text style={styles.row}>市民のお題: {words.majority}</Text>
+				<Text style={styles.row}>ウルフのお題: {words.wolf}</Text>
 			</View>
 			<Text style={styles.kanpai}>このラウンドの乾杯 🍻 × {kanpaiCount}回</Text>
 			<GradientButton title="もう一回" onPress={onRetry} />
