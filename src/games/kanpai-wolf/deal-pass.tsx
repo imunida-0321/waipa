@@ -3,7 +3,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native'
 import { GradientButton } from '@/components/ui/gradient-button'
 import { haptics } from '@/lib/haptics'
 import { colors, radii, spacing, typography } from '@/theme/tokens'
-import { WW } from './theme'
+import { KW } from './theme'
 
 type Props = {
 	dealIndex: number // 0起点
@@ -70,7 +70,7 @@ const styles = StyleSheet.create({
 		padding: spacing.lg,
 		gap: spacing.lg,
 	},
-	step: { ...typography.caption, textAlign: 'center', color: WW.wolf },
+	step: { ...typography.caption, textAlign: 'center', color: KW.wolf },
 	instruction: { ...typography.body, textAlign: 'center' },
 	wordPad: {
 		minHeight: 200,
@@ -82,9 +82,9 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 		gap: spacing.sm,
 	},
-	wordPadActive: { borderColor: WW.wolf },
+	wordPadActive: { borderColor: KW.wolf },
 	wordLabel: { ...typography.caption },
-	word: { ...typography.hero, fontSize: 40, color: WW.wolf, textAlign: 'center' },
+	word: { ...typography.hero, fontSize: 40, color: KW.wolf, textAlign: 'center' },
 	holdEmoji: { fontSize: 40 },
 	holdText: { ...typography.caption },
 })

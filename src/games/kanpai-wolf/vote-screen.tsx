@@ -4,7 +4,7 @@ import { GradientButton } from '@/components/ui/gradient-button'
 import { haptics } from '@/lib/haptics'
 import { playerColor } from '@/theme/player-colors'
 import { colors, radii, spacing, typography } from '@/theme/tokens'
-import { WW } from './theme'
+import { KW } from './theme'
 
 type Props = {
 	voterIndex: number
@@ -85,7 +85,7 @@ const styles = StyleSheet.create({
 		borderWidth: 1,
 		borderColor: colors.surfaceBorder,
 	},
-	rowSelected: { borderColor: WW.wolf },
+	rowSelected: { borderColor: KW.wolf },
 	colorBar: { width: 6, alignSelf: 'stretch', borderRadius: 3 },
 	name: { ...typography.body },
 })

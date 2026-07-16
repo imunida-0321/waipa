@@ -4,7 +4,7 @@ import { GradientButton } from '@/components/ui/gradient-button'
 import { haptics } from '@/lib/haptics'
 import { playSound } from '@/lib/sound'
 import { colors, spacing, typography } from '@/theme/tokens'
-import { WW } from './theme'
+import { KW } from './theme'
 
 type Props = {
 	seconds: number
@@ -94,5 +94,5 @@ const styles = StyleSheet.create({
 	title: { ...typography.body, textAlign: 'center', fontWeight: '700' },
 	hint: { ...typography.caption, textAlign: 'center' },
 	timer: { ...typography.hero, fontSize: 72, textAlign: 'center', color: colors.text },
-	timerUrgent: { color: WW.danger },
+	timerUrgent: { color: KW.danger },
 })

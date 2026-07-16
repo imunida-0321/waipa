@@ -3,7 +3,7 @@ import { StyleSheet, Text, View } from 'react-native'
 import { useDrumroll } from '@/components/game/use-drumroll'
 import { GradientButton } from '@/components/ui/gradient-button'
 import { colors, spacing, typography } from '@/theme/tokens'
-import { WW } from './theme'
+import { KW } from './theme'
 
 type Props = {
 	name: string // 最多票で吊られた人の表示名
@@ -30,7 +30,7 @@ export function RevealOverlay({ name, wasWolf, onDone }: Props) {
 	return (
 		<View style={styles.container}>
 			<Text style={styles.name}>{name}さんは…</Text>
-			<Text style={[styles.identity, { color: wasWolf ? WW.danger : colors.text }]}>
+			<Text style={[styles.identity, { color: wasWolf ? KW.danger : colors.text }]}>
 				{wasWolf ? '🐺 ウルフ！' : '😇 市民でした…'}
 			</Text>
 			<GradientButton title={wasWolf ? '逆転チャンスへ' : '結果発表へ'} onPress={onDone} />

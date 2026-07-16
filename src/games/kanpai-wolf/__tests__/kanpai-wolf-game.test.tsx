@@ -1,5 +1,5 @@
 import { act, fireEvent, render } from '@testing-library/react-native'
-import { WordWolfGame } from '../word-wolf-game'
+import { KanpaiWolfGame } from '../kanpai-wolf-game'
 
 jest.mock('@/lib/haptics', () => ({
 	haptics: { tap: jest.fn(), heavy: jest.fn(), success: jest.fn() },
@@ -56,7 +56,7 @@ async function voteOne(ui: Awaited<ReturnType<typeof render>>, targetName: strin
 }
 
 it('設定→配布→議論→投票→発表→逆転→結果まで通しでプレイできる', async () => {
-	const ui = await render(<WordWolfGame />)
+	const ui = await render(<KanpaiWolfGame />)
 
 	// setup
 	expect(ui.getByText('はじめる')).toBeTruthy()
@@ -103,7 +103,7 @@ it('設定→配布→議論→投票→発表→逆転→結果まで通しで�
 })
 
 it('通常投票が全員同票のとき決選投票を経て決着し reveal に進む', async () => {
-	const ui = await render(<WordWolfGame />)
+	const ui = await render(<KanpaiWolfGame />)
 
 	// setup
 	await press(ui, 'はじめる')

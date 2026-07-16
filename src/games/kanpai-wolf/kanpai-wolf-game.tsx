@@ -13,7 +13,7 @@ import { VoteScreen } from './vote-screen'
 
 const RUNOFF_DISCUSS_SECONDS = 60
 
-export function WordWolfGame() {
+export function KanpaiWolfGame() {
 	const players = usePlayers()
 	const names = getDisplayNames(players)
 	useWordPairs() // 配信 refresh 後の再レンダー購読

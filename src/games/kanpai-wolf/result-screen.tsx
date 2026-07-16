@@ -5,7 +5,7 @@ import { haptics } from '@/lib/haptics'
 import { colors, radii, spacing, typography } from '@/theme/tokens'
 import type { AssignedWords } from './engine'
 import type { Outcome } from './reducer'
-import { WW } from './theme'
+import { KW } from './theme'
 
 type Props = {
 	outcome: Outcome
@@ -51,7 +51,7 @@ const styles = StyleSheet.create({
 		padding: spacing.lg,
 		gap: spacing.lg,
 	},
-	headline: { ...typography.hero, fontSize: 32, textAlign: 'center', color: WW.wolf },
+	headline: { ...typography.hero, fontSize: 32, textAlign: 'center', color: KW.wolf },
 	card: {
 		padding: spacing.lg,
 		borderRadius: radii.lg,

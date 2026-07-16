@@ -6,14 +6,14 @@ import { BurstChickenGame } from './burst-chicken/burst-chicken-game'
 import { ChinchiroGame } from './chinchiro/chinchiro-game'
 import { DautDiceGame } from './daut-dice/daut-dice-game'
 import { FiveSecStopGame } from './five-sec-stop/five-sec-stop-game'
+import { InshuSuijakuGame } from './inshu-suijaku/inshu-suijaku-game'
+import { KanpaiWolfGame } from './kanpai-wolf/kanpai-wolf-game'
 import { KimagureOxGame } from './kimagure-ox/kimagure-ox-game'
 import { NoKingGame } from './no-king-game/no-king-game'
 import { OdekoPokerGame } from './odeko-poker/odeko-poker-game'
-import { InshuSuijakuGame } from './inshu-suijaku/inshu-suijaku-game'
 import { ReactionPairsGame } from './reaction-pairs/reaction-pairs-game'
 import { SasayakiLimitGame } from './sasayaki-limit/sasayaki-limit-game'
 import { WhoWillPayGame } from './who-will-pay/who-will-pay-game'
-import { WordWolfGame } from './word-wolf/word-wolf-game'
 
 export type GameMeta = {
 	id: string
@@ -254,27 +254,25 @@ export const games: readonly GameMeta[] = [
 		Component: DautDiceGame,
 	},
 	{
-		id: 'word-wolf',
-		title: 'ワードウルフ',
-		tagline: 'ひとりだけ違うお題、誰だ？',
-		emoji: '🐺',
+		id: 'kanpai-wolf',
+		title: '乾杯ウルフ',
+		tagline: 'お題は推理、乾杯はルールで！',
+		emoji: '🍻',
 		gradient: ['#6C5CE7', '#4834D4'],
 		minPlayers: 3,
 		maxPlayers: 12,
 		requiresPlayers: true,
 		premium: true,
-		catchCopy: 'みんな同じお題…のはずが1人だけ違う！\n会話で見抜け、バレずに逃げ切れ！',
+		catchCopy: '1人だけ違うお題を見抜け！\nただし今夜は「乾杯ルール」つき！',
 		summary:
-			'このゲームは、全員に配られたお題のうち1人だけ微妙に違うお題を持つ「ワードウルフ」を探すゲームです！議論で多数派を探り、投票でウルフを当てよう。ウルフは吊られても市民のお題を言い当てれば逆転勝ち！',
-		thumbnail: require('@/assets/images/word-wolf/intro.jpg'),
-		cardThumbnail: require('@/assets/images/word-wolf/card.jpg'),
+			'このゲームは、1人だけ微妙に違うお題を持つ「ウルフ」を会話で探す推理ゲームです！さらに毎ラウンド1つだけ「乾杯ルール」（例: 誰かが質問されたら全員乾杯）が公開され、議論中に条件が起きたらみんなで乾杯！ウルフは吊られても市民のお題を当てれば逆転勝ちです！',
 		howToPlay: [
 			'① メンバーを登録（3〜12名）して、議論時間とお題パックを選ぼう！',
-			'② スマホを回して、自分のお題を長押しでこっそり確認（1人だけ違うお題！）',
-			'③ 議論タイム！お互いに質問して、ひとりだけ違う人（ウルフ）を探そう',
-			'④ 投票で最多票の正体を発表！ウルフなら市民の勝ち。ただしウルフが市民のお題を当てたら逆転勝ち！',
+			'② スマホを回して自分のお題をこっそり確認。最後に「今回の乾杯ルール」が発表！',
+			'③ 議論タイム！乾杯ルールの条件が起きたら🍻乾杯！しながらウルフを探そう',
+			'④ 投票で最多票の正体を発表！ウルフなら市民の勝ち。ウルフがお題を当てたら逆転勝ち！',
 		],
-		Component: WordWolfGame,
+		Component: KanpaiWolfGame,
 	},
 	{
 		id: 'inshu-suijaku',
