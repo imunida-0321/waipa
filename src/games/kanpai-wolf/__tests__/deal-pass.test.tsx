@@ -61,9 +61,9 @@ it('一度確認するまで「次の人へ」は押せない', async () => {
 	expect(onConfirm).toHaveBeenCalled()
 })
 
-it('最後の人はボタン文言が「議論スタート」になる', async () => {
+it('最後の人はボタン文言が「乾杯ルールへ」になる', async () => {
 	const { getByText } = await render(
 		<DealPass dealIndex={2} playerCount={3} name="き" word="うどん" onConfirm={jest.fn()} />,
 	)
-	expect(getByText('確認した（議論スタート！）')).toBeTruthy()
+	expect(getByText('確認した（乾杯ルールへ！）')).toBeTruthy()
 })

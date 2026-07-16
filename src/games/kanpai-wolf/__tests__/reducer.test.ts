@@ -1,8 +1,10 @@
-import type { WordPair } from '../engine'
+import type { KanpaiTrigger, WordPair } from '../engine'
 import { currentVoter, initialState, reduce, type Action, type GameState } from '../reducer'
 
 const pair: WordPair = { id: 'p1', pack: 'food', word_a: 'ラーメン', word_b: 'うどん' }
 const pair2: WordPair = { id: 'p2', pack: 'food', word_a: '寿司', word_b: '刺身' }
+const trig: KanpaiTrigger = { id: 't1', text: '誰かが質問されたら全員乾杯' }
+const trig2: KanpaiTrigger = { id: 't2', text: '誰かが笑ったら全員乾杯' }
 
 // rng() => 0 固定: assignRoles はウルフ index 0、swapWords は word_a が多数派
 const rng0 = () => 0
@@ -12,6 +14,7 @@ function start(playerCount: number, wolfCount: 1 | 2 = 1): GameState {
 		type: 'start',
 		config: { wolfCount, discussSeconds: 180, pack: 'food' },
 		pair,
+		trigger: trig,
 		rng: rng0,
 	})
 }
@@ -20,11 +23,11 @@ function apply(state: GameState, ...actions: Action[]): GameState {
 	return actions.reduce(reduce, state)
 }
 
-// deal を全員ぶん進めて discuss へ
+// deal を全員ぶん＋乾杯ルール発表を進めて discuss へ
 function toDiscuss(state: GameState): GameState {
 	let s = state
 	for (let i = 0; i < s.playerCount; i++) s = reduce(s, { type: 'dealtOne' })
-	return s
+	return reduce(s, { type: 'triggerRevealDone' })
 }
 
 describe('start / deal', () => {
@@ -41,12 +44,12 @@ describe('start / deal', () => {
 		expect(s.wolfIndices).toHaveLength(1)
 	})
 
-	it('dealtOne を人数ぶん繰り返すと discuss へ', () => {
+	it('dealtOne を人数ぶん繰り返すと trigger-reveal へ', () => {
 		let s = start(3)
 		s = apply(s, { type: 'dealtOne' })
 		expect(s.dealIndex).toBe(1)
 		s = apply(s, { type: 'dealtOne' }, { type: 'dealtOne' })
-		expect(s.phase).toBe('discuss')
+		expect(s.phase).toBe('trigger-reveal')
 	})
 })
 
@@ -218,7 +221,7 @@ describe('retry', () => {
 			{ type: 'vote', target: 0 },
 			{ type: 'revealDone' },
 			{ type: 'reversalJudged', guessed: false },
-			{ type: 'retry', pair: pair2, rng: rng0 },
+			{ type: 'retry', pair: pair2, trigger: trig2, rng: rng0 },
 		)
 		expect(s.phase).toBe('deal')
 		expect(s.usedPairIds).toEqual(['p1', 'p2'])
@@ -236,8 +239,49 @@ describe('retry', () => {
 			{ type: 'vote', target: 0 },
 			{ type: 'revealDone' },
 			{ type: 'reversalJudged', guessed: false },
-			{ type: 'retry', pair, rng: rng0 }, // p1 を再利用
+			{ type: 'retry', pair, trigger: trig, rng: rng0 }, // p1 を再利用
 		)
 		expect(s.usedPairIds).toEqual(['p1'])
+	})
+})
+
+describe('乾杯トリガー', () => {
+	it('start でトリガーが確定し usedTriggerIds に積まれ kanpaiCount は 0', () => {
+		const s = start(3)
+		expect(s.trigger).toEqual(trig)
+		expect(s.usedTriggerIds).toEqual(['t1'])
+		expect(s.kanpaiCount).toBe(0)
+	})
+
+	it('triggerRevealDone で discuss へ。trigger-reveal 以外では no-op', () => {
+		let s = start(3)
+		expect(reduce(s, { type: 'triggerRevealDone' })).toBe(s) // deal 中は no-op
+		for (let i = 0; i < 3; i++) s = reduce(s, { type: 'dealtOne' })
+		expect(s.phase).toBe('trigger-reveal')
+		s = reduce(s, { type: 'triggerRevealDone' })
+		expect(s.phase).toBe('discuss')
+	})
+
+	function toResult(): GameState {
+		let s = apply(toDiscuss(start(3)), { type: 'discussDone' })
+		return apply(
+			s,
+			{ type: 'vote', target: 1 },
+			{ type: 'vote', target: 0 },
+			{ type: 'vote', target: 0 },
+			{ type: 'revealDone' },
+			{ type: 'reversalJudged', guessed: false },
+		)
+	}
+
+	it('retry で新トリガーが選ばれ usedTriggerIds が蓄積される', () => {
+		const s = apply(toResult(), { type: 'retry', pair: pair2, trigger: trig2, rng: rng0 })
+		expect(s.trigger).toEqual(trig2)
+		expect(s.usedTriggerIds).toEqual(['t1', 't2'])
+	})
+
+	it('使用済みトリガーが再登場したら usedTriggerIds をリセット', () => {
+		const s = apply(toResult(), { type: 'retry', pair: pair2, trigger: trig, rng: rng0 })
+		expect(s.usedTriggerIds).toEqual(['t1'])
 	})
 })

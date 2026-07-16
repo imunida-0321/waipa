@@ -46,7 +46,7 @@ async function dealOne(ui: Awaited<ReturnType<typeof render>>, last: boolean) {
 	await act(async () => {
 		fireEvent(pad, 'pressOut')
 	})
-	await press(ui, last ? '確認した（議論スタート！）' : '確認した（次の人へ）')
+	await press(ui, last ? '確認した（乾杯ルールへ！）' : '確認した（次の人へ）')
 }
 
 async function voteOne(ui: Awaited<ReturnType<typeof render>>, targetName: string) {
@@ -74,6 +74,10 @@ it('設定→配布→議論→投票→発表→逆転→結果まで通しで�
 	await press(ui, '確認した（次の人へ）')
 	await dealOne(ui, false)
 	await dealOne(ui, true)
+
+	// trigger-reveal（rng 0 固定: TRIGGERS[0] が選ばれる）
+	expect(ui.getByText('誰かが質問されたら全員乾杯')).toBeTruthy()
+	await press(ui, '議論スタート')
 
 	// discuss → スキップ（2度押し）
 	await press(ui, '投票へすすむ')
@@ -112,6 +116,10 @@ it('通常投票が全員同票のとき決選投票を経て決着し reveal �
 	await dealOne(ui, false)
 	await dealOne(ui, false)
 	await dealOne(ui, true)
+
+	// trigger-reveal（rng 0 固定: TRIGGERS[0] が選ばれる）
+	expect(ui.getByText('誰かが質問されたら全員乾杯')).toBeTruthy()
+	await press(ui, '議論スタート')
 
 	// discuss → スキップ（2度押し）
 	await press(ui, '投票へすすむ')

@@ -3,12 +3,13 @@ import { getDisplayNames, usePlayers } from '@/lib/players-store'
 import { getPairsByPack, useWordPairs } from '@/lib/word-pairs-store'
 import { DealPass } from './deal-pass'
 import { DiscussScreen } from './discuss-screen'
-import { choosePair } from './engine'
+import { choosePair, chooseTrigger } from './engine'
 import { currentVoter, initialState, reduce, type StartConfig } from './reducer'
 import { ResultScreen } from './result-screen'
 import { RevealOverlay } from './reveal-overlay'
 import { ReversalScreen } from './reversal-screen'
 import { SetupScreen } from './setup-screen'
+import { TriggerRevealScreen } from './trigger-reveal-screen'
 import { VoteScreen } from './vote-screen'
 
 const RUNOFF_DISCUSS_SECONDS = 60
@@ -30,6 +31,7 @@ export function KanpaiWolfGame() {
 			type: 'start',
 			config,
 			pair: pickPair(config.pack, state.usedPairIds),
+			trigger: chooseTrigger(state.usedTriggerIds, Math.random),
 			rng: Math.random,
 		})
 
@@ -47,6 +49,15 @@ export function KanpaiWolfGame() {
 					name={names[state.dealIndex]}
 					word={isWolf ? state.words.wolf : state.words.majority}
 					onConfirm={() => dispatch({ type: 'dealtOne' })}
+				/>
+			)
+		}
+		case 'trigger-reveal': {
+			if (!state.trigger) return null
+			return (
+				<TriggerRevealScreen
+					triggerText={state.trigger.text}
+					onDone={() => dispatch({ type: 'triggerRevealDone' })}
 				/>
 			)
 		}
@@ -111,6 +122,7 @@ export function KanpaiWolfGame() {
 						dispatch({
 							type: 'retry',
 							pair: pickPair(state.pack, state.usedPairIds),
+							trigger: chooseTrigger(state.usedTriggerIds, Math.random),
 							rng: Math.random,
 						})
 					}

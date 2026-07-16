@@ -54,7 +54,7 @@ export function DealPass({ dealIndex, playerCount, name, word, onConfirm }: Prop
 				title={
 					dealIndex + 1 < playerCount
 						? '確認した（次の人へ）'
-						: '確認した（議論スタート！）'
+						: '確認した（乾杯ルールへ！）'
 				}
 				onPress={onConfirm}
 				disabled={!viewed || pressing}
