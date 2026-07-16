@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Animated, Pressable, StyleSheet, Text, View } from 'react-native'
 import { GradientButton } from '@/components/ui/gradient-button'
 import { haptics } from '@/lib/haptics'
@@ -30,7 +30,7 @@ export function DiscussScreen({
 	const doneRef = useRef(false)
 	const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
 	const halfRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-	const scale = useRef(new Animated.Value(1)).current
+	const scale = useMemo(() => new Animated.Value(1), [])
 
 	const finish = () => {
 		if (doneRef.current) return

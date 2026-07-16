@@ -11,6 +11,7 @@ type Props = {
 	outcome: Outcome
 	wolfNames: string[]
 	words: AssignedWords
+	kanpaiCount: number
 	onRetry: () => void
 }
 
@@ -20,7 +21,7 @@ const HEADLINES: Record<Outcome, string> = {
 	'wolf-reversal': '🐺 ウルフの逆転勝利！',
 }
 
-export function ResultScreen({ outcome, wolfNames, words, onRetry }: Props) {
+export function ResultScreen({ outcome, wolfNames, words, kanpaiCount, onRetry }: Props) {
 	return (
 		<View style={styles.container}>
 			<Text style={styles.headline}>{HEADLINES[outcome]}</Text>
@@ -29,6 +30,7 @@ export function ResultScreen({ outcome, wolfNames, words, onRetry }: Props) {
 				<Text style={styles.row}>😇 市民のお題: {words.majority}</Text>
 				<Text style={styles.row}>🐺 ウルフのお題: {words.wolf}</Text>
 			</View>
+			<Text style={styles.kanpai}>このラウンドの乾杯 🍻 × {kanpaiCount}回</Text>
 			<GradientButton title="もう一回" onPress={onRetry} />
 			<Pressable
 				accessibilityRole="button"
@@ -61,6 +63,7 @@ const styles = StyleSheet.create({
 		gap: spacing.sm,
 	},
 	row: { ...typography.body },
+	kanpai: { ...typography.caption, textAlign: 'center' },
 	homeButton: {
 		padding: spacing.md,
 		borderRadius: radii.md,

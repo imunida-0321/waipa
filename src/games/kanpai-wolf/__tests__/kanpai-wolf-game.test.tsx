@@ -103,6 +103,7 @@ it('設定→配布→議論→投票→発表→逆転→結果まで通しで�
 	// result
 	expect(ui.getByText(/市民チームの勝利/)).toBeTruthy()
 	expect(ui.getByText(/あか/)).toBeTruthy() // ウルフの正体公開
+	expect(ui.getByText(/このラウンドの乾杯/)).toBeTruthy()
 	expect(ui.getByText('もう一回')).toBeTruthy()
 })
 

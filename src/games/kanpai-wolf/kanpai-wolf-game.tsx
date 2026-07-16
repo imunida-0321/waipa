@@ -124,6 +124,7 @@ export function KanpaiWolfGame() {
 					outcome={state.outcome}
 					wolfNames={state.wolfIndices.map((i) => names[i])}
 					words={state.words}
+					kanpaiCount={state.kanpaiCount}
 					onRetry={() =>
 						dispatch({
 							type: 'retry',
