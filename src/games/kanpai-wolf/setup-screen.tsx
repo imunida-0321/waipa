@@ -5,7 +5,7 @@ import { haptics } from '@/lib/haptics'
 import { colors, radii, spacing, typography } from '@/theme/tokens'
 import { PACKS } from './engine'
 import type { StartConfig } from './reducer'
-import { WW } from './theme'
+import { KW } from './theme'
 
 type Props = {
 	playerCount: number
@@ -112,7 +112,7 @@ const styles = StyleSheet.create({
 		borderWidth: 1,
 		borderColor: colors.surfaceBorder,
 	},
-	chipActive: { borderColor: WW.wolf, backgroundColor: WW.night },
+	chipActive: { borderColor: KW.wolf, backgroundColor: KW.night },
 	chipText: { ...typography.body },
 	chipTextActive: { color: colors.text, fontWeight: '700' },
 })

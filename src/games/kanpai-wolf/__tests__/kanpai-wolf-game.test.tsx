@@ -1,5 +1,5 @@
 import { act, fireEvent, render } from '@testing-library/react-native'
-import { WordWolfGame } from '../word-wolf-game'
+import { KanpaiWolfGame } from '../kanpai-wolf-game'
 
 jest.mock('@/lib/haptics', () => ({
 	haptics: { tap: jest.fn(), heavy: jest.fn(), success: jest.fn() },
@@ -39,41 +39,41 @@ async function press(ui: Awaited<ReturnType<typeof render>>, label: string | Reg
 }
 
 async function dealOne(ui: Awaited<ReturnType<typeof render>>, last: boolean) {
-	const pad = ui.getByLabelText('長押しで自分のお題を表示')
+	const pad = ui.getByLabelText('タップで自分のお題を表示')
 	await act(async () => {
-		fireEvent(pad, 'pressIn')
+		fireEvent.press(pad)
 	})
-	await act(async () => {
-		fireEvent(pad, 'pressOut')
-	})
-	await press(ui, last ? '確認した（議論スタート！）' : '確認した（次の人へ）')
+	await press(ui, last ? '確認した（乾杯ルールへ！）' : '確認した（次の人へ）')
 }
 
 async function voteOne(ui: Awaited<ReturnType<typeof render>>, targetName: string) {
 	await press(ui, '投票する')
 	await press(ui, targetName)
-	await press(ui, 'この人に投票（確定）')
+	await press(ui, '投票する')
 }
 
 it('設定→配布→議論→投票→発表→逆転→結果まで通しでプレイできる', async () => {
-	const ui = await render(<WordWolfGame />)
+	const ui = await render(<KanpaiWolfGame />)
 
 	// setup
 	expect(ui.getByText('はじめる')).toBeTruthy()
 	await press(ui, 'はじめる')
 
 	// deal ×3（ウルフは あか＝index 0。あか の長押しで「うどん」が見える）
-	const pad = ui.getByLabelText('長押しで自分のお題を表示')
+	const pad = ui.getByLabelText('タップで自分のお題を表示')
 	await act(async () => {
-		fireEvent(pad, 'pressIn')
+		fireEvent.press(pad)
 	})
 	expect(ui.getByText('うどん')).toBeTruthy()
-	await act(async () => {
-		fireEvent(pad, 'pressOut')
-	})
 	await press(ui, '確認した（次の人へ）')
+	expect(ui.queryByText('うどん')).toBeNull()
+	expect(ui.getByText('タップで自分のお題を表示')).toBeTruthy()
 	await dealOne(ui, false)
 	await dealOne(ui, true)
+
+	// trigger-reveal（rng 0 固定: TRIGGERS[0] が選ばれる）
+	expect(ui.getByText('誰かが質問されたら全員乾杯')).toBeTruthy()
+	await press(ui, '議論スタート')
 
 	// discuss → スキップ（2度押し）
 	await press(ui, '投票へすすむ')
@@ -96,14 +96,19 @@ it('設定→配布→議論→投票→発表→逆転→結果まで通しで�
 	expect(ui.getByText('ラーメン')).toBeTruthy()
 	await press(ui, '外した')
 
+	// kanpai-time
+	expect(ui.getByText('外したので乾杯！')).toBeTruthy()
+	await press(ui, '結果発表へ')
+
 	// result
 	expect(ui.getByText(/市民チームの勝利/)).toBeTruthy()
 	expect(ui.getByText(/あか/)).toBeTruthy() // ウルフの正体公開
+	expect(ui.getByText(/このラウンドの乾杯/)).toBeTruthy()
 	expect(ui.getByText('もう一回')).toBeTruthy()
 })
 
 it('通常投票が全員同票のとき決選投票を経て決着し reveal に進む', async () => {
-	const ui = await render(<WordWolfGame />)
+	const ui = await render(<KanpaiWolfGame />)
 
 	// setup
 	await press(ui, 'はじめる')
@@ -112,6 +117,10 @@ it('通常投票が全員同票のとき決選投票を経て決着し reveal �
 	await dealOne(ui, false)
 	await dealOne(ui, false)
 	await dealOne(ui, true)
+
+	// trigger-reveal（rng 0 固定: TRIGGERS[0] が選ばれる）
+	expect(ui.getByText('誰かが質問されたら全員乾杯')).toBeTruthy()
+	await press(ui, '議論スタート')
 
 	// discuss → スキップ（2度押し）
 	await press(ui, '投票へすすむ')

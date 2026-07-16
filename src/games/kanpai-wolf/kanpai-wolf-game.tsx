@@ -3,17 +3,19 @@ import { getDisplayNames, usePlayers } from '@/lib/players-store'
 import { getPairsByPack, useWordPairs } from '@/lib/word-pairs-store'
 import { DealPass } from './deal-pass'
 import { DiscussScreen } from './discuss-screen'
-import { choosePair } from './engine'
+import { choosePair, chooseTrigger } from './engine'
+import { KanpaiTimeScreen } from './kanpai-time-screen'
 import { currentVoter, initialState, reduce, type StartConfig } from './reducer'
 import { ResultScreen } from './result-screen'
 import { RevealOverlay } from './reveal-overlay'
 import { ReversalScreen } from './reversal-screen'
 import { SetupScreen } from './setup-screen'
+import { TriggerRevealScreen } from './trigger-reveal-screen'
 import { VoteScreen } from './vote-screen'
 
 const RUNOFF_DISCUSS_SECONDS = 60
 
-export function WordWolfGame() {
+export function KanpaiWolfGame() {
 	const players = usePlayers()
 	const names = getDisplayNames(players)
 	useWordPairs() // 配信 refresh 後の再レンダー購読
@@ -30,6 +32,7 @@ export function WordWolfGame() {
 			type: 'start',
 			config,
 			pair: pickPair(config.pack, state.usedPairIds),
+			trigger: chooseTrigger(state.usedTriggerIds, Math.random),
 			rng: Math.random,
 		})
 
@@ -50,10 +53,22 @@ export function WordWolfGame() {
 				/>
 			)
 		}
+		case 'trigger-reveal': {
+			if (!state.trigger) return null
+			return (
+				<TriggerRevealScreen
+					triggerText={state.trigger.text}
+					onDone={() => dispatch({ type: 'triggerRevealDone' })}
+				/>
+			)
+		}
 		case 'discuss':
 			return (
 				<DiscussScreen
 					seconds={state.discussSeconds}
+					trigger={state.trigger?.text ?? ''}
+					kanpaiCount={state.kanpaiCount}
+					onKanpai={() => dispatch({ type: 'kanpai' })}
 					onDone={() => dispatch({ type: 'discussDone' })}
 				/>
 			)
@@ -62,7 +77,10 @@ export function WordWolfGame() {
 				<DiscussScreen
 					key={`runoff-${state.voteCandidates?.join('-') ?? 'all'}`}
 					seconds={RUNOFF_DISCUSS_SECONDS}
+					trigger={state.trigger?.text ?? ''}
+					kanpaiCount={state.kanpaiCount}
 					isRunoff
+					onKanpai={() => dispatch({ type: 'kanpai' })}
 					onDone={() => dispatch({ type: 'discussDone' })}
 				/>
 			)
@@ -100,6 +118,8 @@ export function WordWolfGame() {
 				/>
 			)
 		}
+		case 'kanpai-time':
+			return <KanpaiTimeScreen onDone={() => dispatch({ type: 'kanpaiTimeDone' })} />
 		case 'result': {
 			if (state.outcome === null || !state.words) return null
 			return (
@@ -107,10 +127,12 @@ export function WordWolfGame() {
 					outcome={state.outcome}
 					wolfNames={state.wolfIndices.map((i) => names[i])}
 					words={state.words}
+					kanpaiCount={state.kanpaiCount}
 					onRetry={() =>
 						dispatch({
 							type: 'retry',
 							pair: pickPair(state.pack, state.usedPairIds),
+							trigger: chooseTrigger(state.usedTriggerIds, Math.random),
 							rng: Math.random,
 						})
 					}

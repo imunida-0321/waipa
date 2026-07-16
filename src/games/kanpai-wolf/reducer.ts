@@ -4,12 +4,22 @@ import {
 	swapWords,
 	tallyVotes,
 	type AssignedWords,
+	type KanpaiTrigger,
 	type Rng,
 	type WordPair,
 } from './engine'
 
 export type Phase =
-	'setup' | 'deal' | 'discuss' | 'vote' | 'runoff-discuss' | 'reveal' | 'reversal' | 'result'
+	'setup'
+	| 'deal'
+	| 'trigger-reveal'
+	| 'discuss'
+	| 'vote'
+	| 'runoff-discuss'
+	| 'reveal'
+	| 'reversal'
+	| 'kanpai-time'
+	| 'result'
 
 export type Outcome = 'citizens' | 'wolf' | 'wolf-reversal'
 
@@ -35,16 +45,22 @@ export type GameState = {
 	eliminatedIndex: number | null
 	outcome: Outcome | null
 	usedPairIds: string[] // 連戦の重複出題防止
+	trigger: KanpaiTrigger | null // 今ラウンドの公開「乾杯ルール」
+	kanpaiCount: number // 今ラウンドの乾杯回数（演出用・勝敗に影響しない）
+	usedTriggerIds: string[] // 連戦の重複回避
 }
 
 export type Action =
-	| { type: 'start'; config: StartConfig; pair: WordPair; rng: Rng }
+	| { type: 'start'; config: StartConfig; pair: WordPair; trigger: KanpaiTrigger; rng: Rng }
 	| { type: 'dealtOne' }
+	| { type: 'triggerRevealDone' }
+	| { type: 'kanpai' }
 	| { type: 'discussDone' }
 	| { type: 'vote'; target: number }
 	| { type: 'revealDone' }
 	| { type: 'reversalJudged'; guessed: boolean }
-	| { type: 'retry'; pair: WordPair; rng: Rng }
+	| { type: 'kanpaiTimeDone' }
+	| { type: 'retry'; pair: WordPair; trigger: KanpaiTrigger; rng: Rng }
 
 export function initialState(playerCount: number): GameState {
 	return {
@@ -63,6 +79,9 @@ export function initialState(playerCount: number): GameState {
 		eliminatedIndex: null,
 		outcome: null,
 		usedPairIds: [],
+		trigger: null,
+		kanpaiCount: 0,
+		usedTriggerIds: [],
 	}
 }
 
@@ -72,11 +91,14 @@ export function currentVoter(state: GameState): number | null {
 }
 
 // 新ラウンド（start / retry）の共通処理
-function newRound(state: GameState, pair: WordPair, rng: Rng): GameState {
-	// choosePair が used をリセットして返した pair は既に usedPairIds にある → リストを作り直す
+function newRound(state: GameState, pair: WordPair, trigger: KanpaiTrigger, rng: Rng): GameState {
+	// choosePair / chooseTrigger が used をリセットして返したものは既にリストにある → 作り直す
 	const usedPairIds = state.usedPairIds.includes(pair.id)
 		? [pair.id]
 		: [...state.usedPairIds, pair.id]
+	const usedTriggerIds = state.usedTriggerIds.includes(trigger.id)
+		? [trigger.id]
+		: [...state.usedTriggerIds, trigger.id]
 	return {
 		...state,
 		words: swapWords(pair, rng),
@@ -89,6 +111,9 @@ function newRound(state: GameState, pair: WordPair, rng: Rng): GameState {
 		eliminatedIndex: null,
 		outcome: null,
 		usedPairIds,
+		trigger,
+		kanpaiCount: 0,
+		usedTriggerIds,
 		phase: 'deal',
 	}
 }
@@ -107,6 +132,7 @@ export function reduce(state: GameState, action: Action): GameState {
 					pack: action.config.pack,
 				},
 				action.pair,
+				action.trigger,
 				action.rng,
 			)
 		}
@@ -114,7 +140,13 @@ export function reduce(state: GameState, action: Action): GameState {
 			if (state.phase !== 'deal') return state
 			if (state.dealIndex + 1 < state.playerCount)
 				return { ...state, dealIndex: state.dealIndex + 1 }
+			return { ...state, phase: 'trigger-reveal' }
+		case 'triggerRevealDone':
+			if (state.phase !== 'trigger-reveal') return state
 			return { ...state, phase: 'discuss' }
+		case 'kanpai':
+			if (state.phase !== 'discuss' && state.phase !== 'runoff-discuss') return state
+			return { ...state, kanpaiCount: state.kanpaiCount + 1 }
 		case 'discussDone': {
 			if (state.phase !== 'discuss' && state.phase !== 'runoff-discuss') return state
 			const all = Array.from({ length: state.playerCount }, (_, i) => i)
@@ -176,10 +208,13 @@ export function reduce(state: GameState, action: Action): GameState {
 			return {
 				...state,
 				outcome: action.guessed ? 'wolf-reversal' : 'citizens',
-				phase: 'result',
+				phase: action.guessed ? 'result' : 'kanpai-time',
 			}
+		case 'kanpaiTimeDone':
+			if (state.phase !== 'kanpai-time') return state
+			return { ...state, phase: 'result' }
 		case 'retry':
 			if (state.phase !== 'result') return state
-			return newRound(state, action.pair, action.rng)
+			return newRound(state, action.pair, action.trigger, action.rng)
 	}
 }

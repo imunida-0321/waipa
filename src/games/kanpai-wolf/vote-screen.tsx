@@ -4,7 +4,7 @@ import { GradientButton } from '@/components/ui/gradient-button'
 import { haptics } from '@/lib/haptics'
 import { playerColor } from '@/theme/player-colors'
 import { colors, radii, spacing, typography } from '@/theme/tokens'
-import { WW } from './theme'
+import { KW } from './theme'
 
 type Props = {
 	voterIndex: number
@@ -55,7 +55,7 @@ export function VoteScreen({ voterIndex, voterName, names, candidates, onVote }:
 				})}
 			</ScrollView>
 			<GradientButton
-				title="この人に投票（確定）"
+				title="投票する"
 				onPress={() => {
 					if (selected !== null) onVote(selected)
 				}}
@@ -85,7 +85,7 @@ const styles = StyleSheet.create({
 		borderWidth: 1,
 		borderColor: colors.surfaceBorder,
 	},
-	rowSelected: { borderColor: WW.wolf },
+	rowSelected: { borderColor: KW.wolf },
 	colorBar: { width: 6, alignSelf: 'stretch', borderRadius: 3 },
 	name: { ...typography.body },
 })

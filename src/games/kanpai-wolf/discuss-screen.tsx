@@ -1,25 +1,36 @@
-import { useEffect, useRef, useState } from 'react'
-import { StyleSheet, Text, View } from 'react-native'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { Animated, Pressable, StyleSheet, Text, View } from 'react-native'
 import { GradientButton } from '@/components/ui/gradient-button'
 import { haptics } from '@/lib/haptics'
 import { playSound } from '@/lib/sound'
-import { colors, spacing, typography } from '@/theme/tokens'
-import { WW } from './theme'
+import { colors, radii, spacing, typography } from '@/theme/tokens'
+import { KW } from './theme'
 
 type Props = {
 	seconds: number
+	trigger: string // 今ラウンドの公開「乾杯ルール」
+	kanpaiCount: number
 	isRunoff?: boolean // 決選投票前の再議論
+	onKanpai: () => void
 	onDone: () => void
 }
 
 // 議論タイマー。残り10秒からチクタク（残り5秒からは半拍追加で加速感）。
 // 満了 or「投票へすすむ」2度押しで onDone
-export function DiscussScreen({ seconds, isRunoff = false, onDone }: Props) {
+export function DiscussScreen({
+	seconds,
+	trigger,
+	kanpaiCount,
+	isRunoff = false,
+	onKanpai,
+	onDone,
+}: Props) {
 	const [remaining, setRemaining] = useState(seconds)
 	const [confirming, setConfirming] = useState(false)
 	const doneRef = useRef(false)
 	const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
 	const halfRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+	const scale = useMemo(() => new Animated.Value(1), [])
 
 	const finish = () => {
 		if (doneRef.current) return
@@ -28,6 +39,14 @@ export function DiscussScreen({ seconds, isRunoff = false, onDone }: Props) {
 		if (halfRef.current) clearTimeout(halfRef.current)
 		haptics.heavy()
 		onDone()
+	}
+
+	const kanpai = () => {
+		playSound('cheers') // 素材未登録の間は無音スキップ（#75）
+		haptics.heavy()
+		scale.setValue(1.4)
+		Animated.spring(scale, { toValue: 1, useNativeDriver: true }).start()
+		onKanpai()
 	}
 
 	useEffect(() => {
@@ -62,6 +81,10 @@ export function DiscussScreen({ seconds, isRunoff = false, onDone }: Props) {
 
 	return (
 		<View style={styles.container}>
+			<View style={styles.triggerCard}>
+				<Text style={styles.triggerLabel}>🍻 今回の乾杯ルール</Text>
+				<Text style={styles.triggerText}>{trigger}</Text>
+			</View>
 			<Text style={styles.title}>
 				{isRunoff ? '🗳️ 決選投票の前に、もう一度話し合おう' : '💬 議論タイム！'}
 			</Text>
@@ -73,6 +96,14 @@ export function DiscussScreen({ seconds, isRunoff = false, onDone }: Props) {
 			<Text style={[styles.timer, remaining <= 10 && styles.timerUrgent]}>
 				{mm}:{ss}
 			</Text>
+			<Pressable accessibilityRole="button" onPress={kanpai} style={styles.kanpaiButton}>
+				<Text style={styles.kanpaiLabel}>🍻 乾杯！</Text>
+				{kanpaiCount > 0 && (
+					<Animated.Text style={[styles.kanpaiCount, { transform: [{ scale }] }]}>
+						× {kanpaiCount}
+					</Animated.Text>
+				)}
+			</Pressable>
 			<GradientButton
 				title={confirming ? 'もう一度タップで投票へ！' : '投票へすすむ'}
 				onPress={() => {
@@ -91,8 +122,30 @@ const styles = StyleSheet.create({
 		padding: spacing.lg,
 		gap: spacing.lg,
 	},
+	triggerCard: {
+		padding: spacing.md,
+		borderRadius: radii.md,
+		backgroundColor: colors.surface,
+		borderWidth: 1,
+		borderColor: KW.wolf,
+		gap: spacing.xs,
+	},
+	triggerLabel: { ...typography.caption, color: KW.wolf },
+	triggerText: { ...typography.body, fontWeight: '700' },
 	title: { ...typography.body, textAlign: 'center', fontWeight: '700' },
 	hint: { ...typography.caption, textAlign: 'center' },
 	timer: { ...typography.hero, fontSize: 72, textAlign: 'center', color: colors.text },
-	timerUrgent: { color: WW.danger },
+	timerUrgent: { color: KW.danger },
+	kanpaiButton: {
+		flexDirection: 'row',
+		justifyContent: 'center',
+		alignItems: 'center',
+		gap: spacing.sm,
+		padding: spacing.md,
+		borderRadius: radii.md,
+		borderWidth: 1,
+		borderColor: KW.wolf,
+	},
+	kanpaiLabel: { ...typography.body, fontWeight: '700' },
+	kanpaiCount: { ...typography.body, fontWeight: '700', color: KW.wolf },
 })

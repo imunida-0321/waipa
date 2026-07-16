@@ -51,14 +51,14 @@ it('選択→確定で onVote が呼ばれる。未選択では確定できな�
 	)
 	await toChoose(ui)
 	await act(async () => {
-		fireEvent.press(ui.getByText('この人に投票（確定）'))
+		fireEvent.press(ui.getByText('投票する'))
 	})
 	expect(onVote).not.toHaveBeenCalled()
 	await act(async () => {
 		fireEvent.press(ui.getByText('あお'))
 	})
 	await act(async () => {
-		fireEvent.press(ui.getByText('この人に投票（確定）'))
+		fireEvent.press(ui.getByText('投票する'))
 	})
 	expect(onVote).toHaveBeenCalledWith(1)
 })

@@ -12,6 +12,12 @@ jest.mock('expo-linear-gradient', () => {
 	return { LinearGradient: View }
 })
 
+const baseProps = {
+	trigger: '誰かが質問されたら全員乾杯',
+	kanpaiCount: 0,
+	onKanpai: jest.fn(),
+}
+
 beforeEach(() => {
 	jest.useFakeTimers()
 	;(playSound as jest.Mock).mockClear()
@@ -22,7 +28,7 @@ afterEach(() => {
 
 it('残り時間を mm:ss で表示し、満了で onDone を1回だけ呼ぶ', async () => {
 	const onDone = jest.fn()
-	const { getByText } = await render(<DiscussScreen seconds={61} onDone={onDone} />)
+	const { getByText } = await render(<DiscussScreen seconds={61} onDone={onDone} {...baseProps} />)
 	expect(getByText('1:01')).toBeTruthy()
 	await act(async () => {
 		jest.advanceTimersByTime(61_000)
@@ -31,7 +37,7 @@ it('残り時間を mm:ss で表示し、満了で onDone を1回だけ呼ぶ', 
 })
 
 it('残り10秒からチクタクが鳴る', async () => {
-	await render(<DiscussScreen seconds={12} onDone={jest.fn()} />)
+	await render(<DiscussScreen seconds={12} onDone={jest.fn()} {...baseProps} />)
 	await act(async () => {
 		jest.advanceTimersByTime(1_000) // 残り11秒: まだ鳴らない
 	})
@@ -44,7 +50,7 @@ it('残り10秒からチクタクが鳴る', async () => {
 
 it('「投票へすすむ」は2度押しで確定する', async () => {
 	const onDone = jest.fn()
-	const { getByText } = await render(<DiscussScreen seconds={180} onDone={onDone} />)
+	const { getByText } = await render(<DiscussScreen seconds={180} onDone={onDone} {...baseProps} />)
 	await act(async () => {
 		fireEvent.press(getByText('投票へすすむ'))
 	})
@@ -56,13 +62,15 @@ it('「投票へすすむ」は2度押しで確定する', async () => {
 })
 
 it('決選投票前の再議論では見出しが変わる', async () => {
-	const { getByText } = await render(<DiscussScreen seconds={60} isRunoff onDone={jest.fn()} />)
+	const { getByText } = await render(
+		<DiscussScreen seconds={60} isRunoff onDone={jest.fn()} {...baseProps} />,
+	)
 	expect(getByText(/決選投票/)).toBeTruthy()
 })
 
 it('スキップ確定後はチクタクも onDone 再発火もしない', async () => {
 	const onDone = jest.fn()
-	const { getByText } = await render(<DiscussScreen seconds={180} onDone={onDone} />)
+	const { getByText } = await render(<DiscussScreen seconds={180} onDone={onDone} {...baseProps} />)
 	await act(async () => {
 		fireEvent.press(getByText('投票へすすむ'))
 	})
@@ -79,7 +87,7 @@ it('スキップ確定後はチクタクも onDone 再発火もしない', async
 
 it('残り5秒圏内でスキップしても半拍チクタクが残らない', async () => {
 	const onDone = jest.fn()
-	const { getByText } = await render(<DiscussScreen seconds={4} onDone={onDone} />)
+	const { getByText } = await render(<DiscussScreen seconds={4} onDone={onDone} {...baseProps} />)
 	await act(async () => {
 		jest.advanceTimersByTime(1_000) // 残り3秒: 半拍がスケジュールされる
 	})
@@ -95,4 +103,34 @@ it('残り5秒圏内でスキップしても半拍チクタクが残らない', 
 	})
 	expect(playSound).not.toHaveBeenCalledWith('tick')
 	expect(onDone).toHaveBeenCalledTimes(1)
+})
+
+it('乾杯ルールを常時表示する（runoff でも）', async () => {
+	const ui = await render(<DiscussScreen seconds={180} onDone={jest.fn()} {...baseProps} />)
+	expect(ui.getByText('誰かが質問されたら全員乾杯')).toBeTruthy()
+	const runoff = await render(
+		<DiscussScreen seconds={60} isRunoff onDone={jest.fn()} {...baseProps} />,
+	)
+	expect(runoff.getByText('誰かが質問されたら全員乾杯')).toBeTruthy()
+})
+
+it('乾杯ボタンで onKanpai と cheers 効果音が発火する', async () => {
+	const onKanpai = jest.fn()
+	const { getByText } = await render(
+		<DiscussScreen seconds={180} onDone={jest.fn()} {...baseProps} onKanpai={onKanpai} />,
+	)
+	await act(async () => {
+		fireEvent.press(getByText('🍻 乾杯！'))
+	})
+	expect(onKanpai).toHaveBeenCalledTimes(1)
+	expect(playSound).toHaveBeenCalledWith('cheers')
+})
+
+it('乾杯回数が表示される（0回のときはバッジ非表示）', async () => {
+	const ui = await render(
+		<DiscussScreen seconds={180} onDone={jest.fn()} {...baseProps} kanpaiCount={3} />,
+	)
+	expect(ui.getByText('× 3')).toBeTruthy()
+	const zero = await render(<DiscussScreen seconds={180} onDone={jest.fn()} {...baseProps} />)
+	expect(zero.queryByText(/× \d/)).toBeNull()
 })
