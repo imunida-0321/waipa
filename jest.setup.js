@@ -1,0 +1,11 @@
+// use-shake.ts などが実 expo-sensors → expo 本体（Expo.fx.tsx の副作用チェーン）を
+// 読み込むと、jest-expo 内部モックの解決ずれ次第でスイートがロード時に落ちる（#111）。
+// ユニットテストは実センサーに依存しないため、グローバルにスタブへ差し替える。
+// 個別テスト（use-shake.test.ts 等）の jest.mock はこちらより優先される。
+jest.mock('expo-sensors', () => ({
+	Accelerometer: {
+		isAvailableAsync: jest.fn(async () => false),
+		setUpdateInterval: jest.fn(),
+		addListener: jest.fn(() => ({ remove: jest.fn() })),
+	},
+}))
