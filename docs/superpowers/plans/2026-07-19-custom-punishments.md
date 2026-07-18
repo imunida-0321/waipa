@@ -24,6 +24,7 @@
 ### Task 1: custom-punishments-store
 
 **Files:**
+
 - Create: `src/lib/custom-punishments-store.ts`
 - Test: `src/lib/__tests__/custom-punishments-store.test.ts`
 
@@ -66,6 +67,7 @@ export function countByType(set: CustomSet, type: 'normal' | 'special'): number
 ```
 
 **仕様詳細:**
+
 - デフォルト state: `{ enabled: true, activeSetId: 'set1', sets: [{ id: 'set1', name: 'マイセット', items: [] }], nextId: 2 }`
 - ID 採番: アイテムは `c${nextId}`、セットは `set${nextId}`。どちらも採番後に `nextId + 1`（`Date.now()` 不使用）
 - `addItem`: `text.trim()` が空 → 何もしない。40 文字超は 40 文字に切詰め。タイプ別上限到達時は何もしない。追加先はアクティブセット
@@ -114,21 +116,17 @@ describe('customPunishmentsStore', () => {
 	it('addItem でアクティブセットに追加され、永続化される', async () => {
 		await customPunishmentsStore.addItem('normal', '幹事のモノマネをして1杯')
 		const set = getActiveSet(customPunishmentsStore.getState())
-		expect(set.items).toEqual([
-			{ id: 'c2', text: '幹事のモノマネをして1杯', type: 'normal' },
-		])
-		expect(
-			await AsyncStorage.getItem('waipa.inshu-suijaku.custom-punishments'),
-		).toContain('幹事のモノマネ')
+		expect(set.items).toEqual([{ id: 'c2', text: '幹事のモノマネをして1杯', type: 'normal' }])
+		expect(await AsyncStorage.getItem('waipa.inshu-suijaku.custom-punishments')).toContain(
+			'幹事のモノマネ',
+		)
 	})
 
 	it('addItem は空白のみを無視し、41文字以上を40文字に切り詰める', async () => {
 		await customPunishmentsStore.addItem('normal', '   ')
 		expect(getActiveSet(customPunishmentsStore.getState()).items).toHaveLength(0)
 		await customPunishmentsStore.addItem('normal', 'あ'.repeat(41))
-		expect(getActiveSet(customPunishmentsStore.getState()).items[0].text).toBe(
-			'あ'.repeat(40),
-		)
+		expect(getActiveSet(customPunishmentsStore.getState()).items[0].text).toBe('あ'.repeat(40))
 	})
 
 	it('addItem はタイプ別上限（通常20・特大5）で頭打ちになる', async () => {
@@ -188,9 +186,7 @@ describe('customPunishmentsStore', () => {
 		expect(getActiveSet(customPunishmentsStore.getState()).items).toHaveLength(0)
 		await customPunishmentsStore.addItem('normal', 'セット2のお題')
 		await customPunishmentsStore.selectSet(customPunishmentsStore.getState().sets[0].id)
-		expect(getActiveSet(customPunishmentsStore.getState()).items[0].text).toBe(
-			'セット1のお題',
-		)
+		expect(getActiveSet(customPunishmentsStore.getState()).items[0].text).toBe('セット1のお題')
 	})
 
 	it('getActivePool は enabled=false で空を返す', async () => {
@@ -238,10 +234,12 @@ describe('customPunishmentsStore', () => {
 ### Task 2: engine のカスタムプール対応
 
 **Files:**
+
 - Modify: `src/games/inshu-suijaku/engine.ts`（`createDeck`）
 - Test: `src/games/inshu-suijaku/__tests__/engine.test.ts`（既存に describe 追加）
 
 **Interfaces:**
+
 - Consumes: Task 1 の `CustomPunishment`（構造は `Punishment` と互換なので `punishments.ts` の `Punishment[]` として受ける）
 - Produces: `createDeck(size: BoardSize, rng: Rng, custom?: { normals: readonly Punishment[]; specials: readonly Punishment[] }): Card[]`
 
@@ -304,14 +302,17 @@ describe('createDeck カスタムお題', () => {
 ### Task 3: 一覧シート＋編集フォーム UI
 
 **Files:**
+
 - Create: `src/games/inshu-suijaku/custom-punishments-sheet.tsx`
 - Test: `src/games/inshu-suijaku/__tests__/custom-punishments-sheet.test.tsx`
 
 **Interfaces:**
+
 - Consumes: Task 1 の store 全 API
 - Produces: `export function CustomPunishmentsSheet(props: { visible: boolean; onClose: () => void })`
 
 **仕様詳細（モック準拠）:**
+
 - RN `Modal`（`animationType="slide"`、`transparent` なしのフルスクリーン。`player-setup-sheet.tsx` の構成を参照）
 - ヘッダー: 左 ×（`accessibilityLabel="閉じる"`・`onClose`）/ 中央「カスタムお題」
 - セット行: セット名チップを横並び（アクティブはアクセント枠）。タップで `selectSet`。「＋セット」チップで `addSet('')`（名前はフォールバック採番。リネーム UI は今回なし）。長押しで削除（`Alert.alert` で確認、`removeSet`）
@@ -326,6 +327,7 @@ describe('createDeck カスタムお題', () => {
 - [ ] **Step 1: 失敗するテストを書く**（store は実物＋AsyncStorage mock。`fireEvent`＋`await act`）
 
 テスト観点（それぞれ実コードで書く）:
+
 1. `visible=true` でタイトル「カスタムお題」とデフォルトセット名「マイセット」が表示される
 2. 追加フォームでテキスト入力→「保存する」で store にアイテムが増え、リストに表示される
 3. 空文字のとき「保存する」が disabled（`accessibilityState.disabled`）
@@ -345,14 +347,17 @@ describe('createDeck カスタムお題', () => {
 ### Task 4: SizeSelect 入口＋ゲーム結線
 
 **Files:**
+
 - Modify: `src/games/inshu-suijaku/size-select.tsx`
 - Modify: `src/games/inshu-suijaku/inshu-suijaku-game.tsx`（`start`/`retry` dispatch に `getActivePool` の結果を渡す・マウント時 `hydrate`）
 - Test: `src/games/inshu-suijaku/__tests__/size-select.test.tsx`（既存に追加）/ `__tests__/inshu-suijaku-game.test.tsx`（結線 1 ケース追加）
 
 **Interfaces:**
+
 - Consumes: Task 1 `useCustomPunishments`/`getActivePool`/`countByType`、Task 2 の `custom?` 引数、Task 3 `CustomPunishmentsSheet`
 
 **仕様詳細:**
+
 - SizeSelect に「カスタムお題」行を追加: 👑（`colors.premiumGold` の枠・アイコンは既存ゲームカードの王冠表現に合わせる）＋「カスタムお題」＋サブテキスト「自分たちの罰ゲームを追加」＋有効件数（例「3件 有効」。`enabled=false` なら「オフ」）。タップで `CustomPunishmentsSheet` を開く（`visible` state は SizeSelect 内）
 - `InshuSuijakuGame`: `useEffect` で `customPunishmentsStore.hydrate()`。`onStart` と result の `retry` で `dispatch({ type: 'start'|'retry', size, rng, custom: getActivePool(customState) })`
 - ジョーカー発動時のカードめくり演出・punish-reveal は既存のまま（カスタムでも text を出すだけ）
