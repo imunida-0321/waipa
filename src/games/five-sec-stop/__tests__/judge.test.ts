@@ -1,5 +1,14 @@
-import { deviationMs, formatDeviation, formatSeconds, rankRecords, tierOf } from '../judge'
-import { CLOSE_MS, GOOD_MS, PITTARI_MS, TARGET_MS } from '../judge'
+import {
+	CLOSE_MS,
+	deviationMs,
+	formatDeviation,
+	formatSeconds,
+	GOOD_MS,
+	PITTARI_MS,
+	rankRecords,
+	TARGET_MS,
+	tierOf,
+} from '../judge'
 
 describe('deviationMs', () => {
 	it('5000ms との差の絶対値を返す', () => {
