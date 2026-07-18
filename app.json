@@ -38,6 +38,19 @@
 				{
 					"microphonePermission": "声の大きさを測るゲームでマイクを使用します。録音は保存されません。"
 				}
+			],
+			[
+				"react-native-google-mobile-ads",
+				{
+					"androidAppId": "ca-app-pub-3940256099942544~3347511713",
+					"iosAppId": "ca-app-pub-3940256099942544~1458002511"
+				}
+			],
+			[
+				"expo-tracking-transparency",
+				{
+					"userTrackingPermission": "広告の最適化のために端末の識別子を使用します。"
+				}
 			]
 		],
 		"experiments": {
