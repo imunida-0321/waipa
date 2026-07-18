@@ -2,6 +2,7 @@ import { act, fireEvent, render, waitFor } from '@testing-library/react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { playersStore } from '@/lib/players-store'
 import type { GameMeta } from '@/games/registry'
+import { maybeShowGameExitInterstitial } from '@/lib/ads'
 import { GameScreen } from '../game-screen'
 
 jest.mock('@react-native-async-storage/async-storage', () =>
@@ -17,6 +18,7 @@ jest.mock('expo-haptics', () => ({
 jest.mock('expo-router', () => ({
 	router: { push: jest.fn(), back: jest.fn(), replace: jest.fn() },
 }))
+jest.mock('@/lib/ads', () => ({ maybeShowGameExitInterstitial: jest.fn() }))
 jest.mock('@/theme/player-colors', () => ({
 	playerColor: (index: number) => ({ name: `色${index}`, value: '#FF0000' }),
 }))
@@ -83,7 +85,10 @@ const baseMeta: GameMeta = {
 	Component: DummyGame,
 }
 
+const maybeShowGameExitInterstitialMock = jest.mocked(maybeShowGameExitInterstitial)
+
 beforeEach(async () => {
+	maybeShowGameExitInterstitialMock.mockClear()
 	await AsyncStorage.clear()
 	await playersStore.hydrate()
 	await playersStore.setCount(2)
@@ -193,4 +198,23 @@ it('イントロの×で router.back が呼ばれる', async () => {
 		fireEvent.press(getByLabelText('とじる'))
 	})
 	expect(router.back).toHaveBeenCalled()
+})
+
+it('イントロで閉じたときはインタースティシャルを呼ばない', async () => {
+	const { getByLabelText } = await render(<GameScreen meta={baseMeta} />)
+	await act(async () => {
+		fireEvent.press(getByLabelText('とじる'))
+	})
+	expect(maybeShowGameExitInterstitialMock).not.toHaveBeenCalled()
+})
+
+it('play ステージからの戻るでインタースティシャルを1回呼ぶ', async () => {
+	const { getByText } = await render(<GameScreen meta={baseMeta} />)
+	await act(async () => {
+		fireEvent.press(getByText('ゲームスタート'))
+	})
+	await act(async () => {
+		fireEvent.press(getByText('‹'))
+	})
+	expect(maybeShowGameExitInterstitialMock).toHaveBeenCalledTimes(1)
 })

@@ -3,6 +3,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { router } from 'expo-router'
 import { haptics } from '@/lib/haptics'
+import { maybeShowGameExitInterstitial } from '@/lib/ads'
 import type { GameMeta } from '@/games/registry'
 import { colors, spacing, typography } from '@/theme/tokens'
 import { GameIntroScreen } from './game-intro-screen'
@@ -58,6 +59,7 @@ export function GameScreen({ meta }: { meta: GameMeta }) {
 					accessibilityRole="button"
 					onPress={() => {
 						haptics.tap()
+						maybeShowGameExitInterstitial()
 						router.back()
 					}}
 					style={styles.headerBtn}
