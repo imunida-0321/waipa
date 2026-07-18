@@ -28,6 +28,15 @@ it('visible=true でタイトルとデフォルトセット名が表示される
 	expect(utils.getByText('マイセット')).toBeTruthy()
 })
 
+it('デッキへの混ざり方の tips が一覧に表示される', async () => {
+	const utils = await render(<CustomPunishmentsSheet visible onClose={jest.fn()} />)
+	expect(
+		utils.getByText(
+			'💡 カスタムお題は優先して盤面に入り、そのぶんプリセットのお題と入れ替わります。盤面のペア数より多く登録すると、毎回その中からランダムに選ばれます。',
+		),
+	).toBeTruthy()
+})
+
 it('追加フォームで保存すると store にアイテムが増え、リストに表示される', async () => {
 	const utils = await render(<CustomPunishmentsSheet visible onClose={jest.fn()} />)
 	await act(async () => {

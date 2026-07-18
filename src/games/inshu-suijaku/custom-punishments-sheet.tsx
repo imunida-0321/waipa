@@ -212,6 +212,11 @@ export function CustomPunishmentsSheet({ visible, onClose }: Props) {
 							/>
 						</View>
 
+						<Text style={styles.tips}>
+							💡
+							カスタムお題は優先して盤面に入り、そのぶんプリセットのお題と入れ替わります。盤面のペア数より多く登録すると、毎回その中からランダムに選ばれます。
+						</Text>
+
 						<View style={styles.tabs}>
 							<TabButton
 								active={selectedType === 'normal'}
@@ -335,6 +340,7 @@ const styles = StyleSheet.create({
 	},
 	toggleTitle: { ...typography.body, fontWeight: '700' },
 	note: { ...typography.caption },
+	tips: { ...typography.caption, lineHeight: 19 },
 	tabs: {
 		flexDirection: 'row',
 		backgroundColor: colors.surface,
