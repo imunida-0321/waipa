@@ -1,4 +1,6 @@
 import { fireEvent, render } from '@testing-library/react-native'
+import type { ReactNode } from 'react'
+import { Text } from 'react-native'
 import { GradientButton } from '../gradient-button'
 import { PillButton } from '../pill-button'
 
@@ -13,7 +15,7 @@ jest.mock('expo-haptics', () => ({
 	notificationAsync: jest.fn(),
 }))
 jest.mock('expo-linear-gradient', () => ({
-	LinearGradient: ({ children }: any) => children,
+	LinearGradient: ({ children }: { children: ReactNode }) => children,
 }))
 
 describe('GradientButton', () => {
@@ -37,10 +39,18 @@ describe('GradientButton', () => {
 })
 
 describe('PillButton', () => {
-	it('タイトルを表示し、タップで onPress が呼ばれる', async () => {
+	it('アイコンとタイトルを表示し、タップで onPress が呼ばれる', async () => {
 		const onPress = jest.fn()
-		const { getByText } = await render(<PillButton title="👑 プレミアム" onPress={onPress} />)
-		fireEvent.press(getByText('👑 プレミアム'))
+		const { getByText, getByTestId, queryByText } = await render(
+			<PillButton
+				title="プレミアム"
+				icon={<Text testID="icon-crown">crown</Text>}
+				onPress={onPress}
+			/>,
+		)
+		expect(getByTestId('icon-crown')).toBeTruthy()
+		expect(queryByText('👑 プレミアム')).toBeNull()
+		fireEvent.press(getByText('プレミアム'))
 		expect(onPress).toHaveBeenCalledTimes(1)
 	})
 })

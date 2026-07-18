@@ -1,3 +1,4 @@
+import { MaterialCommunityIcons } from '@expo/vector-icons'
 import { Image } from 'expo-image'
 import { LinearGradient } from 'expo-linear-gradient'
 import { Pressable, StyleSheet, Text, View } from 'react-native'
@@ -46,7 +47,13 @@ export function GameCard({ game, onPress }: Props) {
 				{locked && (
 					<View testID="premium-lock-mask" style={styles.lockMask}>
 						<View style={styles.lockBadge}>
-							<Text style={styles.lockBadgeText}>👑 プレミアム</Text>
+							<MaterialCommunityIcons
+								name="crown"
+								testID="icon-crown"
+								size={13}
+								color={colors.premiumGold}
+							/>
+							<Text style={styles.lockBadgeText}>プレミアム</Text>
 						</View>
 					</View>
 				)}
@@ -92,6 +99,9 @@ const styles = StyleSheet.create({
 		borderRadius: radii.pill,
 		paddingHorizontal: spacing.md,
 		paddingVertical: spacing.xs,
+		flexDirection: 'row',
+		alignItems: 'center',
+		gap: spacing.xs,
 	},
 	lockBadgeText: { ...typography.caption, color: colors.premiumGold },
 	emoji: { fontSize: 40 },

@@ -1,3 +1,4 @@
+import { MaterialCommunityIcons } from '@expo/vector-icons'
 import { router } from 'expo-router'
 import { Pressable, StyleSheet, Text, View } from 'react-native'
 import { PillButton } from '@/components/ui/pill-button'
@@ -10,7 +11,18 @@ export function HomeHeader() {
 		<View style={styles.row}>
 			<Text style={styles.logo}>WaiPa</Text>
 			<View style={styles.right}>
-				<PillButton title="👑 プレミアム" onPress={() => router.push('/settings')} />
+				<PillButton
+					title="プレミアム"
+					icon={
+						<MaterialCommunityIcons
+							name="crown"
+							testID="icon-crown"
+							size={14}
+							color={colors.premiumGold}
+						/>
+					}
+					onPress={() => router.push('/settings')}
+				/>
 				<Pressable
 					accessibilityRole="button"
 					accessibilityLabel="メニュー"

@@ -16,14 +16,8 @@ jest.mock('expo-haptics', () => ({
 jest.mock('expo-router', () => ({ router: { push: jest.fn(), back: jest.fn() } }))
 jest.mock('expo-linear-gradient', () => {
 	// eslint-disable-next-line @typescript-eslint/no-require-imports
-	const React = require('react')
-	// eslint-disable-next-line @typescript-eslint/no-require-imports
 	const { View } = require('react-native')
-	const LinearGradient = React.forwardRef((props: any, ref: any) =>
-		React.createElement(View, { ...props, ref }, props.children),
-	)
-	LinearGradient.displayName = 'LinearGradient'
-	return { LinearGradient }
+	return { LinearGradient: View }
 })
 jest.mock('@/lib/settings-store', () => ({
 	settingsStore: {
@@ -36,16 +30,18 @@ beforeEach(() => {
 })
 
 it('ロゴとプレミアムボタンとメニューが表示される', async () => {
-	const { getByText, getByLabelText } = await render(<HomeHeader />)
+	const { getByText, getByTestId, getByLabelText, queryByText } = await render(<HomeHeader />)
 	expect(getByText('WaiPa')).toBeTruthy()
-	expect(getByText('👑 プレミアム')).toBeTruthy()
+	expect(getByTestId('icon-crown')).toBeTruthy()
+	expect(getByText('プレミアム')).toBeTruthy()
+	expect(queryByText('👑 プレミアム')).toBeNull()
 	expect(getByLabelText('メニュー')).toBeTruthy()
 })
 
 it('プレミアムボタンとメニューで設定へ遷移する', async () => {
 	const { getByText, getByLabelText } = await render(<HomeHeader />)
 	await act(async () => {
-		fireEvent.press(getByText('👑 プレミアム'))
+		fireEvent.press(getByText('プレミアム'))
 	})
 	await act(async () => {
 		fireEvent.press(getByLabelText('メニュー'))

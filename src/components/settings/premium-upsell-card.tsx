@@ -1,3 +1,4 @@
+import { MaterialCommunityIcons } from '@expo/vector-icons'
 import { Image } from 'expo-image'
 import { StyleSheet, Text, View } from 'react-native'
 import { GradientButton } from '@/components/ui/gradient-button'
@@ -12,7 +13,13 @@ export function PremiumUpsellCard({ onUpgradePress }: Props) {
 	return (
 		<View style={styles.card}>
 			<View style={styles.mascotWrap}>
-				<Text style={styles.crown}>👑</Text>
+				<MaterialCommunityIcons
+					name="crown"
+					testID="icon-crown"
+					size={28}
+					color={colors.premiumGold}
+					style={styles.crown}
+				/>
 				<Image
 					style={styles.mascot}
 					source={require('@/assets/images/expo-logo.png')}
@@ -39,7 +46,7 @@ const styles = StyleSheet.create({
 		gap: spacing.sm,
 	},
 	mascotWrap: { alignItems: 'center' },
-	crown: { fontSize: 28, marginBottom: -spacing.xs, zIndex: 1 },
+	crown: { marginBottom: -spacing.xs, zIndex: 1 },
 	mascot: { width: 72, height: 72 },
 	title: { ...typography.title, color: colors.premiumGold },
 	copy: { ...typography.body, color: colors.textMuted, textAlign: 'center' },
