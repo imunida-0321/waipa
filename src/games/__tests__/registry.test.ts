@@ -1,4 +1,19 @@
 import { games, getGame } from '../registry'
+import { meta as bomb216Meta } from '../bomb-216/meta'
+import { meta as bombRelayMeta } from '../bomb-relay/meta'
+import { meta as bombSwipeMeta } from '../bomb-swipe/meta'
+import { meta as burstChickenMeta } from '../burst-chicken/meta'
+import { meta as chinchiroMeta } from '../chinchiro/meta'
+import { meta as dautDiceMeta } from '../daut-dice/meta'
+import { meta as fiveSecStopMeta } from '../five-sec-stop/meta'
+import { meta as inshuSuijakuMeta } from '../inshu-suijaku/meta'
+import { meta as kanpaiWolfMeta } from '../kanpai-wolf/meta'
+import { meta as kimagureOxMeta } from '../kimagure-ox/meta'
+import { meta as noKingGameMeta } from '../no-king-game/meta'
+import { meta as odekoPokerMeta } from '../odeko-poker/meta'
+import { meta as reactionPairsMeta } from '../reaction-pairs/meta'
+import { meta as sasayakiLimitMeta } from '../sasayaki-limit/meta'
+import { meta as whoWillPayMeta } from '../who-will-pay/meta'
 
 jest.mock('@react-native-async-storage/async-storage', () =>
 	// eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -61,6 +76,27 @@ jest.mock('@/games/daut-dice/dice-roll-3d', () => ({
 }))
 
 describe('ゲームレジストリ', () => {
+	it('ゲーム別 meta.ts をホーム表示順どおりに集約している', () => {
+		const expected = [
+			whoWillPayMeta,
+			bomb216Meta,
+			fiveSecStopMeta,
+			kimagureOxMeta,
+			noKingGameMeta,
+			chinchiroMeta,
+			bombRelayMeta,
+			reactionPairsMeta,
+			burstChickenMeta,
+			dautDiceMeta,
+			kanpaiWolfMeta,
+			inshuSuijakuMeta,
+			bombSwipeMeta,
+			sasayakiLimitMeta,
+			odekoPokerMeta,
+		]
+		expect(games).toEqual(expected)
+	})
+
 	it('MVP の8ゲーム＋プレミアム7本（バーストチキン・ダウトダイス・乾杯ウルフ・飲酒衰弱・爆弾スワイプ・ささやきリミット・おでこインディアンポーカー）が登録されている', () => {
 		expect(games).toHaveLength(15)
 	})
