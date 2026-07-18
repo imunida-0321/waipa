@@ -23,11 +23,11 @@ Codex CLI（コーダー）
      指示された範囲のコーディングと単体テスト作成
 ```
 
-| 役割 | 担当 | 主な仕事 |
-| --- | --- | --- |
-| 人間 | プロダクトオーナー | 何を作るか決める・Issue 化・実機確認・PR マージ |
+| 役割        | 担当               | 主な仕事                                                                               |
+| ----------- | ------------------ | -------------------------------------------------------------------------------------- |
+| 人間        | プロダクトオーナー | 何を作るか決める・Issue 化・実機確認・PR マージ                                        |
 | Claude Code | 設計 / 指示 / 評価 | ブランチ作成、タスク分解、Codex への指示、RED/GREEN ログの検証、diff レビュー、PR 作成 |
-| Codex CLI | 実装 | `codex exec` 経由でテストとコードを書く（AGENTS.md を自動読込） |
+| Codex CLI   | 実装               | `codex exec` 経由でテストとコードを書く（AGENTS.md を自動読込）                        |
 
 依頼の仕方の例: 「Issue #64 を実装して。コーディングは codex に任せて」
 
@@ -68,15 +68,15 @@ Codex に委任するときは、Claude が指示を「① テスト作成（RED
 
 ## よく使うコマンド
 
-| コマンド | 用途 |
-| --- | --- |
-| `npm start` | Expo 開発サーバー起動（`npm run ios` / `npm run android` も可） |
-| `npm test` | 全テスト実行 |
-| `npx jest src/games/<id>/` | 特定ゲームのテストだけ実行 |
-| `npx jest --coverage` | カバレッジ計測 |
-| `npm run typecheck` | TypeScript 型チェック |
-| `npm run lint` | ESLint |
-| `npm run format` | Prettier で整形（タブ幅4・セミコロンなし・シングルクォート） |
+| コマンド                   | 用途                                                            |
+| -------------------------- | --------------------------------------------------------------- |
+| `npm start`                | Expo 開発サーバー起動（`npm run ios` / `npm run android` も可） |
+| `npm test`                 | 全テスト実行                                                    |
+| `npx jest src/games/<id>/` | 特定ゲームのテストだけ実行                                      |
+| `npx jest --coverage`      | カバレッジ計測                                                  |
+| `npm run typecheck`        | TypeScript 型チェック                                           |
+| `npm run lint`             | ESLint                                                          |
+| `npm run format`           | Prettier で整形（タブ幅4・セミコロンなし・シングルクォート）    |
 
 ## ディレクトリ構成
 
@@ -104,7 +104,7 @@ docs/
 ## セキュリティ
 
 - 秘密情報ファイル（`.env` 系・署名証明書・API 秘密鍵）は **AI に読ませない**
-  - Claude 側: PreToolUse フック [.claude/hooks/block-env-access.sh](../.claude/hooks/block-env-access.sh) が機械的にブロック
-  - Codex 側: AGENTS.md の禁止規定＋サンドボックス＋Claude のレビューでカバー
+    - Claude 側: PreToolUse フック [.claude/hooks/block-env-access.sh](../.claude/hooks/block-env-access.sh) が機械的にブロック
+    - Codex 側: AGENTS.md の禁止規定＋サンドボックス＋Claude のレビューでカバー
 - フックは Bash コマンド文字列中の「.env」という文字列にも反応するため、コミットメッセージや PR 本文にこの文字列を含めると実行がブロックされる。「環境変数ファイル」等に言い換えること
 - 閲覧してよいのは `.env.example`（ダミー値）のみ

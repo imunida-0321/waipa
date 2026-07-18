@@ -86,16 +86,16 @@ npm run format:check  # フォーマット確認（崩れていたら npm run fo
 
 ## よく使うコマンド
 
-| コマンド | 用途 |
-| --- | --- |
-| `npm start` | Expo 開発サーバー起動 |
-| `npm test` | 全テスト実行 |
-| `npx jest src/games/<id>/` | 特定ゲームのテストだけ実行 |
-| `npx jest <path> --watch` | watch モード（TDD 中はこれ） |
-| `npx jest --coverage` | カバレッジ計測（目安: Lines 80% 以上を維持） |
-| `npm run typecheck` | TypeScript 型チェック |
-| `npm run lint` | ESLint |
-| `npm run format` / `format:check` | Prettier 整形 / 確認 |
+| コマンド                          | 用途                                         |
+| --------------------------------- | -------------------------------------------- |
+| `npm start`                       | Expo 開発サーバー起動                        |
+| `npm test`                        | 全テスト実行                                 |
+| `npx jest src/games/<id>/`        | 特定ゲームのテストだけ実行                   |
+| `npx jest <path> --watch`         | watch モード（TDD 中はこれ）                 |
+| `npx jest --coverage`             | カバレッジ計測（目安: Lines 80% 以上を維持） |
+| `npm run typecheck`               | TypeScript 型チェック                        |
+| `npm run lint`                    | ESLint                                       |
+| `npm run format` / `format:check` | Prettier 整形 / 確認                         |
 
 ## 新しいゲームを追加する場合
 
