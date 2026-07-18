@@ -1,8 +1,15 @@
 import { act, fireEvent, render } from '@testing-library/react-native'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import { customPunishmentsStore } from '@/lib/custom-punishments-store'
 import type { Card } from '../engine'
+import { createDeck } from '../engine'
 import { MATCH_ANIM_MS } from '../card-grid'
 import { JOKER_ANIM_MS, MISMATCH_MS, InshuSuijakuGame } from '../inshu-suijaku-game'
 
+jest.mock('@react-native-async-storage/async-storage', () =>
+	// eslint-disable-next-line @typescript-eslint/no-require-imports
+	require('@react-native-async-storage/async-storage/jest/async-storage-mock'),
+)
 jest.mock('@/lib/sound', () => ({ playSound: jest.fn(), registerSound: jest.fn() }))
 jest.mock('@/lib/haptics', () => ({
 	haptics: { tap: jest.fn(), heavy: jest.fn(), success: jest.fn() },
@@ -91,6 +98,26 @@ async function startGame(utils: Awaited<ReturnType<typeof render>>) {
 		})
 	})
 }
+
+it('スタート時に有効なカスタムお題プールを createDeck に渡す', async () => {
+	await AsyncStorage.clear()
+	await customPunishmentsStore.hydrate()
+	await customPunishmentsStore.addItem('normal', 'カスタム通常')
+	await customPunishmentsStore.addItem('special', 'カスタム特大')
+	const mockedCreateDeck = createDeck as jest.MockedFunction<typeof createDeck>
+	mockedCreateDeck.mockClear()
+
+	const utils = await render(<InshuSuijakuGame />)
+	await startGame(utils)
+
+	const firstCall = mockedCreateDeck.mock.calls[0]
+	expect(firstCall[0]).toBe('small')
+	expect(typeof firstCall[1]).toBe('function')
+	expect(firstCall[2]).toEqual({
+		normals: [{ id: 'c2', text: 'カスタム通常', type: 'normal' }],
+		specials: [{ id: 'c3', text: 'カスタム特大', type: 'special' }],
+	})
+})
 
 it('サイズ選択 → play: 秘匿された盤面が出る', async () => {
 	const utils = await render(<InshuSuijakuGame />)

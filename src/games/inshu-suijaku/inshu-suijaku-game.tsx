@@ -1,6 +1,11 @@
 import { router } from 'expo-router'
 import { useEffect, useReducer } from 'react'
 import { StyleSheet, Text, View } from 'react-native'
+import {
+	customPunishmentsStore,
+	getActivePool,
+	useCustomPunishments,
+} from '@/lib/custom-punishments-store'
 import { haptics } from '@/lib/haptics'
 import { getDisplayNames, usePlayers } from '@/lib/players-store'
 import { playerColor } from '@/theme/player-colors'
@@ -20,7 +25,12 @@ const rng: Rng = () => Math.random()
 export function InshuSuijakuGame() {
 	const players = usePlayers()
 	const names = getDisplayNames(players)
+	const customState = useCustomPunishments()
 	const [state, dispatch] = useReducer(reduce, players.count, initialState)
+
+	useEffect(() => {
+		void customPunishmentsStore.hydrate()
+	}, [])
 
 	// 不成立の2枚は約1.5秒見せて自動で裏返す
 	const mismatch = isMismatchShown(state)
@@ -47,7 +57,13 @@ export function InshuSuijakuGame() {
 	}, [state.phase])
 
 	if (state.phase === 'size') {
-		return <SizeSelect onStart={(size) => dispatch({ type: 'start', size, rng })} />
+		return (
+			<SizeSelect
+				onStart={(size) =>
+					dispatch({ type: 'start', size, rng, custom: getActivePool(customState) })
+				}
+			/>
+		)
 	}
 
 	if (state.phase === 'result') {
@@ -55,7 +71,7 @@ export function InshuSuijakuGame() {
 			<ResultScreen
 				names={names}
 				scores={state.scores}
-				onRetry={() => dispatch({ type: 'retry', rng })}
+				onRetry={() => dispatch({ type: 'retry', rng, custom: getActivePool(customState) })}
 				onHome={() => router.replace('/')}
 			/>
 		)
