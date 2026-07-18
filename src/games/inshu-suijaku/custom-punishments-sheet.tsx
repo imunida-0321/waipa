@@ -214,7 +214,7 @@ export function CustomPunishmentsSheet({ visible, onClose }: Props) {
 
 						<Text style={styles.tips}>
 							💡
-							カスタムお題は優先して盤面に入り、そのぶんプリセットのお題と入れ替わります。盤面のペア数より多く登録すると、毎回その中からランダムに選ばれます。
+							カスタムお題は優先して盤面に入り、その分プリセットのお題と入れ替わります。盤面のペア数より多く登録すると、毎回その中からランダムに選ばれます。
 						</Text>
 
 						<View style={styles.tabs}>

@@ -32,7 +32,7 @@ it('デッキへの混ざり方の tips が一覧に表示される', async () =
 	const utils = await render(<CustomPunishmentsSheet visible onClose={jest.fn()} />)
 	expect(
 		utils.getByText(
-			'💡 カスタムお題は優先して盤面に入り、そのぶんプリセットのお題と入れ替わります。盤面のペア数より多く登録すると、毎回その中からランダムに選ばれます。',
+			'💡 カスタムお題は優先して盤面に入り、その分プリセットのお題と入れ替わります。盤面のペア数より多く登録すると、毎回その中からランダムに選ばれます。',
 		),
 	).toBeTruthy()
 })
