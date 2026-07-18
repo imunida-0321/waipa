@@ -33,7 +33,7 @@ export function useDigitRoulette(amount: number, playerCount: number) {
 		if (isSpinning || allDone || currentIndex === null) return
 
 		const targetIndex = currentIndex
-		const playerIndex = pickPlayerIndex(playerCount)
+		const playerIndex = pickPlayerIndex(playerCount, Math.random)
 
 		setIsSpinning(true)
 		playSound('spin')

@@ -1,4 +1,5 @@
 import { amountToSlots, assignSlot, needsSpin, playerTotals, pickPlayerIndex } from '../payment'
+import type { Rng } from '../payment'
 
 describe('amountToSlots', () => {
 	it('124 を位取り付きスロットに分解する', () => {
@@ -56,15 +57,30 @@ describe('assignSlot / playerTotals', () => {
 
 describe('pickPlayerIndex', () => {
 	it('playerCount=1 は必ず 0 を返す', () => {
-		for (let i = 0; i < 20; i++) expect(pickPlayerIndex(1)).toBe(0)
+		for (let i = 0; i < 20; i++) expect(pickPlayerIndex(1, Math.random)).toBe(0)
 	})
 
 	it('0..playerCount-1 の範囲に収まる', () => {
 		for (let i = 0; i < 100; i++) {
-			const v = pickPlayerIndex(5)
+			const v = pickPlayerIndex(5, Math.random)
 			expect(v).toBeGreaterThanOrEqual(0)
 			expect(v).toBeLessThan(5)
 			expect(Number.isInteger(v)).toBe(true)
 		}
+	})
+
+	it('注入された rng が 0 を返すと index 0 を返す', () => {
+		const rng: Rng = () => 0
+		expect(pickPlayerIndex(4, rng)).toBe(0)
+	})
+
+	it('注入された rng が 1 に極めて近い値を返すと最後の index を返す', () => {
+		const rng: Rng = () => 0.999999
+		expect(pickPlayerIndex(4, rng)).toBe(3)
+	})
+
+	it('注入された rng の中間値から決定的に index を選ぶ', () => {
+		const rng: Rng = () => 0.5
+		expect(pickPlayerIndex(4, rng)).toBe(2)
 	})
 })

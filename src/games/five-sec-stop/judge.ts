@@ -1,5 +1,7 @@
 export const TARGET_MS = 5000
 export const PITTARI_MS = 50
+export const GOOD_MS = 200
+export const CLOSE_MS = 500
 
 export type Tier = 'pittari' | 'good' | 'close' | 'far'
 
@@ -19,8 +21,8 @@ export function deviationMs(ms: number): number {
 export function tierOf(ms: number): Tier {
 	const d = deviationMs(ms)
 	if (d <= PITTARI_MS) return 'pittari'
-	if (d <= 200) return 'good'
-	if (d <= 500) return 'close'
+	if (d <= GOOD_MS) return 'good'
+	if (d <= CLOSE_MS) return 'close'
 	return 'far'
 }
 

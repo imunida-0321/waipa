@@ -6,6 +6,8 @@ export type DigitSlot = {
 	playerIndex: number | null
 }
 
+export type Rng = () => number
+
 // 合計金額を左（上位桁）から位取り付きスロットに分解する
 export function amountToSlots(amount: number): DigitSlot[] {
 	const digits = Math.max(0, Math.floor(amount)).toString().split('')
@@ -37,6 +39,6 @@ export function playerTotals(slots: DigitSlot[], playerCount: number): number[] 
 }
 
 // 均等乱数で担当プレイヤーを選ぶ
-export function pickPlayerIndex(playerCount: number): number {
-	return Math.floor(Math.random() * playerCount)
+export function pickPlayerIndex(playerCount: number, rng: Rng): number {
+	return Math.floor(rng() * playerCount)
 }

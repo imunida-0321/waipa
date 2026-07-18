@@ -1,4 +1,5 @@
 import { deviationMs, formatDeviation, formatSeconds, rankRecords, tierOf } from '../judge'
+import { CLOSE_MS, GOOD_MS, PITTARI_MS, TARGET_MS } from '../judge'
 
 describe('deviationMs', () => {
 	it('5000ms との差の絶対値を返す', () => {
@@ -18,6 +19,33 @@ describe('tierOf', () => {
 		expect(tierOf(5201)).toBe('close')
 		expect(tierOf(5500)).toBe('close') // 500ms ちょうど
 		expect(tierOf(5501)).toBe('far')
+	})
+
+	it('PITTARI_MS の境界ちょうどと ±1ms で tier を分ける', () => {
+		expect(tierOf(TARGET_MS + PITTARI_MS - 1)).toBe('pittari')
+		expect(tierOf(TARGET_MS + PITTARI_MS)).toBe('pittari')
+		expect(tierOf(TARGET_MS + PITTARI_MS + 1)).toBe('good')
+		expect(tierOf(TARGET_MS - PITTARI_MS + 1)).toBe('pittari')
+		expect(tierOf(TARGET_MS - PITTARI_MS)).toBe('pittari')
+		expect(tierOf(TARGET_MS - PITTARI_MS - 1)).toBe('good')
+	})
+
+	it('GOOD_MS の境界ちょうどと ±1ms で tier を分ける', () => {
+		expect(tierOf(TARGET_MS + GOOD_MS - 1)).toBe('good')
+		expect(tierOf(TARGET_MS + GOOD_MS)).toBe('good')
+		expect(tierOf(TARGET_MS + GOOD_MS + 1)).toBe('close')
+		expect(tierOf(TARGET_MS - GOOD_MS + 1)).toBe('good')
+		expect(tierOf(TARGET_MS - GOOD_MS)).toBe('good')
+		expect(tierOf(TARGET_MS - GOOD_MS - 1)).toBe('close')
+	})
+
+	it('CLOSE_MS の境界ちょうどと ±1ms で tier を分ける', () => {
+		expect(tierOf(TARGET_MS + CLOSE_MS - 1)).toBe('close')
+		expect(tierOf(TARGET_MS + CLOSE_MS)).toBe('close')
+		expect(tierOf(TARGET_MS + CLOSE_MS + 1)).toBe('far')
+		expect(tierOf(TARGET_MS - CLOSE_MS + 1)).toBe('close')
+		expect(tierOf(TARGET_MS - CLOSE_MS)).toBe('close')
+		expect(tierOf(TARGET_MS - CLOSE_MS - 1)).toBe('far')
 	})
 })
 
