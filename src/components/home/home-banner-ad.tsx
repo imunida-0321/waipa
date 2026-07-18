@@ -10,7 +10,10 @@ export function HomeBannerAd() {
 	if (!adsEnabled()) return null
 	return (
 		<View testID="home-banner-ad" style={[styles.wrap, { paddingBottom: insets.bottom }]}>
-			<BannerAd unitId={AD_UNIT_IDS.homeBanner} size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER} />
+			<BannerAd
+				unitId={AD_UNIT_IDS.homeBanner}
+				size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
+			/>
 		</View>
 	)
 }
