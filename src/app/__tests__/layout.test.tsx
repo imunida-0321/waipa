@@ -17,7 +17,10 @@ jest.mock('expo-router', () => {
 	const { Text } = require('react-native')
 	const Stack = ({ children }: { children?: import('react').ReactNode }) =>
 		React.createElement(React.Fragment, null, children)
-	Stack.Screen = ({ name }: { name: string }) => React.createElement(Text, null, `screen:${name}`)
+	const StackScreen = ({ name }: { name: string }) =>
+		React.createElement(Text, null, `screen:${name}`)
+	StackScreen.displayName = 'Stack.Screen'
+	Stack.Screen = StackScreen
 	return {
 		DarkTheme: { name: 'dark' },
 		DefaultTheme: { name: 'light' },

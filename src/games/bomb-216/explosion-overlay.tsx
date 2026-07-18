@@ -7,7 +7,6 @@ export function ExplosionOverlay() {
 	return (
 		<View pointerEvents="none" style={StyleSheet.absoluteFill} testID="explosion-overlay">
 			<LottieView
-				// eslint-disable-next-line @typescript-eslint/no-require-imports
 				source={require('@/assets/lottie/explosion.json')}
 				autoPlay
 				loop={false}
