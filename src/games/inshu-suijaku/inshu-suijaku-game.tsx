@@ -47,9 +47,7 @@ export function InshuSuijakuGame() {
 	}, [state.phase])
 
 	if (state.phase === 'size') {
-		return (
-			<SizeSelect onStart={(size) => dispatch({ type: 'start', size, rng })} />
-		)
+		return <SizeSelect onStart={(size) => dispatch({ type: 'start', size, rng })} />
 	}
 
 	if (state.phase === 'result') {

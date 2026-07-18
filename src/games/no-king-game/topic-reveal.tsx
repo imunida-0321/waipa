@@ -52,7 +52,10 @@ export function TopicReveal({
 			{drumroll.phase === 'idle' && (
 				<>
 					{skipsLeft > 0 ? (
-						<PillButton title={`お題をスキップ（残り${skipsLeft}回）`} onPress={onSkip} />
+						<PillButton
+							title={`お題をスキップ（残り${skipsLeft}回）`}
+							onPress={onSkip}
+						/>
 					) : (
 						<Text style={styles.skipExhausted}>スキップは使い切りました</Text>
 					)}

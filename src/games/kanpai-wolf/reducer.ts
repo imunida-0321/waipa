@@ -10,7 +10,7 @@ import {
 } from './engine'
 
 export type Phase =
-	'setup'
+	| 'setup'
 	| 'deal'
 	| 'trigger-reveal'
 	| 'discuss'

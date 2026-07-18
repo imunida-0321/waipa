@@ -28,7 +28,9 @@ afterEach(() => {
 
 it('残り時間を mm:ss で表示し、満了で onDone を1回だけ呼ぶ', async () => {
 	const onDone = jest.fn()
-	const { getByText } = await render(<DiscussScreen seconds={61} onDone={onDone} {...baseProps} />)
+	const { getByText } = await render(
+		<DiscussScreen seconds={61} onDone={onDone} {...baseProps} />,
+	)
 	expect(getByText('1:01')).toBeTruthy()
 	await act(async () => {
 		jest.advanceTimersByTime(61_000)
@@ -50,7 +52,9 @@ it('残り10秒からチクタクが鳴る', async () => {
 
 it('「投票へすすむ」は2度押しで確定する', async () => {
 	const onDone = jest.fn()
-	const { getByText } = await render(<DiscussScreen seconds={180} onDone={onDone} {...baseProps} />)
+	const { getByText } = await render(
+		<DiscussScreen seconds={180} onDone={onDone} {...baseProps} />,
+	)
 	await act(async () => {
 		fireEvent.press(getByText('投票へすすむ'))
 	})
@@ -70,7 +74,9 @@ it('決選投票前の再議論では見出しが変わる', async () => {
 
 it('スキップ確定後はチクタクも onDone 再発火もしない', async () => {
 	const onDone = jest.fn()
-	const { getByText } = await render(<DiscussScreen seconds={180} onDone={onDone} {...baseProps} />)
+	const { getByText } = await render(
+		<DiscussScreen seconds={180} onDone={onDone} {...baseProps} />,
+	)
 	await act(async () => {
 		fireEvent.press(getByText('投票へすすむ'))
 	})
