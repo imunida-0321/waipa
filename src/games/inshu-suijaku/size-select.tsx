@@ -1,3 +1,4 @@
+import { MaterialCommunityIcons } from '@expo/vector-icons'
 import { useState } from 'react'
 import { Pressable, StyleSheet, Text, View } from 'react-native'
 import { GradientButton } from '@/components/ui/gradient-button'
@@ -35,7 +36,12 @@ export function SizeSelect({ onStart }: Props) {
 				style={styles.customRow}
 			>
 				<View style={styles.crownBadge}>
-					<Text style={styles.crown}>👑</Text>
+					<MaterialCommunityIcons
+						name="crown"
+						testID="icon-crown"
+						size={18}
+						color={colors.premiumGold}
+					/>
 				</View>
 				<View style={styles.customBody}>
 					<Text style={styles.customTitle}>カスタムお題</Text>
@@ -97,7 +103,6 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		justifyContent: 'center',
 	},
-	crown: { fontSize: 18, color: colors.premiumGold },
 	customBody: { flex: 1, gap: spacing.xs },
 	customTitle: { ...typography.body, fontWeight: '700' },
 	customMeta: { ...typography.caption },

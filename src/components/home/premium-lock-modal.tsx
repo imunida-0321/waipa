@@ -1,3 +1,4 @@
+import { MaterialCommunityIcons } from '@expo/vector-icons'
 import { Modal, Pressable, StyleSheet, Text, View } from 'react-native'
 import { GradientButton } from '@/components/ui/gradient-button'
 import { colors, radii, spacing, typography } from '@/theme/tokens'
@@ -15,7 +16,12 @@ export function PremiumLockModal({ visible, gameTitle, onClose }: Props) {
 		<Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
 			<Pressable style={styles.backdrop} onPress={onClose}>
 				<Pressable style={styles.sheet} onPress={() => {}}>
-					<Text style={styles.emoji}>👑</Text>
+					<MaterialCommunityIcons
+						name="crown"
+						testID="icon-crown"
+						size={48}
+						color={colors.premiumGold}
+					/>
 					<Text style={styles.title}>{gameTitle}</Text>
 					<Text style={styles.desc}>このゲームは WaiPa プレミアムで遊べます。</Text>
 					<View style={styles.badge}>
@@ -46,7 +52,6 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		gap: spacing.md,
 	},
-	emoji: { fontSize: 48 },
 	title: { ...typography.title, textAlign: 'center' },
 	desc: { ...typography.body, color: colors.textMuted, textAlign: 'center' },
 	badge: {

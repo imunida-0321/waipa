@@ -106,6 +106,18 @@ it('solo-fight: 一人勝ちの発表になり、負けなし', async () => {
 	expect(queryByText(/負け！/)).toBeNull()
 })
 
+it('solo-fight: 勝者マークは王冠アイコンで表示される', async () => {
+	const j: Judgement = {
+		outcome: 'solo-fight',
+		loserIndices: [],
+		winnerIndex: 1,
+		hetareIndex: null,
+	}
+	const { getByTestId, queryByText } = await renderRevealed(j, ['fold', 'fight', 'fold'])
+	expect(getByTestId('icon-crown')).toBeTruthy()
+	expect(queryByText('👑')).toBeNull()
+})
+
 it('all-fold: 全員負けの発表', async () => {
 	const j: Judgement = {
 		outcome: 'all-fold',

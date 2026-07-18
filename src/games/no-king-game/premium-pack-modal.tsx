@@ -1,3 +1,4 @@
+import { MaterialCommunityIcons } from '@expo/vector-icons'
 import { Modal, Pressable, StyleSheet, Text, View } from 'react-native'
 import { GradientButton } from '@/components/ui/gradient-button'
 import { colors, radii, spacing, typography } from '@/theme/tokens'
@@ -14,7 +15,12 @@ export function PremiumPackModal({ visible, onClose }: Props) {
 		<Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
 			<Pressable style={styles.backdrop} onPress={onClose}>
 				<Pressable style={styles.sheet} onPress={() => {}}>
-					<Text style={styles.emoji}>🔒</Text>
+					<MaterialCommunityIcons
+						name="lock"
+						testID="icon-lock"
+						size={48}
+						color={colors.text}
+					/>
 					<Text style={styles.title}>限定お題パック</Text>
 					<Text style={styles.desc}>
 						ドキドキ度アップの限定お題が遊べるパックです。{'\n'}
@@ -48,7 +54,6 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		gap: spacing.md,
 	},
-	emoji: { fontSize: 48 },
 	title: { ...typography.title },
 	desc: { ...typography.body, color: colors.textMuted, textAlign: 'center', lineHeight: 24 },
 	badge: {

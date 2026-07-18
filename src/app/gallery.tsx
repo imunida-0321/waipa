@@ -1,3 +1,4 @@
+import { MaterialCommunityIcons } from '@expo/vector-icons'
 import { Redirect, router } from 'expo-router'
 import { ScrollView, StyleSheet, View } from 'react-native'
 import { Card } from '@/components/ui/card'
@@ -29,7 +30,18 @@ export default function GalleryScreen() {
 			<View style={styles.gap} />
 			<GradientButton title="無効状態" onPress={() => {}} disabled />
 			<View style={styles.gap} />
-			<PillButton title="👑 プレミアム" onPress={() => haptics.success()} />
+			<PillButton
+				title="プレミアム"
+				icon={
+					<MaterialCommunityIcons
+						name="crown"
+						testID="icon-crown"
+						size={14}
+						color={colors.premiumGold}
+					/>
+				}
+				onPress={() => haptics.success()}
+			/>
 
 			<SectionHeader title="カード" />
 			<Card>
