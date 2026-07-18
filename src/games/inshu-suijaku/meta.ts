@@ -13,7 +13,7 @@ export const meta: GameMeta = {
 	premium: true,
 	catchCopy: 'めくって揃えば罰ゲーム！\n誰にやらせるかは、あなた次第！',
 	summary:
-		'このゲームは、トランプの神経衰弱に罰ゲームを仕込んだ飲み会向けゲームです！ペアを揃えると隠されていた罰ゲームが発表され、揃えた人が実行者を指名。ジョーカーを引いたら特大罰を自分が実行！全ペア消化後、獲得ペア数のランキングを発表します！',
+		'このゲームは、トランプの神経衰弱に罰ゲームを仕込んだゲームです！ペアを揃えると隠されていた罰ゲームが発表され、揃えた人が実行者を指名。ジョーカーを引いたら特大罰を自分が実行！全ペア消化後、獲得ペア数のランキングを発表します！',
 	thumbnail: require('@/assets/images/inshu-suijaku/intro.jpg'),
 	cardThumbnail: require('@/assets/images/inshu-suijaku/card.jpg'),
 	howToPlay: [

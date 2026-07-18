@@ -1,4 +1,4 @@
-import { NORMAL_PUNISHMENTS, SPECIAL_PUNISHMENTS } from './punishments'
+import { NORMAL_PUNISHMENTS, SPECIAL_PUNISHMENTS, type Punishment } from './punishments'
 
 export type Rng = () => number
 
@@ -16,6 +16,11 @@ export type Card = {
 	punishmentId: string
 	punishment: string // ペア成立（またはジョーカー発動）まで UI に出さない
 	state: CardState
+}
+
+export type CustomPunishmentPool = {
+	normals: readonly Punishment[]
+	specials: readonly Punishment[]
 }
 
 export const JOKER_COUNT = 2
@@ -44,12 +49,18 @@ export function shuffle<T>(items: readonly T[], rng: Rng): T[] {
 }
 
 // 標準52枚からペア数ぶんの (rank, suit) を重複なし抽出し、罰を割り当ててシャッフルする
-export function createDeck(size: BoardSize, rng: Rng): Card[] {
+export function createDeck(size: BoardSize, rng: Rng, custom?: CustomPunishmentPool): Card[] {
 	const { pairs } = BOARD_CONFIG[size]
 	const combos = SUITS.flatMap((suit) => RANKS.map((rank) => ({ rank, suit })))
 	const picked = shuffle(combos, rng).slice(0, pairs)
-	const normals = shuffle(NORMAL_PUNISHMENTS, rng).slice(0, pairs)
-	const specials = shuffle(SPECIAL_PUNISHMENTS, rng).slice(0, JOKER_COUNT)
+	const normals = [
+		...shuffle(custom?.normals ?? [], rng),
+		...shuffle(NORMAL_PUNISHMENTS, rng),
+	].slice(0, pairs)
+	const specials = [
+		...shuffle(custom?.specials ?? [], rng),
+		...shuffle(SPECIAL_PUNISHMENTS, rng),
+	].slice(0, JOKER_COUNT)
 
 	const cards: Card[] = []
 	picked.forEach((combo, i) => {

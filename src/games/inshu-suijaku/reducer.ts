@@ -1,4 +1,11 @@
-import { createDeck, isMatch, type BoardSize, type Card, type Rng } from './engine'
+import {
+	createDeck,
+	isMatch,
+	type BoardSize,
+	type Card,
+	type CustomPunishmentPool,
+	type Rng,
+} from './engine'
 
 export type Phase = 'size' | 'play' | 'matchAnim' | 'jokerAnim' | 'punish' | 'result'
 
@@ -21,13 +28,13 @@ export type GameState = {
 }
 
 export type Action =
-	| { type: 'start'; size: BoardSize; rng: Rng }
+	| { type: 'start'; size: BoardSize; rng: Rng; custom?: CustomPunishmentPool }
 	| { type: 'flip'; cardId: string }
 	| { type: 'hideMismatch' }
 	| { type: 'matchAnimDone' }
 	| { type: 'jokerAnimDone' }
 	| { type: 'punishDone' }
-	| { type: 'retry'; rng: Rng }
+	| { type: 'retry'; rng: Rng; custom?: CustomPunishmentPool }
 
 export function initialState(playerCount: number): GameState {
 	return {
@@ -69,7 +76,7 @@ export function reduce(state: GameState, action: Action): GameState {
 				...initialState(state.playerCount),
 				phase: 'play',
 				size: action.size,
-				cards: createDeck(action.size, action.rng),
+				cards: createDeck(action.size, action.rng, action.custom),
 			}
 		case 'flip':
 			return flip(state, action.cardId)
@@ -86,6 +93,7 @@ export function reduce(state: GameState, action: Action): GameState {
 				type: 'start',
 				size: state.size,
 				rng: action.rng,
+				custom: action.custom,
 			})
 	}
 }

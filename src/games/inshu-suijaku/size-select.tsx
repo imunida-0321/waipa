@@ -1,8 +1,10 @@
 import { useState } from 'react'
 import { Pressable, StyleSheet, Text, View } from 'react-native'
 import { GradientButton } from '@/components/ui/gradient-button'
+import { getActiveSet, useCustomPunishments } from '@/lib/custom-punishments-store'
 import { haptics } from '@/lib/haptics'
 import { colors, radii, spacing, typography } from '@/theme/tokens'
+import { CustomPunishmentsSheet } from './custom-punishments-sheet'
 import { BOARD_CONFIG, JOKER_COUNT, type BoardSize } from './engine'
 import { NS } from './theme'
 
@@ -15,10 +17,32 @@ type Props = {
 // 盤面サイズ3択（ペア数・目安時間つき）＋スタート
 export function SizeSelect({ onStart }: Props) {
 	const [selected, setSelected] = useState<BoardSize>('small')
+	const [customVisible, setCustomVisible] = useState(false)
+	const custom = useCustomPunishments()
+	const activeSet = getActiveSet(custom)
+	const activeCount = activeSet.items.length
+	const customStatus = custom.enabled ? `${activeCount}件 有効` : 'オフ'
 
 	return (
 		<View style={styles.container}>
 			<Text style={styles.heading}>盤面サイズをえらぼう</Text>
+			<Pressable
+				accessibilityRole="button"
+				onPress={() => {
+					haptics.tap()
+					setCustomVisible(true)
+				}}
+				style={styles.customRow}
+			>
+				<View style={styles.crownBadge}>
+					<Text style={styles.crown}>👑</Text>
+				</View>
+				<View style={styles.customBody}>
+					<Text style={styles.customTitle}>カスタムお題</Text>
+					<Text style={styles.customMeta}>自分たちの罰ゲームを追加</Text>
+				</View>
+				<Text style={styles.customStatus}>{customStatus}</Text>
+			</Pressable>
 			<View style={styles.options}>
 				{SIZES.map((size) => {
 					const config = BOARD_CONFIG[size]
@@ -43,6 +67,10 @@ export function SizeSelect({ onStart }: Props) {
 				})}
 			</View>
 			<GradientButton title="スタート" onPress={() => onStart(selected)} />
+			<CustomPunishmentsSheet
+				visible={customVisible}
+				onClose={() => setCustomVisible(false)}
+			/>
 		</View>
 	)
 }
@@ -50,6 +78,30 @@ export function SizeSelect({ onStart }: Props) {
 const styles = StyleSheet.create({
 	container: { flex: 1, justifyContent: 'center', padding: spacing.md, gap: spacing.lg },
 	heading: { ...typography.title, textAlign: 'center' },
+	customRow: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		backgroundColor: colors.surface,
+		borderWidth: 1,
+		borderColor: colors.premiumGold,
+		borderRadius: radii.md,
+		padding: spacing.md,
+		gap: spacing.md,
+	},
+	crownBadge: {
+		width: 36,
+		height: 36,
+		borderRadius: 18,
+		borderWidth: 1,
+		borderColor: colors.premiumGold,
+		alignItems: 'center',
+		justifyContent: 'center',
+	},
+	crown: { fontSize: 18, color: colors.premiumGold },
+	customBody: { flex: 1, gap: spacing.xs },
+	customTitle: { ...typography.body, fontWeight: '700' },
+	customMeta: { ...typography.caption },
+	customStatus: { ...typography.caption, color: colors.premiumGold, fontWeight: '700' },
 	options: { gap: spacing.sm },
 	option: {
 		backgroundColor: colors.surface,

@@ -14,6 +14,7 @@ export function GradientButton({ title, onPress, disabled = false }: Props) {
 	return (
 		<Pressable
 			accessibilityRole="button"
+			accessibilityState={{ disabled }}
 			disabled={disabled}
 			onPress={() => {
 				haptics.tap()

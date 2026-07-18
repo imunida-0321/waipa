@@ -90,3 +90,46 @@ it('remainingPairs: removed を除いたペア数を返す', () => {
 	)
 	expect(remainingPairs(removed)).toBe(6)
 })
+
+describe('createDeck カスタムお題', () => {
+	const fixedRng = () => 0.5
+	const custom = {
+		normals: [
+			{ id: 'c1', text: 'カスタム通常1', type: 'normal' as const },
+			{ id: 'c2', text: 'カスタム通常2', type: 'normal' as const },
+		],
+		specials: [{ id: 'c3', text: 'カスタム特大', type: 'special' as const }],
+	}
+
+	it('カスタム通常罰が優先して盤面に入る', () => {
+		const cards = createDeck('small', fixedRng, custom)
+		const ids = new Set(cards.map((c) => c.punishmentId))
+		expect(ids.has('c1')).toBe(true)
+		expect(ids.has('c2')).toBe(true)
+	})
+
+	it('カスタム特大罰がジョーカーに優先して割り当たる', () => {
+		const cards = createDeck('small', fixedRng, custom)
+		const jokers = cards.filter((c) => c.rank === 'JOKER')
+		expect(jokers.some((c) => c.punishmentId === 'c3')).toBe(true)
+		expect(jokers).toHaveLength(JOKER_COUNT)
+	})
+
+	it('カスタムがペア数を超えてもペア数・カード枚数は変わらない', () => {
+		const many = {
+			normals: Array.from({ length: 30 }, (_, i) => ({
+				id: `cn${i}`,
+				text: `多め${i}`,
+				type: 'normal' as const,
+			})),
+			specials: [],
+		}
+		const cards = createDeck('small', fixedRng, many)
+		expect(cards).toHaveLength(BOARD_CONFIG.small.pairs * 2 + JOKER_COUNT)
+	})
+
+	it('custom 省略時は従来どおりプリセットのみ', () => {
+		const cards = createDeck('small', fixedRng)
+		expect(cards.every((c) => !c.punishmentId.startsWith('c'))).toBe(true)
+	})
+})
