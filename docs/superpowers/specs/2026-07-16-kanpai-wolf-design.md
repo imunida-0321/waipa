@@ -22,20 +22,20 @@
 
 ## トリガー内蔵リスト（初期12個）
 
-| id | text |
-| --- | --- |
-| question | 誰かが質問されたら全員乾杯 |
-| silence | 3秒沈黙したら全員一口 |
-| wakaru | 誰かが「わかる」と言ったらその人が一口 |
+| id            | text                                   |
+| ------------- | -------------------------------------- |
+| question      | 誰かが質問されたら全員乾杯             |
+| silence       | 3秒沈黙したら全員一口                  |
+| wakaru        | 誰かが「わかる」と言ったらその人が一口 |
 | majority-look | 多数派っぽい発言をした人を指名して乾杯 |
-| before-doubt | ウルフだと思う人に質問する前に乾杯 |
-| laugh | 誰かが笑ったら全員乾杯 |
-| name-call | 名前を呼ばれた人は一口 |
-| maybe | 「たぶん」「かも」を言ったら本人が一口 |
-| repeat | 直前の人と同じ単語を使ったら全員乾杯 |
-| point | 誰かを指さしたら指した人が一口 |
-| agree-all | 全員がうなずいたら全員乾杯 |
-| keigo | 敬語を使ったら本人が一口 |
+| before-doubt  | ウルフだと思う人に質問する前に乾杯     |
+| laugh         | 誰かが笑ったら全員乾杯                 |
+| name-call     | 名前を呼ばれた人は一口                 |
+| maybe         | 「たぶん」「かも」を言ったら本人が一口 |
+| repeat        | 直前の人と同じ単語を使ったら全員乾杯   |
+| point         | 誰かを指さしたら指した人が一口         |
+| agree-all     | 全員がうなずいたら全員乾杯             |
+| keigo         | 敬語を使ったら本人が一口               |
 
 - 文言は「一口」「乾杯」主体。**「飲め」等の強制表現・敗者飲酒の直接表現は使わない**（daut-dice / 飲酒衰弱と同方針、レーティング配慮）
 - ソフトドリンクでも成立する文言にする（「一口」は飲み物を選ばない）
@@ -63,21 +63,29 @@ export const TRIGGERS: readonly KanpaiTrigger[] = [/* 上記12個 */]
 export function chooseTrigger(usedIds: readonly string[], rng: Rng): KanpaiTrigger
 
 // reducer.ts の差分
-type Phase = 'setup' | 'deal' | 'trigger-reveal' | 'discuss' | 'vote'
-	| 'runoff-discuss' | 'reveal' | 'reversal' | 'result'
+type Phase =
+	| 'setup'
+	| 'deal'
+	| 'trigger-reveal'
+	| 'discuss'
+	| 'vote'
+	| 'runoff-discuss'
+	| 'reveal'
+	| 'reversal'
+	| 'result'
 type GameState = {
 	// …既存フィールドはそのまま…
 	trigger: KanpaiTrigger | null // 今ラウンドの公開ルール
-	kanpaiCount: number           // 今ラウンドの乾杯回数（演出用）
-	usedTriggerIds: string[]      // 連戦の重複回避（usedPairIds と同パターン）
+	kanpaiCount: number // 今ラウンドの乾杯回数（演出用）
+	usedTriggerIds: string[] // 連戦の重複回避（usedPairIds と同パターン）
 }
 type Action =
 	// start / retry は pair と同様に trigger も外から注入（reducer は純関数を保つ）
 	| { type: 'start'; config: StartConfig; pair: WordPair; trigger: KanpaiTrigger; rng: Rng }
 	| { type: 'retry'; pair: WordPair; trigger: KanpaiTrigger; rng: Rng }
 	| { type: 'triggerRevealDone' } // trigger-reveal → discuss
-	| { type: 'kanpai' }            // discuss / runoff-discuss 中のみ有効。kanpaiCount +1
-	// …既存アクションはそのまま…
+	| { type: 'kanpai' } // discuss / runoff-discuss 中のみ有効。kanpaiCount +1
+// …既存アクションはそのまま…
 ```
 
 - `newRound` の遷移先を `deal` のまま維持し、`dealtOne` の最終遷移を `discuss` → `trigger-reveal` に変更
@@ -107,14 +115,14 @@ src/games/kanpai-wolf/
 
 ## リネームの影響範囲
 
-| 対象 | 対応 |
-| --- | --- |
-| `src/games/word-wolf/` | `src/games/kanpai-wolf/` へ移動（`word-wolf-game.tsx` → `kanpai-wolf-game.tsx`、コンポーネント名 `WordWolfGame` → `KanpaiWolfGame`） |
-| registry.ts | `id: 'kanpai-wolf'`、`title: '乾杯ウルフ'`、絵文字 🍻、tagline / catchCopy / summary / howToPlay を乾杯トリガー込みに全面更新 |
-| registry の thumbnail / cardThumbnail | 既存画像（`assets/images/word-wolf/`）には「ワードウルフ」のタイトル文字が入っている前提のため**一旦外す**（絵文字＋グラデのフォールバック表示）。新アートは他ゲーム同様に後日追加（#75 と同枠） |
-| `src/lib/word-pairs-store.ts` / Supabase `word_pairs` テーブル / キャッシュキー `waipa.word_pairs.v1` | **変更しない**。お題ペアの供給機構はゲーム名と独立した資産として現名称を維持（DB マイグレーションと既存キャッシュ破棄を避ける） |
-| CLAUDE.md「収録ゲーム候補」 | ワードウルフの行を「乾杯ウルフ – ワードウルフに公開乾杯ルールを1つ足した推理×乾杯ゲーム（プレミアム）」に更新 |
-| `src/games/__tests__/registry.test.ts` | 期待値を新 ID・新タイトルに更新 |
+| 対象                                                                                                  | 対応                                                                                                                                                                                             |
+| ----------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `src/games/word-wolf/`                                                                                | `src/games/kanpai-wolf/` へ移動（`word-wolf-game.tsx` → `kanpai-wolf-game.tsx`、コンポーネント名 `WordWolfGame` → `KanpaiWolfGame`）                                                             |
+| registry.ts                                                                                           | `id: 'kanpai-wolf'`、`title: '乾杯ウルフ'`、絵文字 🍻、tagline / catchCopy / summary / howToPlay を乾杯トリガー込みに全面更新                                                                    |
+| registry の thumbnail / cardThumbnail                                                                 | 既存画像（`assets/images/word-wolf/`）には「ワードウルフ」のタイトル文字が入っている前提のため**一旦外す**（絵文字＋グラデのフォールバック表示）。新アートは他ゲーム同様に後日追加（#75 と同枠） |
+| `src/lib/word-pairs-store.ts` / Supabase `word_pairs` テーブル / キャッシュキー `waipa.word_pairs.v1` | **変更しない**。お題ペアの供給機構はゲーム名と独立した資産として現名称を維持（DB マイグレーションと既存キャッシュ破棄を避ける）                                                                  |
+| CLAUDE.md「収録ゲーム候補」                                                                           | ワードウルフの行を「乾杯ウルフ – ワードウルフに公開乾杯ルールを1つ足した推理×乾杯ゲーム（プレミアム）」に更新                                                                                    |
+| `src/games/__tests__/registry.test.ts`                                                                | 期待値を新 ID・新タイトルに更新                                                                                                                                                                  |
 
 - 未リリースアプリのため、旧 ID `word-wolf` の互換維持（リダイレクト等）は不要
 

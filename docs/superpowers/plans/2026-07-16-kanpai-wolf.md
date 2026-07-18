@@ -28,12 +28,14 @@
 ### Task 1: word-wolf → kanpai-wolf 全面リネーム（挙動不変）
 
 **Files:**
+
 - Rename: `src/games/word-wolf/` → `src/games/kanpai-wolf/`（`word-wolf-game.tsx` → `kanpai-wolf-game.tsx`、テストも同様）
 - Modify: `src/games/registry.ts`（word-wolf エントリ全面書き換え）
 - Modify: `src/games/__tests__/registry.test.ts:64`（テスト名の文言）
 - Modify: `CLAUDE.md:27`（収録ゲーム候補の行）
 
 **Interfaces:**
+
 - Consumes: なし（機械的リネーム）
 - Produces: `KanpaiWolfGame`（`src/games/kanpai-wolf/kanpai-wolf-game.tsx`）、テーマ定数 `KW`（旧 `WW`、`src/games/kanpai-wolf/theme.ts`）。以降のタスクは全てこのパスを前提とする
 
@@ -48,6 +50,7 @@ git mv src/games/kanpai-wolf/__tests__/word-wolf-game.test.tsx src/games/kanpai-
 - [ ] **Step 2: 識別子の一括置換**
 
 `src/games/kanpai-wolf/` 内の全 `.ts` / `.tsx` で:
+
 - `WordWolfGame` → `KanpaiWolfGame`
 - `from '../word-wolf-game'` → `from '../kanpai-wolf-game'`
 - `WW` → `KW`（`theme.ts` の export と全画面の import / 使用箇所）
@@ -103,9 +106,9 @@ import を `import { KanpaiWolfGame } from './kanpai-wolf/kanpai-wolf-game'` に
 64行目のテスト名 `ワードウルフ` → `乾杯ウルフ`:
 
 ```ts
-	it('MVP の8ゲーム＋プレミアム7本（バーストチキン・ダウトダイス・乾杯ウルフ・飲酒衰弱・爆弾スワイプ・ささやきリミット・おでこインディアンポーカー）が登録されている', () => {
-		expect(games).toHaveLength(15)
-	})
+it('MVP の8ゲーム＋プレミアム7本（バーストチキン・ダウトダイス・乾杯ウルフ・飲酒衰弱・爆弾スワイプ・ささやきリミット・おでこインディアンポーカー）が登録されている', () => {
+	expect(games).toHaveLength(15)
+})
 ```
 
 - [ ] **Step 5: CLAUDE.md の収録ゲーム候補を更新**
@@ -133,10 +136,12 @@ git commit -m "refactor: word-wolf を kanpai-wolf に全面リネーム（乾�
 ### Task 2: engine — TRIGGERS / chooseTrigger（TDD）
 
 **Files:**
+
 - Modify: `src/games/kanpai-wolf/engine.ts`（末尾に追加）
 - Test: `src/games/kanpai-wolf/__tests__/engine.test.ts`（末尾に describe 追加）
 
 **Interfaces:**
+
 - Consumes: `Rng`（engine.ts 既存型）
 - Produces: `type KanpaiTrigger = { id: string; text: string }`、`const TRIGGERS: readonly KanpaiTrigger[]`（12個）、`function chooseTrigger(usedIds: readonly string[], rng: Rng): KanpaiTrigger`。Task 3 以降が使用
 
@@ -223,6 +228,7 @@ git commit -m "feat: 乾杯トリガーの内蔵リストと抽選ロジック�
 ### Task 3: reducer trigger-reveal フェーズ＋発表画面＋ゲーム配線
 
 **Files:**
+
 - Modify: `src/games/kanpai-wolf/reducer.ts`
 - Create: `src/games/kanpai-wolf/trigger-reveal-screen.tsx`
 - Modify: `src/games/kanpai-wolf/deal-pass.tsx:57`（最終ボタン文言）
@@ -230,6 +236,7 @@ git commit -m "feat: 乾杯トリガーの内蔵リストと抽選ロジック�
 - Test: `src/games/kanpai-wolf/__tests__/reducer.test.ts` / `__tests__/trigger-reveal-screen.test.tsx`（新規）/ `__tests__/deal-pass.test.tsx` / `__tests__/kanpai-wolf-game.test.tsx`
 
 **Interfaces:**
+
 - Consumes: `KanpaiTrigger` / `chooseTrigger`（Task 2）
 - Produces:
     - `Phase` に `'trigger-reveal'` 追加（`deal` 完了 → `trigger-reveal` → `discuss`）
@@ -266,6 +273,7 @@ function toDiscuss(state: GameState): GameState {
 ```
 
 既存テストの修正:
+
 - `'dealtOne を人数ぶん繰り返すと discuss へ'` → 期待値を `'trigger-reveal'` に変え、テスト名を `'dealtOne を人数ぶん繰り返すと trigger-reveal へ'` に変更
 - `describe('retry')` 内の2つの `{ type: 'retry', pair: …, rng: rng0 }` に `trigger: trig2`（1つ目）/ `trigger: trig`（2つ目）を追加
 
@@ -336,8 +344,15 @@ import {
 } from './engine'
 
 export type Phase =
-	'setup' | 'deal' | 'trigger-reveal' | 'discuss' | 'vote' | 'runoff-discuss'
-	| 'reveal' | 'reversal' | 'result'
+	| 'setup'
+	| 'deal'
+	| 'trigger-reveal'
+	| 'discuss'
+	| 'vote'
+	| 'runoff-discuss'
+	| 'reveal'
+	| 'reversal'
+	| 'result'
 ```
 
 `GameState` に追加（`usedPairIds` の下）:
@@ -517,14 +532,14 @@ import { TriggerRevealScreen } from './trigger-reveal-screen'
 `onStart` / `retry` の dispatch に trigger を追加し、phase switch に新ケースを追加:
 
 ```tsx
-	const onStart = (config: StartConfig) =>
-		dispatch({
-			type: 'start',
-			config,
-			pair: pickPair(config.pack, state.usedPairIds),
-			trigger: chooseTrigger(state.usedTriggerIds, Math.random),
-			rng: Math.random,
-		})
+const onStart = (config: StartConfig) =>
+	dispatch({
+		type: 'start',
+		config,
+		pair: pickPair(config.pack, state.usedPairIds),
+		trigger: chooseTrigger(state.usedTriggerIds, Math.random),
+		rng: Math.random,
+	})
 ```
 
 ```tsx
@@ -555,13 +570,14 @@ result の `onRetry`:
 - [ ] **Step 10: ゲーム通しテストを更新**
 
 `__tests__/kanpai-wolf-game.test.tsx`:
+
 - `dealOne` ヘルパーの最終ラベルを `'確認した（乾杯ルールへ！）'` に変更（58行目付近の直書き `'確認した（次の人へ）'` はそのまま）
 - 両方の通しテストで、最終 deal の直後に trigger-reveal のステップを挿入（`Math.random` は 0 固定 → `TRIGGERS[0]` = 「誰かが質問されたら全員乾杯」）:
 
 ```tsx
-	// trigger-reveal（rng 0 固定: TRIGGERS[0] が選ばれる）
-	expect(ui.getByText('誰かが質問されたら全員乾杯')).toBeTruthy()
-	await press(ui, '議論スタート')
+// trigger-reveal（rng 0 固定: TRIGGERS[0] が選ばれる）
+expect(ui.getByText('誰かが質問されたら全員乾杯')).toBeTruthy()
+await press(ui, '議論スタート')
 ```
 
 - [ ] **Step 11: 全テストがパスすることを確認**
@@ -581,12 +597,14 @@ git commit -m "feat: trigger-reveal フェーズと乾杯ルール発表画面�
 ### Task 4: kanpai アクション＋議論画面の乾杯UI
 
 **Files:**
+
 - Modify: `src/games/kanpai-wolf/reducer.ts`（`kanpai` アクション）
 - Modify: `src/games/kanpai-wolf/discuss-screen.tsx`（トリガー常時表示＋乾杯ボタン）
 - Modify: `src/games/kanpai-wolf/kanpai-wolf-game.tsx`（props 配線）
 - Test: `src/games/kanpai-wolf/__tests__/reducer.test.ts` / `__tests__/discuss-screen.test.tsx`
 
 **Interfaces:**
+
 - Consumes: `GameState.trigger` / `kanpaiCount`（Task 3）
 - Produces: `Action` に `{ type: 'kanpai' }`。`DiscussScreen` の Props が `{ seconds, trigger: string, kanpaiCount: number, isRunoff?, onKanpai: () => void, onDone }` になる（Task 5 は変更なしで併存可）
 
@@ -595,40 +613,40 @@ git commit -m "feat: trigger-reveal フェーズと乾杯ルール発表画面�
 `reducer.test.ts` の `describe('乾杯トリガー')` に追加:
 
 ```ts
-	it('kanpai は discuss / runoff-discuss 中だけカウント +1', () => {
-		let s = toDiscuss(start(3))
-		s = apply(s, { type: 'kanpai' }, { type: 'kanpai' })
-		expect(s.kanpaiCount).toBe(2)
-		// vote 中は no-op
-		const voting = reduce(s, { type: 'discussDone' })
-		expect(reduce(voting, { type: 'kanpai' })).toBe(voting)
-	})
+it('kanpai は discuss / runoff-discuss 中だけカウント +1', () => {
+	let s = toDiscuss(start(3))
+	s = apply(s, { type: 'kanpai' }, { type: 'kanpai' })
+	expect(s.kanpaiCount).toBe(2)
+	// vote 中は no-op
+	const voting = reduce(s, { type: 'discussDone' })
+	expect(reduce(voting, { type: 'kanpai' })).toBe(voting)
+})
 
-	it('runoff-discuss 中の kanpai もカウントされ、retry で 0 に戻る', () => {
-		// 全員同票 → runoff-discuss へ
-		let s = apply(toDiscuss(start(3)), { type: 'discussDone' })
-		s = apply(
-			s,
-			{ type: 'vote', target: 1 },
-			{ type: 'vote', target: 2 },
-			{ type: 'vote', target: 0 },
-		)
-		expect(s.phase).toBe('runoff-discuss')
-		s = reduce(s, { type: 'kanpai' })
-		expect(s.kanpaiCount).toBe(1)
-		// 決着 → result → retry でリセット
-		s = apply(
-			s,
-			{ type: 'discussDone' },
-			{ type: 'vote', target: 1 },
-			{ type: 'vote', target: 0 },
-			{ type: 'vote', target: 0 },
-			{ type: 'revealDone' },
-			{ type: 'reversalJudged', guessed: false },
-			{ type: 'retry', pair: pair2, trigger: trig2, rng: rng0 },
-		)
-		expect(s.kanpaiCount).toBe(0)
-	})
+it('runoff-discuss 中の kanpai もカウントされ、retry で 0 に戻る', () => {
+	// 全員同票 → runoff-discuss へ
+	let s = apply(toDiscuss(start(3)), { type: 'discussDone' })
+	s = apply(
+		s,
+		{ type: 'vote', target: 1 },
+		{ type: 'vote', target: 2 },
+		{ type: 'vote', target: 0 },
+	)
+	expect(s.phase).toBe('runoff-discuss')
+	s = reduce(s, { type: 'kanpai' })
+	expect(s.kanpaiCount).toBe(1)
+	// 決着 → result → retry でリセット
+	s = apply(
+		s,
+		{ type: 'discussDone' },
+		{ type: 'vote', target: 1 },
+		{ type: 'vote', target: 0 },
+		{ type: 'vote', target: 0 },
+		{ type: 'revealDone' },
+		{ type: 'reversalJudged', guessed: false },
+		{ type: 'retry', pair: pair2, trigger: trig2, rng: rng0 },
+	)
+	expect(s.kanpaiCount).toBe(0)
+})
 ```
 
 - [ ] **Step 2: テストが失敗することを確認**
@@ -728,15 +746,15 @@ type Props = {
 コンポーネント内（`finish` の下）に乾杯演出:
 
 ```tsx
-	const scale = useRef(new Animated.Value(1)).current
+const scale = useRef(new Animated.Value(1)).current
 
-	const kanpai = () => {
-		playSound('cheers') // 素材未登録の間は無音スキップ（#75）
-		haptics.heavy()
-		scale.setValue(1.4)
-		Animated.spring(scale, { toValue: 1, useNativeDriver: true }).start()
-		onKanpai()
-	}
+const kanpai = () => {
+	playSound('cheers') // 素材未登録の間は無音スキップ（#75）
+	haptics.heavy()
+	scale.setValue(1.4)
+	Animated.spring(scale, { toValue: 1, useNativeDriver: true }).start()
+	onKanpai()
+}
 ```
 
 JSX: タイトルの上にトリガーカード、タイマーの下（GradientButton の上）に乾杯ボタン:
@@ -829,11 +847,13 @@ git commit -m "feat: 議論画面に乾杯ルール常時表示と🍻乾杯ボ�
 ### Task 5: リザルトの乾杯回数表示＋総仕上げ
 
 **Files:**
+
 - Modify: `src/games/kanpai-wolf/result-screen.tsx`
 - Modify: `src/games/kanpai-wolf/kanpai-wolf-game.tsx`（result 配線＋通しテスト）
 - Test: `src/games/kanpai-wolf/__tests__/result-screen.test.tsx`（新規）/ `__tests__/kanpai-wolf-game.test.tsx`
 
 **Interfaces:**
+
 - Consumes: `GameState.kanpaiCount`（Task 3）
 - Produces: `ResultScreen` の Props に `kanpaiCount: number` を追加
 
@@ -897,7 +917,7 @@ Expected: FAIL — `kanpaiCount` prop 未対応・乾杯行なし
 `result-screen.tsx`: Props に `kanpaiCount: number` を追加し、card の `</View>` 直後（GradientButton の上）に:
 
 ```tsx
-			<Text style={styles.kanpai}>このラウンドの乾杯 🍻 × {kanpaiCount}回</Text>
+<Text style={styles.kanpai}>このラウンドの乾杯 🍻 × {kanpaiCount}回</Text>
 ```
 
 styles に `kanpai: { ...typography.caption, textAlign: 'center' },` を追加。
@@ -914,7 +934,7 @@ Expected: PASS
 `__tests__/kanpai-wolf-game.test.tsx` の1本目通しテスト、result 検証部に追記:
 
 ```tsx
-	expect(ui.getByText(/このラウンドの乾杯/)).toBeTruthy()
+expect(ui.getByText(/このラウンドの乾杯/)).toBeTruthy()
 ```
 
 Run: `npx jest src/games/kanpai-wolf`
