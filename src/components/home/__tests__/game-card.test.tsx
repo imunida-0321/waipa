@@ -62,12 +62,14 @@ describe('プレミアムロック表示', () => {
 		mockPremiumUnlocked = false
 	})
 
-	it('premium かつ未解放: 黒マスク＋👑バッジを重ねる（グラデフォールバック）', async () => {
-		const { getByTestId, getByText } = await render(
+	it('premium かつ未解放: 黒マスク＋王冠アイコンのバッジを重ねる（グラデフォールバック）', async () => {
+		const { getByTestId, getByText, queryByText } = await render(
 			<GameCard game={{ ...baseGame, premium: true }} onPress={jest.fn()} />,
 		)
 		expect(getByTestId('premium-lock-mask')).toBeTruthy()
-		expect(getByText('👑 プレミアム')).toBeTruthy()
+		expect(getByTestId('icon-crown')).toBeTruthy()
+		expect(getByText('プレミアム')).toBeTruthy()
+		expect(queryByText('👑 プレミアム')).toBeNull()
 	})
 
 	it('premium かつ未解放: cardThumbnail ありでもマスクを重ねる', async () => {

@@ -1,3 +1,4 @@
+import { MaterialCommunityIcons } from '@expo/vector-icons'
 import { useEffect } from 'react'
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
 import { DrumrollReveal } from '@/components/game/drumroll-reveal'
@@ -79,11 +80,18 @@ export function ResultScreen({
 									{declarations[i] === 'fight' ? '勝負' : '降りる'}
 								</Text>
 							</View>
-							<Text style={styles.badges}>
-								{isLoser ? '💀' : ''}
-								{isWinner ? '👑' : ''}
-								{isHetare ? '🐔ヘタレ賞' : ''}
-							</Text>
+							<View style={styles.badges}>
+								{isLoser && <Text style={styles.badgeText}>💀</Text>}
+								{isWinner && (
+									<MaterialCommunityIcons
+										name="crown"
+										testID="icon-crown"
+										size={13}
+										color={colors.premiumGold}
+									/>
+								)}
+								{isHetare && <Text style={styles.badgeText}>🐔ヘタレ賞</Text>}
+							</View>
 							<Text style={styles.cardValue}>{cards[i]}</Text>
 						</View>
 					)
@@ -127,7 +135,8 @@ const styles = StyleSheet.create({
 	chipFight: { backgroundColor: `${OP.fight}33` },
 	chipFold: { backgroundColor: `${OP.fold}33` },
 	chipText: { ...typography.caption, color: colors.text },
-	badges: { ...typography.caption, color: OP.hetare },
+	badges: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
+	badgeText: { ...typography.caption, color: OP.hetare },
 	cardValue: { ...typography.title, minWidth: 44, textAlign: 'right' },
 	hetareNote: { ...typography.body, textAlign: 'center', color: OP.hetare },
 	home: { ...typography.caption, textAlign: 'center', padding: spacing.sm },

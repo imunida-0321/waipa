@@ -12,9 +12,11 @@ jest.mock('expo-linear-gradient', () => {
 })
 
 it('ゲーム名とプレミアム案内、近日対応バッジを表示する', async () => {
-	const { getByText } = await render(
+	const { getByText, getByTestId, queryByText } = await render(
 		<PremiumLockModal visible gameTitle="バーストチキン" onClose={jest.fn()} />,
 	)
+	expect(getByTestId('icon-crown')).toBeTruthy()
+	expect(queryByText('👑')).toBeNull()
 	expect(getByText('バーストチキン')).toBeTruthy()
 	expect(getByText(/WaiPa プレミアムで遊べます/)).toBeTruthy()
 	expect(getByText('近日対応予定')).toBeTruthy()

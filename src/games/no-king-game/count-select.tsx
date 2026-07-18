@@ -1,3 +1,4 @@
+import { MaterialCommunityIcons } from '@expo/vector-icons'
 import { useState } from 'react'
 import { Pressable, StyleSheet, Text, View } from 'react-native'
 import { GradientButton } from '@/components/ui/gradient-button'
@@ -54,7 +55,15 @@ export function CountSelect({ count, onChangeCount, onDeal }: Props) {
 				}}
 				style={styles.packRow}
 			>
-				<Text style={styles.packText}>🔒 限定お題パック</Text>
+				<View style={styles.packLabel}>
+					<MaterialCommunityIcons
+						name="lock"
+						testID="icon-lock"
+						size={16}
+						color={colors.text}
+					/>
+					<Text style={styles.packText}>限定お題パック</Text>
+				</View>
 				<Text style={styles.packChevron}>›</Text>
 			</Pressable>
 
@@ -103,6 +112,7 @@ const styles = StyleSheet.create({
 		paddingHorizontal: spacing.md,
 		paddingVertical: spacing.md,
 	},
+	packLabel: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
 	packText: { ...typography.body },
 	packChevron: { ...typography.title, color: colors.textMuted },
 })

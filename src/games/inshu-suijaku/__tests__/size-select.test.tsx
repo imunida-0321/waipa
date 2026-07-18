@@ -50,6 +50,8 @@ it('未選択でもデフォルト（小）でスタートできる', async () =
 
 it('カスタムお題の入口行が表示される', async () => {
 	const utils = await render(<SizeSelect onStart={jest.fn()} />)
+	expect(utils.getByTestId('icon-crown')).toBeTruthy()
+	expect(utils.queryByText('👑')).toBeNull()
 	expect(utils.getByText('カスタムお題')).toBeTruthy()
 	expect(utils.getByText('自分たちの罰ゲームを追加')).toBeTruthy()
 	expect(utils.getByText('0件 有効')).toBeTruthy()

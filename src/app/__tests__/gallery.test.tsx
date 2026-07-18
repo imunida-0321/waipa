@@ -53,13 +53,17 @@ describe('GalleryScreen', () => {
 	})
 
 	it('ボタンと設定行の操作を各ハンドラへ渡す', async () => {
-		const { getByText, getAllByRole } = await render(<GalleryScreen />)
+		const { getByText, getByTestId, getAllByRole, queryByText } = await render(
+			<GalleryScreen />,
+		)
 
 		await act(async () => {
 			fireEvent.press(getByText('アップグレード'))
 		})
+		expect(getByTestId('icon-crown')).toBeTruthy()
+		expect(queryByText('👑 プレミアム')).toBeNull()
 		await act(async () => {
-			fireEvent.press(getByText('👑 プレミアム'))
+			fireEvent.press(getByText('プレミアム'))
 		})
 		await act(async () => {
 			fireEvent.press(getByText('レビューを書く'))

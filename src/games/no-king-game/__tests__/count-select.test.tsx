@@ -31,7 +31,7 @@ describe('CountSelect', () => {
 	})
 
 	it('人数と限定パック導線と開始ボタンを表示する', async () => {
-		const { getByText, getByLabelText } = await render(
+		const { getByText, getByTestId, getByLabelText, queryByText } = await render(
 			<CountSelect count={4} onChangeCount={jest.fn()} onDeal={jest.fn()} />,
 		)
 
@@ -39,7 +39,9 @@ describe('CountSelect', () => {
 		expect(getByText('4人')).toBeTruthy()
 		expect(getByLabelText('人数を減らす')).toBeTruthy()
 		expect(getByLabelText('人数を増やす')).toBeTruthy()
-		expect(getByText('🔒 限定お題パック')).toBeTruthy()
+		expect(getByTestId('icon-lock')).toBeTruthy()
+		expect(getByText('限定お題パック')).toBeTruthy()
+		expect(queryByText('🔒 限定お題パック')).toBeNull()
 		expect(getByText('番号を配る')).toBeTruthy()
 	})
 
@@ -72,7 +74,7 @@ describe('CountSelect', () => {
 		)
 
 		await act(async () => {
-			fireEvent.press(getByText('🔒 限定お題パック'))
+			fireEvent.press(getByText('限定お題パック'))
 		})
 
 		expect(getByText('近日対応予定')).toBeTruthy()
