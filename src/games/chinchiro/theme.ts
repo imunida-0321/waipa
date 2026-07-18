@@ -11,6 +11,9 @@ export const CHIN = {
 	dieSideR: '#BBB29C',
 	pip: '#1E1A33',
 	pipRed: '#C0392B',
+	rollButton: '#D8D8DC',
+	rollButtonBorder: '#F2F2F5',
+	rollButtonPressed: '#A9A9AE',
 	handColors: {
 		pinzoro: colors.gold,
 		arashi: colors.gold,
