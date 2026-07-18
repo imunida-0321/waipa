@@ -9,4 +9,11 @@ module.exports = defineConfig([
 	{
 		ignores: ['dist/*', '.expo/*', '.agents/*'],
 	},
+	{
+		// jest の setupFiles はテストファイル扱いされず jest グローバルが未定義になるため個別に許可
+		files: ['jest.setup.js'],
+		languageOptions: {
+			globals: { jest: 'readonly' },
+		},
+	},
 ])
