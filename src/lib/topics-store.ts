@@ -74,6 +74,35 @@ export const topicsStore = {
 			return false
 		}
 	},
+	// プレミアムお題パックの取得（リワード解放時・プレミアム時に呼ぶ）。
+	// 通常の refresh は is_premium=false のみなので、ここで対象パックだけ追加取得してマージする
+	async refreshPremiumPack(pack: string): Promise<boolean> {
+		try {
+			const anonKey = getAnonKey()
+			const supabaseUrl = getSupabaseUrl()
+			const res = await fetch(
+				`${supabaseUrl}/rest/v1/topics?select=id,pack,text&pack=eq.${pack}&limit=1000`,
+				{
+					headers: {
+						apikey: anonKey,
+						Authorization: `Bearer ${anonKey}`,
+					},
+				},
+			)
+			if (!res.ok) return false
+			const fetched = (await res.json()) as Topic[]
+			const known = new Set(state.topics.map((t) => t.id))
+			state = {
+				...state,
+				topics: [...state.topics, ...fetched.filter((t) => !known.has(t.id))],
+			}
+			emit()
+			await AsyncStorage.setItem(CACHE_KEY, JSON.stringify(state))
+			return true
+		} catch {
+			return false
+		}
+	},
 	// テスト用: モジュール状態を初期化
 	_resetForTest() {
 		state = { topics: [], fetchedAt: null }
