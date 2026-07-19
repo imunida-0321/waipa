@@ -39,7 +39,7 @@ describe('SettingToggleRow', () => {
 		const onValueChange = jest.fn()
 		const { getByRole } = await render(
 			<SettingToggleRow
-				icon="🔊"
+				icon="volume-high"
 				label="効果音"
 				value={true}
 				onValueChange={onValueChange}
@@ -54,7 +54,7 @@ describe('ChevronRow', () => {
 	it('ChevronRow のタップで onPress が呼ばれる', async () => {
 		const onPress = jest.fn()
 		const { getByText } = await render(
-			<ChevronRow icon="⭐" label="レビューを書く" onPress={onPress} />,
+			<ChevronRow icon="star" label="レビューを書く" onPress={onPress} />,
 		)
 		fireEvent.press(getByText('レビューを書く'))
 		expect(onPress).toHaveBeenCalledTimes(1)

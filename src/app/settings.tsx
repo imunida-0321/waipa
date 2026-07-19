@@ -37,24 +37,24 @@ export default function SettingsScreen() {
 			<SectionHeader title="設定" />
 			<Card>
 				<SettingToggleRow
-					icon="🔊"
+					icon="volume-high"
 					label="効果音"
 					value={settings.soundEnabled}
 					onValueChange={(v) => settingsStore.setSoundEnabled(v)}
 				/>
 				<SettingToggleRow
-					icon="📳"
+					icon="vibrate"
 					label="バイブレーション"
 					value={settings.hapticsEnabled}
 					onValueChange={(v) => settingsStore.setHapticsEnabled(v)}
 				/>
-				<SettingValueRow icon="🌐" label="言語" value="日本語" />
+				<SettingValueRow icon="web" label="言語" value="日本語" />
 			</Card>
 			<SectionHeader title="その他" />
 			<Card>
-				<ChevronRow icon="🛒" label="購入を復元する" onPress={handleRestorePremium} />
-				<ChevronRow icon="⭐" label="レビューを書く" onPress={() => writeReview()} />
-				<ChevronRow icon="✉️" label="要望・問い合わせ" onPress={() => contactSupport()} />
+				<ChevronRow icon="restore" label="購入を復元する" onPress={handleRestorePremium} />
+				<ChevronRow icon="star" label="レビューを書く" onPress={() => writeReview()} />
+				<ChevronRow icon="email-outline" label="要望・問い合わせ" onPress={() => contactSupport()} />
 			</Card>
 		</ScrollView>
 	)
