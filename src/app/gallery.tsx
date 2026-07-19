@@ -51,24 +51,24 @@ export default function GalleryScreen() {
 			<SectionHeader title="設定行" />
 			<Card>
 				<SettingToggleRow
-					icon="🔊"
+					icon="volume-high"
 					label="効果音"
 					value={settings.soundEnabled}
 					onValueChange={(v) => settingsStore.setSoundEnabled(v)}
 				/>
 				<SettingToggleRow
-					icon="📳"
+					icon="vibrate"
 					label="バイブレーション"
 					value={settings.hapticsEnabled}
 					onValueChange={(v) => settingsStore.setHapticsEnabled(v)}
 				/>
-				<ChevronRow icon="⭐" label="レビューを書く" onPress={() => haptics.heavy()} />
+				<ChevronRow icon="star" label="レビューを書く" onPress={() => haptics.heavy()} />
 			</Card>
 
 			<SectionHeader title="ゲームフレーム" />
 			<Card>
 				<ChevronRow
-					icon="🎮"
+					icon="gamepad-variant"
 					label="デモ: ゲーム画面を開く（Who will pay）"
 					onPress={() =>
 						router.push({ pathname: '/game/[id]', params: { id: 'who-will-pay' } })

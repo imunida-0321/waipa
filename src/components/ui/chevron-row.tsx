@@ -1,9 +1,11 @@
+import { MaterialCommunityIcons } from '@expo/vector-icons'
+import type { ComponentProps } from 'react'
 import { Pressable, StyleSheet, Text } from 'react-native'
 import { haptics } from '@/lib/haptics'
 import { colors, spacing, typography } from '@/theme/tokens'
 
 type Props = {
-	icon: string
+	icon: ComponentProps<typeof MaterialCommunityIcons>['name']
 	label: string
 	onPress: () => void
 }
@@ -19,7 +21,7 @@ export function ChevronRow({ icon, label, onPress }: Props) {
 			}}
 			style={({ pressed }) => [styles.row, pressed && styles.pressed]}
 		>
-			<Text style={styles.icon}>{icon}</Text>
+			<MaterialCommunityIcons name={icon} size={20} color={colors.text} style={styles.icon} />
 			<Text style={styles.label}>{label}</Text>
 			<Text style={styles.chevron}>›</Text>
 		</Pressable>
@@ -29,7 +31,7 @@ export function ChevronRow({ icon, label, onPress }: Props) {
 const styles = StyleSheet.create({
 	row: { flexDirection: 'row', alignItems: 'center', paddingVertical: spacing.md },
 	pressed: { opacity: 0.7 },
-	icon: { fontSize: 20, marginRight: spacing.md },
+	icon: { marginRight: spacing.md },
 	label: { ...typography.body, flex: 1 },
 	chevron: { fontSize: 22, color: colors.textMuted },
 })
