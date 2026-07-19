@@ -6,6 +6,7 @@ import { useColorScheme } from 'react-native'
 import { AnimatedSplashOverlay } from '@/components/animated-icon'
 import { initAds } from '@/lib/ads'
 import { playersStore } from '@/lib/players-store'
+import { initPremium } from '@/lib/premium'
 import { settingsStore } from '@/lib/settings-store'
 import { registerSound } from '@/lib/sound'
 import { topicsStore } from '@/lib/topics-store'
@@ -19,6 +20,7 @@ export default function RootLayout() {
 
 	useEffect(() => {
 		initAds()
+		initPremium()
 		settingsStore.hydrate()
 		playersStore.hydrate()
 		topicsStore.hydrate().then(() => {
@@ -56,6 +58,10 @@ export default function RootLayout() {
 					}}
 				/>
 				<Stack.Screen name="game/[id]" />
+				<Stack.Screen
+					name="paywall"
+					options={{ presentation: 'modal', headerShown: false }}
+				/>
 				<Stack.Screen
 					name="settings"
 					options={{

@@ -1,4 +1,5 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons'
+import { router } from 'expo-router'
 import { Modal, Pressable, StyleSheet, Text, View } from 'react-native'
 import { GradientButton } from '@/components/ui/gradient-button'
 import { colors, radii, spacing, typography } from '@/theme/tokens'
@@ -9,9 +10,13 @@ type Props = {
 	onClose: () => void
 }
 
-// プレミアム限定ゲーム（全体ロック）の案内スタブ。
-// アップグレード導線（購入フロー）は RevenueCat (#7) 実装時にここへ接続する
+// プレミアム限定ゲームの案内。閉じてから遷移し、背後にモーダルを残さない
 export function PremiumLockModal({ visible, gameTitle, onClose }: Props) {
+	function handleUpgrade() {
+		onClose()
+		router.push('/paywall')
+	}
+
 	return (
 		<Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
 			<Pressable style={styles.backdrop} onPress={onClose}>
@@ -24,10 +29,19 @@ export function PremiumLockModal({ visible, gameTitle, onClose }: Props) {
 					/>
 					<Text style={styles.title}>{gameTitle}</Text>
 					<Text style={styles.desc}>このゲームは WaiPa プレミアムで遊べます。</Text>
-					<View style={styles.badge}>
-						<Text style={styles.badgeText}>近日対応予定</Text>
+					<View style={styles.buttonWrap}>
+						<GradientButton
+							title="プレミアムにアップグレード"
+							onPress={handleUpgrade}
+						/>
 					</View>
-					<GradientButton title="とじる" onPress={onClose} />
+					<Pressable
+						accessibilityRole="button"
+						onPress={onClose}
+						style={styles.closeLink}
+					>
+						<Text style={styles.closeLinkText}>とじる</Text>
+					</Pressable>
 				</Pressable>
 			</Pressable>
 		</Modal>
@@ -54,13 +68,7 @@ const styles = StyleSheet.create({
 	},
 	title: { ...typography.title, textAlign: 'center' },
 	desc: { ...typography.body, color: colors.textMuted, textAlign: 'center' },
-	badge: {
-		backgroundColor: colors.background,
-		borderWidth: 1,
-		borderColor: colors.surfaceBorder,
-		borderRadius: radii.pill,
-		paddingHorizontal: spacing.md,
-		paddingVertical: spacing.xs,
-	},
-	badgeText: { ...typography.caption, color: colors.premiumGold },
+	buttonWrap: { alignSelf: 'stretch' },
+	closeLink: { padding: spacing.sm },
+	closeLinkText: { ...typography.body, color: colors.textMuted, fontWeight: '700' },
 })

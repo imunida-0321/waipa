@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { StyleSheet, View } from 'react-native'
 import { games, type GameMeta } from '@/games/registry'
 import { haptics } from '@/lib/haptics'
-import { isPremiumUnlocked } from '@/lib/premium'
+import { usePremium } from '@/lib/premium'
 import { GameCard } from './game-card'
 import { PremiumLockModal } from './premium-lock-modal'
 
@@ -11,6 +11,7 @@ import { PremiumLockModal } from './premium-lock-modal'
 // プレミアム限定ゲームは未解放の間タップでロックモーダルを出す（解放判定は @/lib/premium に集約）
 export function GameGrid() {
 	const [lockedGame, setLockedGame] = useState<GameMeta | null>(null)
+	const premiumUnlocked = usePremium()
 
 	return (
 		<View style={styles.grid}>
@@ -20,7 +21,7 @@ export function GameGrid() {
 					game={game}
 					onPress={() => {
 						haptics.tap()
-						if (game.premium === true && !isPremiumUnlocked()) {
+						if (game.premium === true && !premiumUnlocked) {
 							setLockedGame(game)
 							return
 						}

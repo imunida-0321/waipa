@@ -11,6 +11,7 @@ jest.mock('expo-linear-gradient', () => {
 let mockPremiumUnlocked = false
 jest.mock('@/lib/premium', () => ({
 	isPremiumUnlocked: () => mockPremiumUnlocked,
+	usePremium: () => mockPremiumUnlocked,
 }))
 
 const baseGame: GameMeta = {
