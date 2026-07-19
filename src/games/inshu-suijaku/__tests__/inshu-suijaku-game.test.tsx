@@ -99,6 +99,16 @@ async function startGame(utils: Awaited<ReturnType<typeof render>>) {
 	})
 }
 
+type TrialStoreModule = {
+	useTrialRoundConsumer: (gameId: string, isRoundEnd: boolean) => void
+}
+
+function spyTrialRoundConsumer() {
+	// eslint-disable-next-line @typescript-eslint/no-require-imports
+	const module = require('@/lib/trial-store') as TrialStoreModule
+	return jest.spyOn(module, 'useTrialRoundConsumer').mockImplementation(() => {})
+}
+
 it('スタート時に有効なカスタムお題プールを createDeck に渡す', async () => {
 	await AsyncStorage.clear()
 	await customPunishmentsStore.hydrate()
@@ -206,4 +216,46 @@ it('ジョーカー → 特大罰 → 全ペア消化で結果発表まで通る
 	})
 	expect(utils.getByText('🏆 結果発表')).toBeTruthy()
 	expect(utils.getAllByText(/最下位/).length).toBeGreaterThanOrEqual(1)
+})
+
+it('決着画面到達でトライアルの1ラウンドを消費する', async () => {
+	const consumerSpy = spyTrialRoundConsumer()
+	const utils = await render(<InshuSuijakuGame />)
+	await startGame(utils)
+	await act(async () => {
+		fireEvent.press(utils.getByLabelText('カード5'))
+	})
+	await act(async () => {
+		jest.advanceTimersByTime(JOKER_ANIM_MS)
+	})
+	await act(async () => {
+		fireEvent.press(utils.getByText('実行した！'))
+	})
+	await act(async () => {
+		fireEvent.press(utils.getByLabelText('カード1'))
+	})
+	await act(async () => {
+		fireEvent.press(utils.getByLabelText('カード2'))
+	})
+	await act(async () => {
+		jest.advanceTimersByTime(MATCH_ANIM_MS)
+	})
+	await act(async () => {
+		fireEvent.press(utils.getByText('実行した！'))
+	})
+	await act(async () => {
+		fireEvent.press(utils.getByLabelText('カード3'))
+	})
+	await act(async () => {
+		fireEvent.press(utils.getByLabelText('カード4'))
+	})
+	await act(async () => {
+		jest.advanceTimersByTime(MATCH_ANIM_MS)
+	})
+	await act(async () => {
+		fireEvent.press(utils.getByText('実行した！'))
+	})
+
+	expect(utils.getByText('🏆 結果発表')).toBeTruthy()
+	expect(consumerSpy).toHaveBeenCalledWith('inshu-suijaku', true)
 })

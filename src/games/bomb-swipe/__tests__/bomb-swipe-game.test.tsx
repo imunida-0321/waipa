@@ -86,6 +86,16 @@ async function press(target: Parameters<typeof fireEvent.press>[0]) {
 	})
 }
 
+type TrialStoreModule = {
+	useTrialRoundConsumer: (gameId: string, isRoundEnd: boolean) => void
+}
+
+function spyTrialRoundConsumer() {
+	// eslint-disable-next-line @typescript-eslint/no-require-imports
+	const module = require('@/lib/trial-store') as TrialStoreModule
+	return jest.spyOn(module, 'useTrialRoundConsumer').mockImplementation(() => {})
+}
+
 it('初期表示: 先頭プレイヤーの手番表示と開始ボタン', async () => {
 	const { getByText } = await render(<BombSwipeGame />)
 	expect(getByText(/あかさんの番/)).toBeTruthy()
@@ -148,4 +158,21 @@ it('全員終了でリザルトに敗者と答え合わせが表示される', a
 		jest.advanceTimersByTime(3000) // ドラムロール消化
 	})
 	expect(getByText(/あおさんの負け/)).toBeTruthy()
+})
+
+it('決着画面到達でトライアルの1ラウンドを消費する', async () => {
+	const consumerSpy = spyTrialRoundConsumer()
+	const { getByText, getByTestId } = await render(<BombSwipeGame />)
+	await press(getByText(/スワイプ開始/))
+	await press(getByTestId('mock-release-50'))
+	await press(getByText(/次へ/))
+	await press(getByText(/スワイプ開始/))
+	await press(getByTestId('mock-release-60'))
+	await press(getByText(/次へ/))
+	await act(async () => {
+		jest.advanceTimersByTime(3000)
+	})
+
+	expect(getByText(/あおさんの負け/)).toBeTruthy()
+	expect(consumerSpy).toHaveBeenCalledWith('bomb-swipe', true)
 })

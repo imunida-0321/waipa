@@ -40,11 +40,43 @@ jest.mock('../use-mic-level', () => ({
 beforeEach(() => {
 	jest.useFakeTimers()
 	jest.clearAllMocks()
-	mockMic = { ...mockMic, permission: 'granted', meteringSupported: true }
+	mockMic = {
+		permission: 'granted',
+		requestPermission: mockRequestPermission,
+		start: mockStart,
+		stop: mockStop,
+		levelDb: -30,
+		isRecording: false,
+		meteringSupported: true,
+	}
 })
 afterEach(() => {
 	jest.useRealTimers()
+	jest.restoreAllMocks()
 })
+
+async function completeSpeech(utils: Awaited<ReturnType<typeof render>>, levelDb: number) {
+	mockMic = { ...mockMic, levelDb }
+	await act(async () => {
+		fireEvent.press(utils.getByText('タップして発声スタート'))
+	})
+	await act(async () => {
+		jest.advanceTimersByTime(MEASURE_MS + 200)
+	})
+	await act(async () => {
+		fireEvent.press(utils.getByText('つぎの人へ'))
+	})
+}
+
+type TrialStoreModule = {
+	useTrialRoundConsumer: (gameId: string, isRoundEnd: boolean) => void
+}
+
+function spyTrialRoundConsumer() {
+	// eslint-disable-next-line @typescript-eslint/no-require-imports
+	const module = require('@/lib/trial-store') as TrialStoreModule
+	return jest.spyOn(module, 'useTrialRoundConsumer').mockImplementation(() => {})
+}
 
 describe('SasayakiLimitGame', () => {
 	it('権限拒否で案内画面が出る', async () => {
@@ -82,5 +114,30 @@ describe('SasayakiLimitGame', () => {
 			jest.advanceTimersByTime(MEASURE_MS + 200)
 		})
 		expect(getByText('つぎの人へ')).toBeTruthy()
+	})
+
+	it('決着画面到達でトライアルの1ラウンドを消費する', async () => {
+		const consumerSpy = spyTrialRoundConsumer()
+		jest.spyOn(Math, 'random').mockReturnValue(0)
+		const utils = await render(<SasayakiLimitGame />)
+		await act(async () => {
+			jest.advanceTimersByTime(3100)
+		})
+		await act(async () => {
+			fireEvent.press(utils.getByText('スタート'))
+		})
+
+		for (let round = 1; round <= 3; round++) {
+			await completeSpeech(utils, -30)
+			await completeSpeech(utils, -2)
+			if (round < 3) {
+				await act(async () => {
+					fireEvent.press(utils.getByText(`ラウンド ${round + 1} へ`))
+				})
+			}
+		}
+
+		expect(utils.getByText('結果発表')).toBeTruthy()
+		expect(consumerSpy).toHaveBeenCalledWith('sasayaki-limit', true)
 	})
 })

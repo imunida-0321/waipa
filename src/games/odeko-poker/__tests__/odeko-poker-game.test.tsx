@@ -67,6 +67,16 @@ async function declareAll(utils: Utils, choices: ('勝負' | '降りる')[]) {
 	}
 }
 
+type TrialStoreModule = {
+	useTrialRoundConsumer: (gameId: string, isRoundEnd: boolean) => void
+}
+
+function spyTrialRoundConsumer() {
+	// eslint-disable-next-line @typescript-eslint/no-require-imports
+	const module = require('@/lib/trial-store') as TrialStoreModule
+	return jest.spyOn(module, 'useTrialRoundConsumer').mockImplementation(() => {})
+}
+
 it('deal 画面から始まり、額当て→宣言→全員降りで「全員負け」発表まで通る', async () => {
 	const utils = await render(<OdekoPokerGame />)
 	expect(utils.getByText(/ラウンド 1/)).toBeTruthy()
@@ -89,6 +99,19 @@ it('勝負1人なら一人勝ちが発表され、次のラウンドで deal に
 	expect(utils.getByText(/あかさんの一人勝ち/)).toBeTruthy()
 	await act(async () => fireEvent.press(utils.getByText('次のラウンド')))
 	expect(utils.getByText(/ラウンド 2/)).toBeTruthy()
+})
+
+it('決着画面到達でトライアルの1ラウンドを消費する', async () => {
+	const consumerSpy = spyTrialRoundConsumer()
+	const utils = await render(<OdekoPokerGame />)
+	await toDeclarePhase(utils)
+	await declareAll(utils, ['勝負', '降りる', '降りる'])
+	await act(async () => {
+		jest.advanceTimersByTime(2100)
+	})
+
+	expect(utils.getByText(/あかさんの一人勝ち/)).toBeTruthy()
+	expect(consumerSpy).toHaveBeenCalledWith('odeko-poker', true)
 })
 
 it('宣言確定の直後は次の人の handoff（中立画面）で、宣言内容は表示されない', async () => {
