@@ -1,3 +1,4 @@
+import { router } from 'expo-router'
 import { Alert, ScrollView, StyleSheet } from 'react-native'
 import { PremiumUpsellCard } from '@/components/settings/premium-upsell-card'
 import { Card } from '@/components/ui/card'
@@ -5,18 +6,26 @@ import { ChevronRow } from '@/components/ui/chevron-row'
 import { SectionHeader } from '@/components/ui/section-header'
 import { SettingToggleRow } from '@/components/ui/setting-toggle-row'
 import { SettingValueRow } from '@/components/ui/setting-value-row'
+import { restorePremium } from '@/lib/premium'
 import { settingsStore, useSettings } from '@/lib/settings-store'
 import { contactSupport, writeReview } from '@/lib/support'
 import { colors, spacing } from '@/theme/tokens'
 
-// ペイウォール接続は #収益2 完了後にここを差し替える
-function showPaywallComingSoon() {
-	Alert.alert('準備中', 'WaiPa プレミアムは近日提供予定です。')
+function showPaywall() {
+	router.push('/paywall')
 }
 
-// RevenueCat (#7) 結線後に実際の購入復元へ差し替える
-function showRestoreComingSoon() {
-	Alert.alert('準備中', '購入の復元は課金機能の提供開始後に利用できます。')
+async function handleRestorePremium() {
+	const result = await restorePremium()
+	if (result === 'restored') {
+		Alert.alert('復元しました')
+		return
+	}
+	if (result === 'none') {
+		Alert.alert('復元できる購入が見つかりませんでした')
+		return
+	}
+	Alert.alert('復元に失敗しました', '時間をおいてもう一度お試しください。')
 }
 
 export default function SettingsScreen() {
@@ -24,7 +33,7 @@ export default function SettingsScreen() {
 
 	return (
 		<ScrollView style={styles.screen} contentContainerStyle={styles.content}>
-			<PremiumUpsellCard onUpgradePress={showPaywallComingSoon} />
+			<PremiumUpsellCard onUpgradePress={showPaywall} />
 			<SectionHeader title="設定" />
 			<Card>
 				<SettingToggleRow
@@ -43,7 +52,7 @@ export default function SettingsScreen() {
 			</Card>
 			<SectionHeader title="その他" />
 			<Card>
-				<ChevronRow icon="🛒" label="購入を復元する" onPress={showRestoreComingSoon} />
+				<ChevronRow icon="🛒" label="購入を復元する" onPress={handleRestorePremium} />
 				<ChevronRow icon="⭐" label="レビューを書く" onPress={() => writeReview()} />
 				<ChevronRow icon="✉️" label="要望・問い合わせ" onPress={() => contactSupport()} />
 			</Card>

@@ -15,9 +15,10 @@ let mockPackages: PremiumPackages | null = null
 const mockGetPremiumPackages = jest.fn<Promise<PremiumPackages | null>, []>(
 	async () => mockPackages,
 )
-const mockPurchasePremium = jest.fn<Promise<'purchased' | 'cancelled' | 'error'>, [PurchasesPackage]>(
-	async () => 'purchased',
-)
+const mockPurchasePremium = jest.fn<
+	Promise<'purchased' | 'cancelled' | 'error'>,
+	[PurchasesPackage]
+>(async () => 'purchased')
 const mockRestorePremium = jest.fn<Promise<'restored' | 'none' | 'error'>, []>(
 	async () => 'restored',
 )

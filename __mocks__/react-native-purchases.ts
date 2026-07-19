@@ -38,6 +38,8 @@ export const purchasePackage = jest.fn<Promise<MakePurchaseResult>, [PurchasesPa
 			productIdentifier: pkg.product.identifier,
 			purchaseDate: '2026-07-19T00:00:00.000Z',
 			purchaseToken: null,
+			originalJson: null,
+			signature: null,
 		},
 	}),
 )

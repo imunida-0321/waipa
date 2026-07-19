@@ -7,12 +7,14 @@ type Props = {
 	title: string
 	onPress: () => void
 	disabled?: boolean
+	testID?: string
 }
 
 // 参考スクショの「アップグレード」ボタン相当。主要アクション全般に使う
-export function GradientButton({ title, onPress, disabled = false }: Props) {
+export function GradientButton({ title, onPress, disabled = false, testID }: Props) {
 	return (
 		<Pressable
+			testID={testID}
 			accessibilityRole="button"
 			accessibilityState={{ disabled }}
 			disabled={disabled}

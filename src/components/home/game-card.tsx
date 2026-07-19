@@ -3,7 +3,7 @@ import { Image } from 'expo-image'
 import { LinearGradient } from 'expo-linear-gradient'
 import { Pressable, StyleSheet, Text, View } from 'react-native'
 import type { GameMeta } from '@/games/registry'
-import { isPremiumUnlocked } from '@/lib/premium'
+import { usePremium } from '@/lib/premium'
 import { colors, radii, spacing, typography } from '@/theme/tokens'
 
 type Props = {
@@ -15,7 +15,8 @@ type Props = {
 // なければテーマ色グラデ＋絵文字のフォールバック（イントロ用 thumbnail とは独立）。
 // プレミアム限定ゲームは未解放の間、薄い黒マスク＋👑バッジを重ねて課金枠だと分かるようにする
 export function GameCard({ game, onPress }: Props) {
-	const locked = game.premium === true && !isPremiumUnlocked()
+	const premiumUnlocked = usePremium()
+	const locked = game.premium === true && !premiumUnlocked
 	return (
 		<Pressable
 			accessibilityRole="button"

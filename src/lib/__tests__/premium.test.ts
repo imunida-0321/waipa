@@ -133,6 +133,8 @@ function makePurchaseResult(customerInfo: CustomerInfo, pkg: PurchasesPackage): 
 			productIdentifier: pkg.product.identifier,
 			purchaseDate: '2026-07-19T00:00:00.000Z',
 			purchaseToken: null,
+			originalJson: null,
+			signature: null,
 		},
 	}
 }
@@ -258,7 +260,9 @@ describe('購入と復元', () => {
 		process.env.EXPO_PUBLIC_REVENUECAT_API_KEY_IOS = 'ios-key'
 		await initPremium()
 		const pkg = makePackage(PACKAGE_TYPE.ANNUAL, '¥1,100')
-		purchasesMock.purchasePackage.mockResolvedValueOnce(makePurchaseResult(makeCustomerInfo(true), pkg))
+		purchasesMock.purchasePackage.mockResolvedValueOnce(
+			makePurchaseResult(makeCustomerInfo(true), pkg),
+		)
 
 		await expect(purchasePremium(pkg)).resolves.toBe('purchased')
 
