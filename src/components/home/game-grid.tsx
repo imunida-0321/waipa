@@ -31,6 +31,7 @@ export function GameGrid() {
 			))}
 			<PremiumLockModal
 				visible={lockedGame !== null}
+				gameId={lockedGame?.id ?? ''}
 				gameTitle={lockedGame ? `${lockedGame.emoji} ${lockedGame.title}` : ''}
 				onClose={() => setLockedGame(null)}
 			/>

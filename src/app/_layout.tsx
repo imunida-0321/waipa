@@ -10,6 +10,7 @@ import { initPremium } from '@/lib/premium'
 import { settingsStore } from '@/lib/settings-store'
 import { registerSound } from '@/lib/sound'
 import { topicsStore } from '@/lib/topics-store'
+import { trialStore } from '@/lib/trial-store'
 import { wordPairsStore } from '@/lib/word-pairs-store'
 import { colors } from '@/theme/tokens'
 
@@ -23,6 +24,7 @@ export default function RootLayout() {
 		initPremium()
 		settingsStore.hydrate()
 		playersStore.hydrate()
+		trialStore.hydrate()
 		topicsStore.hydrate().then(() => {
 			topicsStore.refresh()
 		})

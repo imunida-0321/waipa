@@ -1,4 +1,5 @@
 import { getDisplayNames, usePlayers } from '@/lib/players-store'
+import { useTrialRoundConsumer } from '@/lib/trial-store'
 import { useTopics, type Topic } from '@/lib/topics-store'
 import { useEffect, useReducer, useRef, useState } from 'react'
 import { Linking, Pressable, StyleSheet, Text, View } from 'react-native'
@@ -40,6 +41,8 @@ export function SasayakiLimitGame() {
 	const usedIdsRef = useRef<string[]>([])
 	const peakRef = useRef(0)
 	const levelDbRef = useRef(mic.levelDb)
+	useTrialRoundConsumer('sasayaki-limit', state.phase === 'result')
+
 	useEffect(() => {
 		levelDbRef.current = mic.levelDb
 	})

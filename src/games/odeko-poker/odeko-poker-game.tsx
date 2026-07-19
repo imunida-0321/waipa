@@ -3,6 +3,7 @@ import { useReducer } from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import { GradientButton } from '@/components/ui/gradient-button'
 import { getDisplayNames, usePlayers } from '@/lib/players-store'
+import { useTrialRoundConsumer } from '@/lib/trial-store'
 import { playerColor } from '@/theme/player-colors'
 import { spacing, typography } from '@/theme/tokens'
 import { DeclareScreen } from './declare-screen'
@@ -14,6 +15,7 @@ export function OdekoPokerGame() {
 	const players = usePlayers()
 	const names = getDisplayNames(players)
 	const [state, dispatch] = useReducer(reduce, players.count, initialState)
+	useTrialRoundConsumer('odeko-poker', state.phase === 'result')
 
 	return (
 		<View style={styles.container}>

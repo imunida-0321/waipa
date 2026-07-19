@@ -9,4 +9,5 @@ export const AD_UNIT_IDS = {
 	homeBanner: __DEV__ ? TestIds.ADAPTIVE_BANNER : 'ca-app-pub-XXXX/home-banner',
 	gameExitInterstitial: __DEV__ ? TestIds.INTERSTITIAL : 'ca-app-pub-XXXX/game-exit',
 	packUnlockRewarded: __DEV__ ? TestIds.REWARDED : 'ca-app-pub-XXXX/pack-unlock',
+	trialRewarded: __DEV__ ? TestIds.REWARDED : 'ca-app-pub-XXXX/trial-rewarded',
 }

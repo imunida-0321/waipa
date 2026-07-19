@@ -6,6 +6,7 @@ import { IsoDie } from '@/games/chinchiro/iso-die'
 import { haptics } from '@/lib/haptics'
 import { playSound } from '@/lib/sound'
 import { getDisplayNames, usePlayers } from '@/lib/players-store'
+import { useTrialRoundConsumer } from '@/lib/trial-store'
 import { colors, radii, spacing, typography } from '@/theme/tokens'
 import { DeclareList } from './declare-list'
 import { DiceRoll3D, ROLL_ANIM_MS } from './dice-roll-3d'
@@ -44,6 +45,7 @@ export function DautDiceGame() {
 	const players = usePlayers()
 	const names = getDisplayNames(players)
 	const [state, dispatch] = useReducer(reduce, players.count, initialState)
+	useTrialRoundConsumer('daut-dice', state.phase === 'result')
 
 	// haptics はボタン経由なら GradientButton 内蔵の tap に任せる（シェイク時のみ明示発火）
 	const doRoll = () => {

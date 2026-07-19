@@ -1,5 +1,6 @@
 import { useCallback, useReducer } from 'react'
 import { getDisplayNames, usePlayers } from '@/lib/players-store'
+import { useTrialRoundConsumer } from '@/lib/trial-store'
 import { getPairsByPack, useWordPairs } from '@/lib/word-pairs-store'
 import { DealPass } from './deal-pass'
 import { DiscussScreen } from './discuss-screen'
@@ -20,6 +21,7 @@ export function KanpaiWolfGame() {
 	const names = getDisplayNames(players)
 	useWordPairs() // 配信 refresh 後の再レンダー購読
 	const [state, dispatch] = useReducer(reduce, players.count, initialState)
+	useTrialRoundConsumer('kanpai-wolf', state.phase === 'result')
 
 	const pickPair = useCallback(
 		(pack: string, usedIds: readonly string[]) =>

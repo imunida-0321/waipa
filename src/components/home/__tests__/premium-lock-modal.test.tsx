@@ -128,12 +128,10 @@ it('お試し可能なら1回きりの説明と動画ボタンを表示し、表
 	expect(AD_UNIT_IDS.trialRewarded).toBe('test-rewarded')
 	expect(mockedRewardedAd).toHaveBeenCalledWith(AD_UNIT_IDS.trialRewarded)
 	expect(state.load).toHaveBeenCalledTimes(1)
+	expect(getByText('動画を見ると2ラウンドだけお試しできます。お試しは1回だけです。')).toBeTruthy()
 	expect(
-		getByText('動画を見ると2ラウンドだけお試しできます。お試しは1回だけです。'),
-	).toBeTruthy()
-	expect(getByRole('button', { name: '動画を見てお試しプレイ' }).props.accessibilityState).toEqual(
-		expect.objectContaining({ disabled: true }),
-	)
+		getByRole('button', { name: '動画を見てお試しプレイ' }).props.accessibilityState,
+	).toEqual(expect.objectContaining({ disabled: true }))
 })
 
 it('リワード動画ロード済みならお試しボタンで動画を表示する', async () => {
@@ -190,4 +188,32 @@ it('お試し利用済みなら利用済みキャプションを表示し、お�
 
 	expect(getByText('お試しプレイは利用済みです')).toBeTruthy()
 	expect(queryByText('動画を見てお試しプレイ')).toBeNull()
+})
+
+it('別のゲームで開き直したとき、再度リワード獲得でお試しを開始できる', async () => {
+	const { trialStore } = requireTrialStore()
+	trialStore._resetForTest()
+	const onClose = jest.fn()
+	mockedRewardedAd.mockReturnValue(rewardedState({ isLoaded: true, isEarnedReward: true }))
+	const { rerender } = await render(
+		<PremiumLockModal
+			visible
+			gameId="burst-chicken"
+			gameTitle="バーストチキン"
+			onClose={onClose}
+		/>,
+	)
+	await waitFor(() => expect(router.push).toHaveBeenCalledWith('/game/burst-chicken'))
+
+	mockedRewardedAd.mockReturnValue(rewardedState({}))
+	await rerender(<PremiumLockModal visible={false} gameId="" gameTitle="" onClose={onClose} />)
+	mockedRewardedAd.mockReturnValue(rewardedState({ isLoaded: true, isEarnedReward: true }))
+	await rerender(
+		<PremiumLockModal visible gameId="daut-dice" gameTitle="ダウトダイス" onClose={onClose} />,
+	)
+
+	await waitFor(() => expect(router.push).toHaveBeenCalledWith('/game/daut-dice'))
+	await expect(AsyncStorage.getItem(storageKey)).resolves.toBe(
+		JSON.stringify(['burst-chicken', 'daut-dice']),
+	)
 })

@@ -4,11 +4,13 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { router, useNavigation } from 'expo-router'
 import { haptics } from '@/lib/haptics'
 import { maybeShowGameExitInterstitial } from '@/lib/ads'
+import { isTrialActive, trialStore } from '@/lib/trial-store'
 import type { GameMeta } from '@/games/registry'
 import { colors, spacing, typography } from '@/theme/tokens'
 import { GameIntroScreen } from './game-intro-screen'
 import { HowToPlayModal } from './how-to-play-modal'
 import { PlayerSetupSheet } from './player-setup-sheet'
+import { TrialLockOverlay } from './trial-lock-overlay'
 
 type Stage = 'intro' | 'setup' | 'play'
 
@@ -26,6 +28,14 @@ export function GameScreen({ meta }: { meta: GameMeta }) {
 			maybeShowGameExitInterstitial()
 		})
 	}, [navigation, stage])
+
+	useEffect(() => {
+		return () => {
+			if (isTrialActive(meta.id)) {
+				trialStore.endTrial()
+			}
+		}
+	}, [meta.id])
 
 	const howToModal = (
 		<HowToPlayModal
@@ -89,6 +99,7 @@ export function GameScreen({ meta }: { meta: GameMeta }) {
 
 			<View style={styles.body}>
 				<meta.Component />
+				{meta.premium === true ? <TrialLockOverlay gameId={meta.id} /> : null}
 			</View>
 
 			{howToModal}
@@ -113,5 +124,5 @@ const styles = StyleSheet.create({
 	headerIcon: { fontSize: 22, color: colors.text },
 	title: { ...typography.title, flex: 1, textAlign: 'center' },
 	headerRight: { flexDirection: 'row' },
-	body: { flex: 1 },
+	body: { flex: 1, position: 'relative' },
 })
