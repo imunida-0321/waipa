@@ -84,6 +84,32 @@ async function rollAndPeek(utils: Awaited<ReturnType<typeof render>>) {
 	})
 }
 
+async function loseDeclarerLifeByBluff(utils: Awaited<ReturnType<typeof render>>) {
+	await rollAndPeek(utils)
+	await act(async () => {
+		fireEvent.press(utils.getByText('21（ミエ）'))
+	})
+	await act(async () => {
+		fireEvent.press(utils.getByText('渡した'))
+	})
+	await act(async () => {
+		fireEvent.press(utils.getByText('ダウト！'))
+	})
+	await act(async () => {
+		jest.advanceTimersByTime(2000)
+	})
+}
+
+type TrialStoreModule = {
+	useTrialRoundConsumer: (gameId: string, isRoundEnd: boolean) => void
+}
+
+function spyTrialRoundConsumer() {
+	// eslint-disable-next-line @typescript-eslint/no-require-imports
+	const module = require('@/lib/trial-store') as TrialStoreModule
+	return jest.spyOn(module, 'useTrialRoundConsumer').mockImplementation(() => {})
+}
+
 it('peek: 長押し前は宣言不可・pressOut すると実出目が隠れる', async () => {
 	const utils = await render(<DautDiceGame />)
 	await act(async () => {
@@ -156,6 +182,28 @@ it('ダウト → 公開 → ライフ-1 → 敗者先手で再開する', async
 	})
 	expect(utils.getByText(/あかさんの番/)).toBeTruthy()
 	expect(utils.getByText('タップで振る')).toBeTruthy()
+})
+
+it('決着画面到達でトライアルの1ラウンドを消費する', async () => {
+	const consumerSpy = spyTrialRoundConsumer()
+	const utils = await render(<DautDiceGame />)
+
+	for (let i = 0; i < 2; i++) {
+		await loseDeclarerLifeByBluff(utils)
+		await act(async () => {
+			fireEvent.press(utils.getByText('つぎへ'))
+		})
+		await act(async () => {
+			fireEvent.press(utils.getByText('渡した'))
+		})
+	}
+	await loseDeclarerLifeByBluff(utils)
+	await act(async () => {
+		fireEvent.press(utils.getByText('結果へ'))
+	})
+
+	expect(utils.getByText(/あかさんの負け/)).toBeTruthy()
+	expect(consumerSpy).toHaveBeenCalledWith('daut-dice', true)
 })
 
 it('信じて振る → 次の人の roll になる', async () => {

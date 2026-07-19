@@ -52,6 +52,16 @@ async function voteOne(ui: Awaited<ReturnType<typeof render>>, targetName: strin
 	await press(ui, '投票する')
 }
 
+type TrialStoreModule = {
+	useTrialRoundConsumer: (gameId: string, isRoundEnd: boolean) => void
+}
+
+function spyTrialRoundConsumer() {
+	// eslint-disable-next-line @typescript-eslint/no-require-imports
+	const module = require('@/lib/trial-store') as TrialStoreModule
+	return jest.spyOn(module, 'useTrialRoundConsumer').mockImplementation(() => {})
+}
+
 it('設定→配布→議論→投票→発表→逆転→結果まで通しでプレイできる', async () => {
 	const ui = await render(<KanpaiWolfGame />)
 
@@ -105,6 +115,32 @@ it('設定→配布→議論→投票→発表→逆転→結果まで通しで�
 	expect(ui.getByText(/あか/)).toBeTruthy() // ウルフの正体公開
 	expect(ui.getByText(/このラウンドの乾杯/)).toBeTruthy()
 	expect(ui.getByText('もう一回')).toBeTruthy()
+})
+
+it('決着画面到達でトライアルの1ラウンドを消費する', async () => {
+	const consumerSpy = spyTrialRoundConsumer()
+	const ui = await render(<KanpaiWolfGame />)
+
+	await press(ui, 'はじめる')
+	await dealOne(ui, false)
+	await dealOne(ui, false)
+	await dealOne(ui, true)
+	await press(ui, '議論スタート')
+	await press(ui, '投票へすすむ')
+	await press(ui, 'もう一度タップで投票へ！')
+	await voteOne(ui, 'あお')
+	await voteOne(ui, 'あか')
+	await voteOne(ui, 'あか')
+	await act(async () => {
+		jest.advanceTimersByTime(2000)
+	})
+	await press(ui, '逆転チャンスへ')
+	await press(ui, '宣言した！お題を開ける')
+	await press(ui, '外した')
+	await press(ui, '結果発表へ')
+
+	expect(ui.getByText(/市民チームの勝利/)).toBeTruthy()
+	expect(consumerSpy).toHaveBeenCalledWith('kanpai-wolf', true)
 })
 
 it('通常投票が全員同票のとき決選投票を経て決着し reveal に進む', async () => {

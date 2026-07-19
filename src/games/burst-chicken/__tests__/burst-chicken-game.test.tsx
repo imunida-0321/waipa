@@ -50,6 +50,16 @@ async function press(target: Parameters<typeof fireEvent.press>[0]) {
 	})
 }
 
+type TrialStoreModule = {
+	useTrialRoundConsumer: (gameId: string, isRoundEnd: boolean) => void
+}
+
+function spyTrialRoundConsumer() {
+	// eslint-disable-next-line @typescript-eslint/no-require-imports
+	const module = require('@/lib/trial-store') as TrialStoreModule
+	return jest.spyOn(module, 'useTrialRoundConsumer').mockImplementation(() => {})
+}
+
 it('初期表示: 合計0・先頭プレイヤーの手番・上限ヒント', async () => {
 	const { getByText } = await render(<BurstChickenGame />)
 	expect(getByText('0')).toBeTruthy()
@@ -90,6 +100,19 @@ it('バーストで爆発演出＋リザルトが出て、もう一回で新ラ�
 	expect(getByText('0')).toBeTruthy()
 	// 開始プレイヤーが +1 ローテーション（あお から）
 	expect(getByText(/あおさんの番/)).toBeTruthy()
+})
+
+it('決着画面到達でトライアルの1ラウンドを消費する', async () => {
+	const consumerSpy = spyTrialRoundConsumer()
+	;(Math.random as jest.Mock).mockReturnValue(0)
+	const { getByLabelText, getByText } = await render(<BurstChickenGame />)
+	for (let i = 0; i < 7; i++) {
+		await press(getByLabelText('+3'))
+	}
+	await press(getByLabelText('+1'))
+
+	expect(getByText(/あおさんの負け/)).toBeTruthy()
+	expect(consumerSpy).toHaveBeenCalledWith('burst-chicken', true)
 })
 
 it('ストップ宣言でドラムロール後に精算リザルトが出る', async () => {

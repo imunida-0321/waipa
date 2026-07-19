@@ -31,6 +31,10 @@ jest.mock('expo-router', () => ({
 	useNavigation: jest.fn(() => ({ addListener: mockNavigationAddListener })),
 }))
 jest.mock('@/lib/ads', () => ({ maybeShowGameExitInterstitial: jest.fn() }))
+jest.mock('@/lib/premium', () => ({
+	isPremiumUnlocked: jest.fn(() => false),
+	usePremium: jest.fn(() => false),
+}))
 jest.mock('@/theme/player-colors', () => ({
 	playerColor: (index: number) => ({ name: `色${index}`, value: '#FF0000' }),
 }))
@@ -83,6 +87,21 @@ jest.mock('expo-linear-gradient', () => {
 
 function DummyGame() {
 	return null
+}
+
+type TrialStoreModule = {
+	isTrialActive: (gameId: string) => boolean
+	trialStore: {
+		_resetForTest: () => void
+		startTrial: (gameId: string) => Promise<void>
+		consumeRound: (gameId: string) => void
+		endTrial: () => void
+	}
+}
+
+function requireTrialStore() {
+	// eslint-disable-next-line @typescript-eslint/no-require-imports
+	return require('@/lib/trial-store') as TrialStoreModule
 }
 
 const baseMeta: GameMeta = {
@@ -263,4 +282,58 @@ it('play ステージの戻るボタンは router.back を呼び、広告表示�
 	})
 	expect(router.back).toHaveBeenCalledTimes(1)
 	expect(maybeShowGameExitInterstitialMock).not.toHaveBeenCalled()
+})
+
+it('premium メタの play body にはトライアルロックオーバーレイを重ねる', async () => {
+	const { trialStore } = requireTrialStore()
+	trialStore._resetForTest()
+	await trialStore.startTrial('dummy')
+	trialStore.consumeRound('dummy')
+	trialStore.consumeRound('dummy')
+	const { getByText, getByTestId } = await render(
+		<GameScreen meta={{ ...baseMeta, premium: true }} />,
+	)
+
+	await act(async () => {
+		fireEvent.press(getByText('ゲームスタート'))
+	})
+
+	expect(getByTestId('trial-lock-overlay')).toBeTruthy()
+})
+
+it('非 premium メタではトライアルロックオーバーレイを重ねない', async () => {
+	const { trialStore } = requireTrialStore()
+	trialStore._resetForTest()
+	await trialStore.startTrial('dummy')
+	trialStore.consumeRound('dummy')
+	trialStore.consumeRound('dummy')
+	const { getByText, queryByTestId } = await render(
+		<GameScreen meta={{ ...baseMeta, premium: false }} />,
+	)
+
+	await act(async () => {
+		fireEvent.press(getByText('ゲームスタート'))
+	})
+
+	expect(queryByTestId('trial-lock-overlay')).toBeNull()
+})
+
+it('アンマウント時に対象ゲームのトライアルが active なら endTrial する', async () => {
+	const { isTrialActive, trialStore } = requireTrialStore()
+	trialStore._resetForTest()
+	await trialStore.startTrial('dummy')
+	const endTrialSpy = jest.spyOn(trialStore, 'endTrial')
+	const { getByText, unmount } = await render(
+		<GameScreen meta={{ ...baseMeta, premium: true }} />,
+	)
+	await act(async () => {
+		fireEvent.press(getByText('ゲームスタート'))
+	})
+
+	await act(async () => {
+		unmount()
+	})
+
+	expect(isTrialActive('dummy')).toBe(false)
+	expect(endTrialSpy).toHaveBeenCalledTimes(1)
 })

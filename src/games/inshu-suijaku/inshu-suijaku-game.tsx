@@ -8,6 +8,7 @@ import {
 } from '@/lib/custom-punishments-store'
 import { haptics } from '@/lib/haptics'
 import { getDisplayNames, usePlayers } from '@/lib/players-store'
+import { useTrialRoundConsumer } from '@/lib/trial-store'
 import { playerColor } from '@/theme/player-colors'
 import { spacing, typography } from '@/theme/tokens'
 import { CardGrid, MATCH_ANIM_MS } from './card-grid'
@@ -27,6 +28,7 @@ export function InshuSuijakuGame() {
 	const names = getDisplayNames(players)
 	const customState = useCustomPunishments()
 	const [state, dispatch] = useReducer(reduce, players.count, initialState)
+	useTrialRoundConsumer('inshu-suijaku', state.phase === 'result')
 
 	useEffect(() => {
 		void customPunishmentsStore.hydrate()

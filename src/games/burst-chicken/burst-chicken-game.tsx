@@ -8,6 +8,7 @@ import { useDrumroll } from '@/components/game/use-drumroll'
 import { haptics } from '@/lib/haptics'
 import { getDisplayNames, usePlayers } from '@/lib/players-store'
 import { playSound } from '@/lib/sound'
+import { useTrialRoundConsumer } from '@/lib/trial-store'
 import { playerColor } from '@/theme/player-colors'
 import { colors, radii, spacing, typography } from '@/theme/tokens'
 import { LIMIT_MAX, LIMIT_MIN, canStop, createInitialState, reduce } from './engine'
@@ -23,6 +24,7 @@ export function BurstChickenGame() {
 	const [state, dispatch] = useReducer(reduce, players.count, (count) =>
 		createInitialState(count, Math.random),
 	)
+	useTrialRoundConsumer('burst-chicken', state.phase === 'exploded' || state.phase === 'settled')
 
 	const tension = tensionLevel(state.total)
 	const turnColor = playerColor(state.turnIndex).value

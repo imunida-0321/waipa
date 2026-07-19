@@ -8,6 +8,7 @@ import { useDrumroll } from '@/components/game/use-drumroll'
 import { haptics } from '@/lib/haptics'
 import { getDisplayNames, usePlayers } from '@/lib/players-store'
 import { playSound } from '@/lib/sound'
+import { useTrialRoundConsumer } from '@/lib/trial-store'
 import { playerColor } from '@/theme/player-colors'
 import { colors, radii, spacing, typography } from '@/theme/tokens'
 import { createInitialState, MINE_MAX, MINE_MIN, reduce } from './engine'
@@ -23,6 +24,7 @@ export function BombSwipeGame() {
 	const [state, dispatch] = useReducer(reduce, players.count, (count) =>
 		createInitialState(count, Math.random),
 	)
+	useTrialRoundConsumer('bomb-swipe', state.phase === 'result')
 	// スワイプ中の緊張演出用。ゲージ内部と重複して持つが、親は演出にだけ使う
 	const [liveScore, setLiveScore] = useState(0)
 	// 直近で心音を鳴らした10点バケット（Math.floor(score / 10)）。
