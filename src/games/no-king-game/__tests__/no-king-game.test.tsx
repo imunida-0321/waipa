@@ -1,10 +1,14 @@
 import { act, fireEvent, render } from '@testing-library/react-native'
+import { isPackUnlocked, packUnlockStore } from '@/lib/pack-unlock-store'
+import { isPremiumUnlocked } from '@/lib/premium'
+import { topicsStore } from '@/lib/topics-store'
 import { NoKingGame } from '../no-king-game'
 
 jest.mock('@react-native-async-storage/async-storage', () =>
 	// eslint-disable-next-line @typescript-eslint/no-require-imports
 	require('@react-native-async-storage/async-storage/jest/async-storage-mock'),
 )
+jest.mock('@/lib/premium', () => ({ isPremiumUnlocked: jest.fn(() => false) }))
 jest.mock('@/lib/sound', () => ({ playSound: jest.fn(), registerSound: jest.fn() }))
 jest.mock('@/lib/haptics', () => ({
 	haptics: { tap: jest.fn(), heavy: jest.fn(), success: jest.fn() },
@@ -33,9 +37,14 @@ jest.mock('react-native-reanimated', () => {
 	}
 })
 
+const mockedPremium = jest.mocked(isPremiumUnlocked)
+
 // rng=0.999 固定: 番号は恒等順列 [1,2,3,4]、お題はフォールバック末尾、実行役は最大番号
 beforeEach(() => {
 	jest.spyOn(Math, 'random').mockReturnValue(0.999)
+	packUnlockStore._resetForTest()
+	topicsStore._resetForTest()
+	mockedPremium.mockReturnValue(false)
 })
 afterEach(() => {
 	jest.useRealTimers()
@@ -127,4 +136,23 @@ it('番号を表示するまで「確認した」ボタンは押せない', asyn
 	await act(async () => fireEvent(pad, 'pressOut'))
 	await act(async () => fireEvent.press(getByText('確認した（次の人へ）')))
 	expect(getByText(/2人目の人にスマホを渡してください/)).toBeTruthy()
+})
+
+it('king_premium 解放中はアンマウントで再ロックされる', async () => {
+	packUnlockStore.unlock('king_premium')
+	const { unmount } = await render(<NoKingGame />)
+	await act(async () => unmount())
+	expect(isPackUnlocked('king_premium')).toBe(false)
+})
+
+it('プレミアム解放中で限定お題が未取得ならマウント時に限定パックを取得する', async () => {
+	mockedPremium.mockReturnValue(true)
+	const refreshPremiumPack = jest
+		.spyOn(topicsStore, 'refreshPremiumPack')
+		.mockResolvedValue(true)
+
+	await render(<NoKingGame />)
+
+	expect(refreshPremiumPack).toHaveBeenCalledTimes(1)
+	expect(refreshPremiumPack).toHaveBeenCalledWith('king_premium')
 })

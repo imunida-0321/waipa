@@ -4,6 +4,7 @@ import { useEffect } from 'react'
 import { useColorScheme } from 'react-native'
 
 import { AnimatedSplashOverlay } from '@/components/animated-icon'
+import { initAds } from '@/lib/ads'
 import { playersStore } from '@/lib/players-store'
 import { settingsStore } from '@/lib/settings-store'
 import { registerSound } from '@/lib/sound'
@@ -17,6 +18,7 @@ export default function RootLayout() {
 	const colorScheme = useColorScheme()
 
 	useEffect(() => {
+		initAds()
 		settingsStore.hydrate()
 		playersStore.hydrate()
 		topicsStore.hydrate().then(() => {

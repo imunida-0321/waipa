@@ -5,6 +5,7 @@ import { settingsStore } from '@/lib/settings-store'
 import { registerSound } from '@/lib/sound'
 import { topicsStore } from '@/lib/topics-store'
 import { wordPairsStore } from '@/lib/word-pairs-store'
+import { initAds } from '@/lib/ads'
 import RootLayout from '../_layout'
 
 jest.mock('expo-splash-screen', () => ({
@@ -49,7 +50,9 @@ jest.mock('@/lib/word-pairs-store', () => ({
 jest.mock('@/lib/sound', () => ({
 	registerSound: jest.fn(),
 }))
+jest.mock('@/lib/ads', () => ({ initAds: jest.fn() }))
 
+const initAdsMock = initAds as jest.MockedFunction<typeof initAds>
 const registerSoundMock = registerSound as jest.MockedFunction<typeof registerSound>
 const settingsHydrateMock = settingsStore.hydrate as jest.MockedFunction<
 	typeof settingsStore.hydrate
@@ -77,6 +80,7 @@ describe('RootLayout', () => {
 	})
 
 	it('マウント時にストア hydrate と効果音登録を実行する', async () => {
+		initAdsMock.mockClear()
 		settingsHydrateMock.mockClear()
 		playersHydrateMock.mockClear()
 		topicsHydrateMock.mockClear()
@@ -108,5 +112,11 @@ describe('RootLayout', () => {
 			'diceRoll2',
 			'heartbeat',
 		])
+	})
+
+	it('起動時に広告を初期化する', async () => {
+		initAdsMock.mockClear()
+		await render(<RootLayout />)
+		expect(initAdsMock).toHaveBeenCalledTimes(1)
 	})
 })

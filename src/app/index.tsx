@@ -3,6 +3,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Link } from 'expo-router'
 import { GameGrid } from '@/components/home/game-grid'
 import { HeroBanner } from '@/components/home/hero-banner'
+import { HomeBannerAd } from '@/components/home/home-banner-ad'
 import { HomeHeader } from '@/components/home/home-header'
 import { SectionHeader } from '@/components/ui/section-header'
 import { colors, spacing, typography } from '@/theme/tokens'
@@ -23,6 +24,7 @@ export default function HomeScreen() {
 					</Link>
 				)}
 			</ScrollView>
+			<HomeBannerAd />
 		</View>
 	)
 }

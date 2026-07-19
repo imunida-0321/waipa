@@ -5,6 +5,9 @@ export type Rng = () => number
 export const MIN_COUNT = 3
 export const MAX_COUNT = 12
 
+// リワード解放対象の限定お題パック（Supabase seed 済み・is_premium=true）
+export const KING_PREMIUM_PACK = 'king_premium'
+
 // topics が空（初回起動がオフライン等）でも遊べるようにする内蔵お題
 export const FALLBACK_TOPICS: readonly Topic[] = [
 	{ id: 'fb-1', pack: 'king', text: '30秒間ずっと笑顔でいる' },

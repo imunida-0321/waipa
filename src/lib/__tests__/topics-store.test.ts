@@ -84,3 +84,27 @@ describe('topicsStore', () => {
 		expect(pickTopic('king', ['a', 'b'])).toBeUndefined()
 	})
 })
+
+describe('refreshPremiumPack', () => {
+	it('取得したお題を重複なくマージする', async () => {
+		mockFetchOk(sample)
+		await topicsStore.refresh()
+		mockFetchOk([
+			{ id: 'a', pack: 'king', text: 'お題A' },
+			{ id: 'p1', pack: 'king_premium', text: '壁ドン' },
+		])
+		const ok = await topicsStore.refreshPremiumPack('king_premium')
+		expect(ok).toBe(true)
+		const packs = topicsStore.getState().topics.map((t) => t.id)
+		expect(packs.filter((id) => id === 'a')).toHaveLength(1)
+		expect(packs).toContain('p1')
+	})
+
+	it('取得失敗時は false を返し state を壊さない', async () => {
+		mockFetchFail()
+		const before = topicsStore.getState()
+		const ok = await topicsStore.refreshPremiumPack('king_premium')
+		expect(ok).toBe(false)
+		expect(topicsStore.getState()).toEqual(before)
+	})
+})

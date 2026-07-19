@@ -2,6 +2,10 @@ import { act, fireEvent, render } from '@testing-library/react-native'
 import { haptics } from '@/lib/haptics'
 import { CountSelect } from '../count-select'
 
+jest.mock('@react-native-async-storage/async-storage', () =>
+	// eslint-disable-next-line @typescript-eslint/no-require-imports
+	require('@react-native-async-storage/async-storage/jest/async-storage-mock'),
+)
 jest.mock('@/lib/haptics', () => ({
 	haptics: { tap: jest.fn(), heavy: jest.fn(), success: jest.fn() },
 }))
@@ -77,13 +81,13 @@ describe('CountSelect', () => {
 			fireEvent.press(getByText('限定お題パック'))
 		})
 
-		expect(getByText('近日対応予定')).toBeTruthy()
-		expect(getByText(/広告視聴 または WaiPa プレミアム/)).toBeTruthy()
+		expect(getByText(/解放中/)).toBeTruthy()
+		expect(getByText(/限定お題が混ざります/)).toBeTruthy()
 
 		await act(async () => {
 			fireEvent.press(getByText('とじる'))
 		})
 
-		expect(queryByText('近日対応予定')).toBeNull()
+		expect(queryByText(/解放中/)).toBeNull()
 	})
 })
