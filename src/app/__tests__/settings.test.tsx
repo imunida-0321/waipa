@@ -1,6 +1,8 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { fireEvent, render } from '@testing-library/react-native'
+import { act, fireEvent, render, waitFor } from '@testing-library/react-native'
+import { router } from 'expo-router'
 import { Alert } from 'react-native'
+import { restorePremium } from '@/lib/premium'
 import { settingsStore } from '@/lib/settings-store'
 import { contactSupport, writeReview } from '@/lib/support'
 import SettingsScreen from '../settings'
@@ -16,12 +18,18 @@ jest.mock('expo-haptics', () => ({
 	notificationAsync: jest.fn(),
 }))
 jest.mock('expo-linear-gradient', () => ({
-	LinearGradient: ({ children }: any) => children,
+	LinearGradient: ({ children }: { children?: import('react').ReactNode }) => children,
+}))
+jest.mock('expo-router', () => ({ router: { push: jest.fn(), back: jest.fn() } }))
+jest.mock('@/lib/premium', () => ({
+	restorePremium: jest.fn(async () => 'restored'),
 }))
 jest.mock('@/lib/support', () => ({
 	contactSupport: jest.fn(async () => {}),
 	writeReview: jest.fn(async () => {}),
 }))
+
+const restorePremiumMock = restorePremium as jest.MockedFunction<typeof restorePremium>
 
 beforeEach(async () => {
 	jest.clearAllMocks()
@@ -56,11 +64,14 @@ describe('プレミアム誘導カード', () => {
 		expect(getByText('アップグレード')).toBeTruthy()
 	})
 
-	it('アップグレード押下で準備中の案内が出る（ペイウォールは #収益2 で結線）', async () => {
-		const alertSpy = jest.spyOn(Alert, 'alert')
+	it('アップグレード押下でペイウォールへ遷移する', async () => {
+		const alertSpy = jest.spyOn(Alert, 'alert').mockImplementation(() => {})
 		const { getByText } = await render(<SettingsScreen />)
-		fireEvent.press(getByText('アップグレード'))
-		expect(alertSpy).toHaveBeenCalled()
+		await act(async () => {
+			fireEvent.press(getByText('アップグレード'))
+		})
+		expect(router.push).toHaveBeenCalledWith('/paywall')
+		expect(alertSpy).not.toHaveBeenCalled()
 	})
 })
 
@@ -72,10 +83,36 @@ describe('その他セクション', () => {
 		expect(getByText('要望・問い合わせ')).toBeTruthy()
 	})
 
-	it('購入を復元する押下で準備中の案内が出る（RevenueCat は #7 で結線）', async () => {
-		const alertSpy = jest.spyOn(Alert, 'alert')
+	it('購入を復元する押下で restorePremium を呼び、復元成功を案内する', async () => {
+		restorePremiumMock.mockResolvedValueOnce('restored')
+		const alertSpy = jest.spyOn(Alert, 'alert').mockImplementation(() => {})
 		const { getByText } = await render(<SettingsScreen />)
-		fireEvent.press(getByText('購入を復元する'))
+		await act(async () => {
+			fireEvent.press(getByText('購入を復元する'))
+		})
+		await waitFor(() => expect(restorePremiumMock).toHaveBeenCalledTimes(1))
+		expect(alertSpy).toHaveBeenCalledWith('復元しました')
+	})
+
+	it('復元できる購入がない場合は none 用の案内を表示する', async () => {
+		restorePremiumMock.mockResolvedValueOnce('none')
+		const alertSpy = jest.spyOn(Alert, 'alert').mockImplementation(() => {})
+		const { getByText } = await render(<SettingsScreen />)
+		await act(async () => {
+			fireEvent.press(getByText('購入を復元する'))
+		})
+		await waitFor(() => expect(restorePremiumMock).toHaveBeenCalledTimes(1))
+		expect(alertSpy).toHaveBeenCalledWith('復元できる購入が見つかりませんでした')
+	})
+
+	it('復元エラー時はエラー案内を表示する', async () => {
+		restorePremiumMock.mockResolvedValueOnce('error')
+		const alertSpy = jest.spyOn(Alert, 'alert').mockImplementation(() => {})
+		const { getByText } = await render(<SettingsScreen />)
+		await act(async () => {
+			fireEvent.press(getByText('購入を復元する'))
+		})
+		await waitFor(() => expect(restorePremiumMock).toHaveBeenCalledTimes(1))
 		expect(alertSpy).toHaveBeenCalled()
 	})
 

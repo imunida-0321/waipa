@@ -7,6 +7,7 @@ import { GameGrid } from '../game-grid'
 let mockPremiumUnlocked = false
 jest.mock('@/lib/premium', () => ({
 	isPremiumUnlocked: () => mockPremiumUnlocked,
+	usePremium: () => mockPremiumUnlocked,
 }))
 
 // プレミアム限定ゲームの実例として実レジストリの burst-chicken（premium: true）をそのまま使う
