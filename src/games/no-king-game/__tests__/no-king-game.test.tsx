@@ -1,5 +1,7 @@
 import { act, fireEvent, render } from '@testing-library/react-native'
 import { isPackUnlocked, packUnlockStore } from '@/lib/pack-unlock-store'
+import { isPremiumUnlocked } from '@/lib/premium'
+import { topicsStore } from '@/lib/topics-store'
 import { NoKingGame } from '../no-king-game'
 
 jest.mock('@react-native-async-storage/async-storage', () =>
@@ -35,10 +37,14 @@ jest.mock('react-native-reanimated', () => {
 	}
 })
 
+const mockedPremium = jest.mocked(isPremiumUnlocked)
+
 // rng=0.999 固定: 番号は恒等順列 [1,2,3,4]、お題はフォールバック末尾、実行役は最大番号
 beforeEach(() => {
 	jest.spyOn(Math, 'random').mockReturnValue(0.999)
 	packUnlockStore._resetForTest()
+	topicsStore._resetForTest()
+	mockedPremium.mockReturnValue(false)
 })
 afterEach(() => {
 	jest.useRealTimers()
@@ -137,4 +143,16 @@ it('king_premium 解放中はアンマウントで再ロックされる', async 
 	const { unmount } = await render(<NoKingGame />)
 	await act(async () => unmount())
 	expect(isPackUnlocked('king_premium')).toBe(false)
+})
+
+it('プレミアム解放中で限定お題が未取得ならマウント時に限定パックを取得する', async () => {
+	mockedPremium.mockReturnValue(true)
+	const refreshPremiumPack = jest
+		.spyOn(topicsStore, 'refreshPremiumPack')
+		.mockResolvedValue(true)
+
+	await render(<NoKingGame />)
+
+	expect(refreshPremiumPack).toHaveBeenCalledTimes(1)
+	expect(refreshPremiumPack).toHaveBeenCalledWith('king_premium')
 })

@@ -98,6 +98,23 @@ describe('maybeShowGameExitInterstitial', () => {
 		expect(adsMock._interstitials[0]?.show).not.toHaveBeenCalled()
 	})
 
+	it('先読み ERROR 後の次回退出で再先読みし、再読込完了後の次回退出で表示する', async () => {
+		await initAds()
+		const first = adsMock._interstitials[0]
+		first._emit('error')
+
+		maybeShowGameExitInterstitial()
+
+		expect(adsMock.InterstitialAd.createForAdRequest).toHaveBeenCalledTimes(2)
+		const second = adsMock._interstitials[1]
+		expect(second?.load).toHaveBeenCalledTimes(1)
+
+		second._emit('loaded')
+		maybeShowGameExitInterstitial()
+
+		expect(second.show).toHaveBeenCalledTimes(1)
+	})
+
 	it('プレミアムなら何もしない', async () => {
 		await initAds()
 		adsMock._interstitials[0]._emit('loaded')

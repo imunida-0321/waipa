@@ -1,6 +1,6 @@
-import { useCallback, useLayoutEffect, useReducer } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useReducer } from 'react'
 import { packUnlockStore, usePackUnlocked } from '@/lib/pack-unlock-store'
-import { useTopics } from '@/lib/topics-store'
+import { getTopicsByPack, topicsStore, useTopics } from '@/lib/topics-store'
 import { CountSelect } from './count-select'
 import { DealPass } from './deal-pass'
 import { KING_PREMIUM_PACK, type Rng } from './engine'
@@ -19,6 +19,12 @@ export function NoKingGame() {
 	)
 
 	const onRevealDone = useCallback(() => dispatch({ type: 'revealDone' }), [])
+
+	useEffect(() => {
+		if (premiumUnlocked && getTopicsByPack(KING_PREMIUM_PACK).length === 0) {
+			topicsStore.refreshPremiumPack(KING_PREMIUM_PACK)
+		}
+	}, [premiumUnlocked])
 
 	// セッション解放は「王様ゲームから出るまで」。アンマウントで再ロック（issue #6）
 	useLayoutEffect(() => () => packUnlockStore.lock(KING_PREMIUM_PACK), [])

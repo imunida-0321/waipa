@@ -1,11 +1,11 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons'
-import { useEffect } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Modal, Pressable, StyleSheet, Text } from 'react-native'
 import { useRewardedAd } from 'react-native-google-mobile-ads'
 import { GradientButton } from '@/components/ui/gradient-button'
 import { AD_UNIT_IDS } from '@/constants/ads'
 import { packUnlockStore, usePackUnlocked } from '@/lib/pack-unlock-store'
-import { topicsStore } from '@/lib/topics-store'
+import { getTopicsByPack, topicsStore } from '@/lib/topics-store'
 import { colors, radii, spacing, typography } from '@/theme/tokens'
 import { KING_PREMIUM_PACK } from './engine'
 
@@ -19,17 +19,46 @@ type Props = {
 export function PremiumPackModal({ visible, onClose }: Props) {
 	const unlocked = usePackUnlocked(KING_PREMIUM_PACK)
 	const { isLoaded, isEarnedReward, load, show } = useRewardedAd(AD_UNIT_IDS.packUnlockRewarded)
+	const [fetchFailed, setFetchFailed] = useState(false)
+
+	const unlockIfTopicsAvailable = useCallback(() => {
+		if (getTopicsByPack(KING_PREMIUM_PACK).length > 0) {
+			packUnlockStore.unlock(KING_PREMIUM_PACK)
+			return true
+		}
+		return false
+	}, [])
+
+	const retryFetch = useCallback(async () => {
+		setFetchFailed(false)
+		if (unlockIfTopicsAvailable()) return
+		const ok = await topicsStore.refreshPremiumPack(KING_PREMIUM_PACK)
+		if (ok) {
+			packUnlockStore.unlock(KING_PREMIUM_PACK)
+			return
+		}
+		setFetchFailed(true)
+	}, [unlockIfTopicsAvailable])
 
 	useEffect(() => {
-		if (visible && !unlocked) load()
+		if (visible && !unlocked) {
+			load()
+			topicsStore.refreshPremiumPack(KING_PREMIUM_PACK)
+		}
 	}, [visible, unlocked, load])
 
 	useEffect(() => {
-		if (isEarnedReward) {
-			packUnlockStore.unlock(KING_PREMIUM_PACK)
-			topicsStore.refreshPremiumPack(KING_PREMIUM_PACK)
-		}
-	}, [isEarnedReward])
+		if (!isEarnedReward) return
+		if (unlockIfTopicsAvailable()) return
+		void topicsStore.refreshPremiumPack(KING_PREMIUM_PACK).then((ok) => {
+			if (ok) {
+				setFetchFailed(false)
+				packUnlockStore.unlock(KING_PREMIUM_PACK)
+				return
+			}
+			setFetchFailed(true)
+		})
+	}, [isEarnedReward, unlockIfTopicsAvailable])
 
 	return (
 		<Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
@@ -58,6 +87,18 @@ export function PremiumPackModal({ visible, onClose }: Props) {
 								disabled={!isLoaded}
 								onPress={() => show()}
 							/>
+							{fetchFailed ? (
+								<>
+									<Text style={styles.error}>お題の取得に失敗しました</Text>
+									<Pressable
+										accessibilityRole="button"
+										onPress={retryFetch}
+										style={styles.retry}
+									>
+										<Text style={styles.retryText}>再試行</Text>
+									</Pressable>
+								</>
+							) : null}
 						</>
 					)}
 					<Pressable accessibilityRole="button" onPress={onClose}>
@@ -89,5 +130,14 @@ const styles = StyleSheet.create({
 	},
 	title: { ...typography.title },
 	desc: { ...typography.body, color: colors.textMuted, textAlign: 'center', lineHeight: 24 },
+	error: { ...typography.body, color: colors.danger, textAlign: 'center' },
+	retry: {
+		borderWidth: 1,
+		borderColor: colors.surfaceBorder,
+		borderRadius: radii.md,
+		paddingHorizontal: spacing.lg,
+		paddingVertical: spacing.sm,
+	},
+	retryText: { ...typography.body, color: colors.text },
 	close: { ...typography.body, color: colors.textMuted, padding: spacing.sm },
 })

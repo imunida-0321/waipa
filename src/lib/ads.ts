@@ -15,6 +15,7 @@ export function adsEnabled(): boolean {
 let initialized = false
 let interstitial: InterstitialAd | null = null
 let interstitialLoaded = false
+let interstitialFailed = false
 let playExitCount = 0
 
 // 初回起動時（ホーム表示直後）に1回だけ呼ぶ。ATT → AdMob 初期化 → 先読み
@@ -31,9 +32,15 @@ export async function initAds(): Promise<void> {
 
 function preloadInterstitial() {
 	interstitialLoaded = false
+	interstitialFailed = false
 	interstitial = InterstitialAd.createForAdRequest(AD_UNIT_IDS.gameExitInterstitial)
 	interstitial.addAdEventListener(AdEventType.LOADED, () => {
 		interstitialLoaded = true
+		interstitialFailed = false
+	})
+	interstitial.addAdEventListener(AdEventType.ERROR, () => {
+		interstitialLoaded = false
+		interstitialFailed = true
 	})
 	// 表示後は次の退出に備えて再読込
 	interstitial.addAdEventListener(AdEventType.CLOSED, preloadInterstitial)
@@ -48,6 +55,10 @@ export function maybeShowGameExitInterstitial(): void {
 	if (interstitialLoaded && interstitial) {
 		interstitialLoaded = false
 		interstitial.show()
+		return
+	}
+	if (interstitialFailed) {
+		preloadInterstitial()
 	}
 }
 
@@ -56,5 +67,6 @@ export function _resetForTest() {
 	initialized = false
 	interstitial = null
 	interstitialLoaded = false
+	interstitialFailed = false
 	playExitCount = 0
 }

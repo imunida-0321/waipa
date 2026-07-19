@@ -1,7 +1,7 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Pressable, StyleSheet, Text, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { router } from 'expo-router'
+import { router, useNavigation } from 'expo-router'
 import { haptics } from '@/lib/haptics'
 import { maybeShowGameExitInterstitial } from '@/lib/ads'
 import type { GameMeta } from '@/games/registry'
@@ -16,8 +16,16 @@ type Stage = 'intro' | 'setup' | 'play'
 // requiresPlayers ならプレイヤー設定ゲート → ヘッダー（戻る/タイトル/？）＋本体
 export function GameScreen({ meta }: { meta: GameMeta }) {
 	const insets = useSafeAreaInsets()
+	const navigation = useNavigation()
 	const [stage, setStage] = useState<Stage>('intro')
 	const [howToVisible, setHowToVisible] = useState(false)
+
+	useEffect(() => {
+		if (stage !== 'play') return
+		return navigation.addListener('beforeRemove', () => {
+			maybeShowGameExitInterstitial()
+		})
+	}, [navigation, stage])
 
 	const howToModal = (
 		<HowToPlayModal
@@ -59,7 +67,6 @@ export function GameScreen({ meta }: { meta: GameMeta }) {
 					accessibilityRole="button"
 					onPress={() => {
 						haptics.tap()
-						maybeShowGameExitInterstitial()
 						router.back()
 					}}
 					style={styles.headerBtn}
