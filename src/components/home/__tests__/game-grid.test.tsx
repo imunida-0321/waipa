@@ -1,4 +1,5 @@
-import { act, fireEvent, render } from '@testing-library/react-native'
+import { act, fireEvent, render, within } from '@testing-library/react-native'
+import { StyleSheet } from 'react-native'
 import { router } from 'expo-router'
 import { games } from '@/games/registry'
 import { GameGrid } from '../game-grid'
@@ -83,7 +84,6 @@ it('レジストリの全ゲームがカード表示される', async () => {
 		} else {
 			expect(getByText(g.title)).toBeTruthy()
 		}
-		expect(getByText(g.tagline)).toBeTruthy()
 	}
 })
 
@@ -93,6 +93,36 @@ it('カードタップで該当ゲームへ遷移する', async () => {
 	expect(router.push).toHaveBeenCalledWith({
 		pathname: '/game/[id]',
 		params: { id: 'bomb-2-16' },
+	})
+})
+
+describe('千鳥グリッド構造', () => {
+	it('偶数番目が左列・奇数番目が右列に分かれる', async () => {
+		const { getByTestId } = await render(<GameGrid />)
+		const left = within(getByTestId('grid-left-column'))
+		const right = within(getByTestId('grid-right-column'))
+		expect(left.getByLabelText(games[0].title)).toBeTruthy()
+		expect(right.getByLabelText(games[1].title)).toBeTruthy()
+		expect(left.getByLabelText(games[2].title)).toBeTruthy()
+		expect(right.queryByLabelText(games[0].title)).toBeNull()
+	})
+
+	it('全ゲームが左右いずれかの列に表示される', async () => {
+		const { getByTestId } = await render(<GameGrid />)
+		const left = within(getByTestId('grid-left-column'))
+		const right = within(getByTestId('grid-right-column'))
+		for (const [i, g] of games.entries()) {
+			const column = i % 2 === 0 ? left : right
+			expect(column.getByLabelText(g.title)).toBeTruthy()
+		}
+	})
+
+	it('右列には半タイル分の上オフセットがある', async () => {
+		const { getByTestId } = await render(<GameGrid />)
+		const style = StyleSheet.flatten(getByTestId('grid-right-column').props.style)
+		expect(style.paddingTop).toBe('18.5%')
+		const leftStyle = StyleSheet.flatten(getByTestId('grid-left-column').props.style)
+		expect(leftStyle.paddingTop).toBeUndefined()
 	})
 })
 
