@@ -1,8 +1,8 @@
 import { StyleSheet, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { BannerAd, BannerAdSize } from 'react-native-google-mobile-ads'
 import { AD_UNIT_IDS } from '@/constants/ads'
 import { adsEnabled } from '@/lib/ads'
+import { BannerAd, BannerAdSize } from '@/lib/gma'
 
 // ホーム下部の常設バナー。プレミアムは非表示（issue #6）
 export function HomeBannerAd() {

@@ -1,5 +1,5 @@
 import { Platform } from 'react-native'
-import { TestIds } from 'react-native-google-mobile-ads'
+import { TestIds } from '@/lib/gma'
 
 // インタースティシャルを何回のゲーム退出ごとに出すか（1 = 毎回）。
 // 頻度を緩める場合はこの定数だけ変える（将来 Supabase 経由で上書き可能にする想定）

@@ -1,10 +1,10 @@
+import { AD_UNIT_IDS, INTERSTITIAL_EVERY_N_EXITS } from '@/constants/ads'
 import {
 	getTrackingPermissionsAsync,
 	PermissionStatus,
 	requestTrackingPermissionsAsync,
-} from 'expo-tracking-transparency'
-import mobileAds, { AdEventType, InterstitialAd } from 'react-native-google-mobile-ads'
-import { AD_UNIT_IDS, INTERSTITIAL_EVERY_N_EXITS } from '@/constants/ads'
+} from '@/lib/att'
+import mobileAds, { AdEventType, InterstitialAd } from '@/lib/gma'
 import { isPremiumUnlocked } from '@/lib/premium'
 
 // プレミアム購読者には一切広告を出さない。判定源は isPremiumUnlocked() のみ
