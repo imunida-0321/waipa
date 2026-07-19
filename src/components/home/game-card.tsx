@@ -5,6 +5,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native'
 import type { GameMeta } from '@/games/registry'
 import { usePremium } from '@/lib/premium'
 import { colors, radii, spacing, typography } from '@/theme/tokens'
+import { PlayerCountBadge } from './player-count-badge'
 
 type Props = {
 	game: GameMeta
@@ -12,7 +13,8 @@ type Props = {
 }
 
 // ゲーム一覧のカード。cardThumbnail があれば画像（タイトル入りキービジュアル前提で文字は重ねない）、
-// なければテーマ色グラデ＋絵文字のフォールバック（イントロ用 thumbnail とは独立）。
+// なければテーマ色グラデ＋右上絵文字＋左下タイトルのフォールバック（Issue #44 モック準拠）。
+// 人数バッジを左上に重ねる。カード下キャッチ（tagline）は廃止。
 // プレミアム限定ゲームは未解放の間、薄い黒マスク＋👑バッジを重ねて課金枠だと分かるようにする
 export function GameCard({ game, onPress }: Props) {
 	const premiumUnlocked = usePremium()
@@ -45,6 +47,7 @@ export function GameCard({ game, onPress }: Props) {
 						</Text>
 					</LinearGradient>
 				)}
+				<PlayerCountBadge game={game} />
 				{locked && (
 					<View testID="premium-lock-mask" style={styles.lockMask}>
 						<View style={styles.lockBadge}>
@@ -59,15 +62,12 @@ export function GameCard({ game, onPress }: Props) {
 					</View>
 				)}
 			</View>
-			<Text style={styles.tagline} numberOfLines={2}>
-				{game.tagline}
-			</Text>
 		</Pressable>
 	)
 }
 
 const styles = StyleSheet.create({
-	container: { width: '48%', marginBottom: spacing.lg },
+	container: { width: '100%', marginBottom: spacing.lg },
 	pressed: { opacity: 0.8 },
 	thumbWrap: { position: 'relative' },
 	thumb: {
@@ -75,10 +75,9 @@ const styles = StyleSheet.create({
 		borderRadius: radii.lg,
 		borderWidth: 1,
 		borderColor: colors.surfaceBorder,
-		alignItems: 'center',
-		justifyContent: 'center',
-		gap: spacing.xs,
+		justifyContent: 'flex-end',
 		padding: spacing.sm,
+		overflow: 'hidden',
 	},
 	thumbImage: {
 		aspectRatio: 1.3,
@@ -105,7 +104,12 @@ const styles = StyleSheet.create({
 		gap: spacing.xs,
 	},
 	lockBadgeText: { ...typography.caption, color: colors.premiumGold },
-	emoji: { fontSize: 40 },
-	title: { ...typography.body, fontWeight: '800', textAlign: 'center' },
-	tagline: { ...typography.caption, textAlign: 'center', marginTop: spacing.sm },
+	emoji: {
+		position: 'absolute',
+		top: spacing.xs,
+		right: spacing.sm,
+		fontSize: 44,
+		opacity: 0.55,
+	},
+	title: { ...typography.body, fontWeight: '800', textAlign: 'left' },
 })
