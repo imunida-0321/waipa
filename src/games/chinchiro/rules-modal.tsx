@@ -1,4 +1,5 @@
 import { Modal, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { GlassSurface } from '@/components/ui/glass-surface'
 import { SecondaryButton } from '@/components/ui/secondary-button'
 import { colors, radii, spacing, typography } from '@/theme/tokens'
 import { CHIN } from './theme'
@@ -84,7 +85,7 @@ export function RulesModal({ visible, onClose }: Props) {
 	return (
 		<Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
 			<View style={styles.backdrop}>
-				<View style={styles.sheet}>
+				<GlassSurface variant="overlay" style={styles.sheet}>
 					<Text style={styles.title}>チンチロの役（強い順）</Text>
 					<ScrollView contentContainerStyle={styles.scroll}>
 						{ROWS.map((row) => (
@@ -118,7 +119,7 @@ export function RulesModal({ visible, onClose }: Props) {
 						</Text>
 					</ScrollView>
 					<SecondaryButton title="とじる" onPress={onClose} />
-				</View>
+				</GlassSurface>
 			</View>
 		</Modal>
 	)
@@ -133,10 +134,7 @@ const styles = StyleSheet.create({
 	},
 	sheet: {
 		maxHeight: '86%',
-		backgroundColor: colors.surface,
 		borderRadius: radii.lg,
-		borderWidth: 1,
-		borderColor: colors.surfaceBorder,
 		padding: spacing.md,
 		gap: spacing.md,
 	},

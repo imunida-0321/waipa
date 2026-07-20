@@ -175,3 +175,18 @@ it('発表完了後に「もう一回」で onRetry が呼ばれる', async () =
 	await act(async () => fireEvent.press(getByText('もう一回')))
 	expect(onRetry).toHaveBeenCalled()
 })
+
+describe('ガラス面', () => {
+	it('カードはガラス面で描画される', async () => {
+		const { getAllByTestId } = await render(
+			<ChinchiroResult
+				hands={[hand(106, 'me', 6), hand(10, 'nome')]}
+				playerNames={['A', 'B']}
+				onRetry={jest.fn()}
+				onHome={jest.fn()}
+			/>,
+		)
+
+		expect(getAllByTestId('glass-surface-pseudo')).toHaveLength(2)
+	})
+})

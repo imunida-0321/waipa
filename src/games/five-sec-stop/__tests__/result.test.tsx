@@ -136,3 +136,18 @@ it('発表完了後に「もう一回」でonRetryが呼ばれる', async () => 
 	await act(async () => fireEvent.press(getByText('もう一回')))
 	expect(onRetry).toHaveBeenCalled()
 })
+
+describe('ガラス面', () => {
+	it('カードはガラス面で描画される', async () => {
+		const { getAllByTestId } = await render(
+			<FiveSecResult
+				records={[4980, 5820]}
+				playerNames={['A', 'B']}
+				onRetry={jest.fn()}
+				onHome={jest.fn()}
+			/>,
+		)
+
+		expect(getAllByTestId('glass-surface-pseudo')).toHaveLength(2)
+	})
+})

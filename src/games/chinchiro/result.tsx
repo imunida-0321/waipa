@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import { useDrumroll } from '@/components/game/use-drumroll'
+import { GlassSurface } from '@/components/ui/glass-surface'
 import { GradientButton } from '@/components/ui/gradient-button'
 import { SecondaryButton } from '@/components/ui/secondary-button'
 import { playSound } from '@/lib/sound'
@@ -251,9 +252,9 @@ function RankCard({
 }) {
 	if (!shown) {
 		return (
-			<View style={styles.card}>
+			<GlassSurface style={styles.card}>
 				<Text style={styles.hiddenMark}>？？？</Text>
-			</View>
+			</GlassSurface>
 		)
 	}
 
@@ -262,13 +263,13 @@ function RankCard({
 	const dotColor = playerColor(entry.playerIndex).value
 
 	return (
-		<View style={[styles.card, isTop && styles.topCard, isFinalLoser && styles.loserCard]}>
+		<GlassSurface style={[styles.card, isTop && styles.topCard, isFinalLoser && styles.loserCard]}>
 			<Text style={styles.rank}>{rank}位</Text>
 			<View style={[styles.colorDot, { backgroundColor: dotColor }]} />
 			<Text style={styles.name}>{name}</Text>
 			{isFinalLoser && <Text style={styles.loserMark}>敗者！</Text>}
 			<Text style={[styles.hand, { color: handColor }]}>{handLabel(entry.hand)}</Text>
-		</View>
+		</GlassSurface>
 	)
 }
 
@@ -288,10 +289,7 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		alignItems: 'center',
 		gap: spacing.sm,
-		backgroundColor: colors.surface,
 		borderRadius: radii.md,
-		borderWidth: 1,
-		borderColor: colors.surfaceBorder,
 		paddingVertical: spacing.sm,
 		paddingHorizontal: spacing.md,
 		marginBottom: spacing.sm,

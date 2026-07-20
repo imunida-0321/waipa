@@ -130,3 +130,11 @@ it('ticking 中に unmount すると爆発もチクタクも発火しない', as
 	expect(soundMock.mock.calls.length).toBe(soundsBefore) // tick も発火しない
 	expect(tapMock.mock.calls.length).toBe(tapsBefore)
 })
+
+describe('ガラス面', () => {
+	it('お題カードはガラス面で描画される', async () => {
+		const { getByTestId } = await render(<BombRelayGame />)
+
+		expect(getByTestId('glass-surface-pseudo')).toBeTruthy()
+	})
+})

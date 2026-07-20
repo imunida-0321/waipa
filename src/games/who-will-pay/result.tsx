@@ -1,4 +1,5 @@
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
+import { GlassSurface } from '@/components/ui/glass-surface'
 import { GradientButton } from '@/components/ui/gradient-button'
 import { SecondaryButton } from '@/components/ui/secondary-button'
 import { playerColor } from '@/theme/player-colors'
@@ -43,7 +44,7 @@ export function Result({ slots, playerNames, onRetry, onHome }: Props) {
 				})}
 			</View>
 
-			<View style={styles.summary}>
+			<GlassSurface style={styles.summary}>
 				{playerNames.map((name, i) => (
 					<View key={i} style={styles.summaryRow}>
 						<View
@@ -55,7 +56,7 @@ export function Result({ slots, playerNames, onRetry, onHome }: Props) {
 						</Text>
 					</View>
 				))}
-			</View>
+			</GlassSurface>
 
 			<View style={styles.actions}>
 				<GradientButton title="もう一度" onPress={onRetry} />
@@ -105,10 +106,7 @@ const styles = StyleSheet.create({
 	},
 	summary: {
 		width: '100%',
-		backgroundColor: colors.surface,
 		borderRadius: radii.md,
-		borderWidth: 1,
-		borderColor: colors.surfaceBorder,
 		padding: spacing.md,
 		marginBottom: spacing.lg,
 	},

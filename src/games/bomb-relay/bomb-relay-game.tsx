@@ -10,6 +10,7 @@ import Animated, {
 } from 'react-native-reanimated'
 import { lottieAssets } from '@/components/game/lottie-assets'
 import { LottieEffect } from '@/components/game/lottie-effect'
+import { GlassSurface } from '@/components/ui/glass-surface'
 import { GradientButton } from '@/components/ui/gradient-button'
 import { haptics } from '@/lib/haptics'
 import { playSound } from '@/lib/sound'
@@ -81,10 +82,10 @@ export function BombRelayGame() {
 
 	return (
 		<View style={styles.container}>
-			<View style={styles.topicCard}>
+			<GlassSurface style={styles.topicCard}>
 				<Text style={styles.topicLabel}>お題</Text>
 				<Text style={styles.topicText}>{topic.text}</Text>
-			</View>
+			</GlassSurface>
 
 			{/* 素材があれば Lottie の爆弾、なければ従来の🧨。どちらも ticking 中は脈打つ */}
 			<Animated.View style={pulseStyle}>
@@ -117,7 +118,6 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 	},
 	topicCard: {
-		backgroundColor: colors.surface,
 		borderWidth: 1,
 		borderColor: BR.purple,
 		borderRadius: radii.lg,
