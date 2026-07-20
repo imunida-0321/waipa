@@ -64,7 +64,7 @@ GlassSurface({ children, style, variant? })
 ### `src/components/ui/app-background.tsx` — ネオンブロブ背景
 
 - `react-native-svg` の `RadialGradient` でピンク（`#E85BF7`）と紫（`#7B5CFA`）のぼやけた光の玉を2〜3個、画面の対角に静的配置
-- `app/_layout.tsx` のルートに1回だけ敷く。`position: absolute`・`pointerEvents="none"` でタッチ・レイアウトを阻害しない
+- native-stack はプッシュ画面が前の画面の上に不透明に重なるため、`_layout.tsx` ではなく各画面のルート View の最初の子として置く（フェーズ1: index / settings / gallery / paywall）。`position: absolute`・`pointerEvents="none"` でタッチ・レイアウトを阻害しない
 - アニメーションなし。初回描画のみで再レンダーコストゼロ
 
 ### `src/theme/tokens.ts` への `glass` トークン追加

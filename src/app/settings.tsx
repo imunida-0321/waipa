@@ -1,6 +1,7 @@
 import { router } from 'expo-router'
-import { Alert, ScrollView, StyleSheet } from 'react-native'
+import { Alert, ScrollView, StyleSheet, View } from 'react-native'
 import { PremiumUpsellCard } from '@/components/settings/premium-upsell-card'
+import { AppBackground } from '@/components/ui/app-background'
 import { Card } from '@/components/ui/card'
 import { ChevronRow } from '@/components/ui/chevron-row'
 import { SectionHeader } from '@/components/ui/section-header'
@@ -32,31 +33,34 @@ export default function SettingsScreen() {
 	const settings = useSettings()
 
 	return (
-		<ScrollView style={styles.screen} contentContainerStyle={styles.content}>
-			<PremiumUpsellCard onUpgradePress={showPaywall} />
-			<SectionHeader title="設定" />
-			<Card>
-				<SettingToggleRow
-					icon="volume-high"
-					label="効果音"
-					value={settings.soundEnabled}
-					onValueChange={(v) => settingsStore.setSoundEnabled(v)}
-				/>
-				<SettingToggleRow
-					icon="vibrate"
-					label="バイブレーション"
-					value={settings.hapticsEnabled}
-					onValueChange={(v) => settingsStore.setHapticsEnabled(v)}
-				/>
-				<SettingValueRow icon="web" label="言語" value="日本語" />
-			</Card>
-			<SectionHeader title="その他" />
-			<Card>
-				<ChevronRow icon="restore" label="購入を復元する" onPress={handleRestorePremium} />
-				<ChevronRow icon="star" label="レビューを書く" onPress={() => writeReview()} />
-				<ChevronRow icon="email-outline" label="要望・問い合わせ" onPress={() => contactSupport()} />
-			</Card>
-		</ScrollView>
+		<View style={styles.screen}>
+			<AppBackground />
+			<ScrollView contentContainerStyle={styles.content}>
+				<PremiumUpsellCard onUpgradePress={showPaywall} />
+				<SectionHeader title="設定" />
+				<Card>
+					<SettingToggleRow
+						icon="volume-high"
+						label="効果音"
+						value={settings.soundEnabled}
+						onValueChange={(v) => settingsStore.setSoundEnabled(v)}
+					/>
+					<SettingToggleRow
+						icon="vibrate"
+						label="バイブレーション"
+						value={settings.hapticsEnabled}
+						onValueChange={(v) => settingsStore.setHapticsEnabled(v)}
+					/>
+					<SettingValueRow icon="web" label="言語" value="日本語" />
+				</Card>
+				<SectionHeader title="その他" />
+				<Card>
+					<ChevronRow icon="restore" label="購入を復元する" onPress={handleRestorePremium} />
+					<ChevronRow icon="star" label="レビューを書く" onPress={() => writeReview()} />
+					<ChevronRow icon="email-outline" label="要望・問い合わせ" onPress={() => contactSupport()} />
+				</Card>
+			</ScrollView>
+		</View>
 	)
 }
 
