@@ -28,26 +28,28 @@ const baseGame: GameMeta = {
 	Component: () => null,
 }
 
-it('thumbnail なし: 絵文字＋タイトル＋人数バッジ＋キャッチのグラデカードを表示する', async () => {
-	const { getByText, queryByTestId, getByTestId } = await render(
+it('thumbnail なし: 絵文字＋タイトル＋キャッチのグラデカードを表示し、人数バッジは出さない', async () => {
+	const { getByText, queryByText, queryByTestId } = await render(
 		<GameCard game={baseGame} onPress={jest.fn()} />,
 	)
 	expect(getByText('🎮')).toBeTruthy()
 	expect(getByText('テストゲーム')).toBeTruthy()
-	expect(getByTestId('player-count-badge')).toBeTruthy()
-	expect(getByText('2〜8人')).toBeTruthy()
+	// 人数バッジは廃止（2026-07-20 レビュー）
+	expect(queryByTestId('player-count-badge')).toBeNull()
+	expect(queryByText('2〜8人')).toBeNull()
 	// カード下キャッチは表示する（2026-07-20 レビューで復活）
 	expect(getByText('テスト用のゲーム')).toBeTruthy()
 	expect(queryByTestId('card-thumb-image')).toBeNull()
 })
 
-it('thumbnail あり: 画像＋人数バッジ＋カード下キャッチを表示し、タイトル文字は重ねない', async () => {
+it('thumbnail あり: 画像＋カード下キャッチを表示し、タイトル文字と人数バッジは重ねない', async () => {
 	const withThumb = { ...baseGame, cardThumbnail: 1 }
-	const { getByText, queryByText, getByTestId, getByLabelText } = await render(
+	const { getByText, queryByText, getByTestId, queryByTestId, getByLabelText } = await render(
 		<GameCard game={withThumb} onPress={jest.fn()} />,
 	)
 	expect(getByTestId('card-thumb-image')).toBeTruthy()
-	expect(getByTestId('player-count-badge')).toBeTruthy()
+	// 人数バッジは廃止（2026-07-20 レビュー）
+	expect(queryByTestId('player-count-badge')).toBeNull()
 	expect(queryByText('🎮')).toBeNull()
 	expect(queryByText('テストゲーム')).toBeNull()
 	// タイトルは読み上げ用ラベルとして残す

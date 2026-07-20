@@ -5,7 +5,6 @@ import { Pressable, StyleSheet, Text, View } from 'react-native'
 import type { GameMeta } from '@/games/registry'
 import { usePremium } from '@/lib/premium'
 import { colors, radii, spacing, typography } from '@/theme/tokens'
-import { PlayerCountBadge } from './player-count-badge'
 
 type Props = {
 	game: GameMeta
@@ -14,7 +13,7 @@ type Props = {
 
 // ゲーム一覧のカード。cardThumbnail があれば画像（タイトル入りキービジュアル前提で文字は重ねない）、
 // なければテーマ色グラデ＋右上絵文字＋左下タイトルのフォールバック（Issue #44 モック準拠）。
-// 人数バッジを左上に重ねる。カード下キャッチ（tagline）はサムネ下に表示する。
+// カード下キャッチ（tagline）はサムネ下・カード面の中に表示する。
 // プレミアム限定ゲームは未解放の間、薄い黒マスク＋👑バッジを重ねて課金枠だと分かるようにする
 export function GameCard({ game, onPress }: Props) {
 	const premiumUnlocked = usePremium()
@@ -48,7 +47,6 @@ export function GameCard({ game, onPress }: Props) {
 							</Text>
 						</LinearGradient>
 					)}
-					<PlayerCountBadge game={game} />
 					{locked && (
 						<View testID="premium-lock-mask" style={styles.lockMask}>
 							<View style={styles.lockBadge}>
