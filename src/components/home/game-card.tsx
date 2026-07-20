@@ -115,5 +115,13 @@ const styles = StyleSheet.create({
 		opacity: 0.55,
 	},
 	title: { ...typography.body, fontWeight: '800', textAlign: 'left' },
-	tagline: { ...typography.caption, textAlign: 'center', marginTop: spacing.sm },
+	// 1行/2行のキャッチ混在でもカード高さが揃うよう常に2行分を確保（千鳥の段ずれ防止）
+	tagline: {
+		...typography.caption,
+		fontSize: 12,
+		lineHeight: 16,
+		minHeight: 32,
+		textAlign: 'center',
+		marginTop: spacing.sm,
+	},
 })

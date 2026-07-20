@@ -1,4 +1,5 @@
 import { fireEvent, render } from '@testing-library/react-native'
+import { StyleSheet } from 'react-native'
 import type { GameMeta } from '@/games/registry'
 import { GameCard } from '../game-card'
 
@@ -60,6 +61,14 @@ it('タップで onPress が呼ばれる（thumbnail あり）', async () => {
 	const { getByLabelText } = await render(<GameCard game={withThumb} onPress={onPress} />)
 	fireEvent.press(getByLabelText('テストゲーム'))
 	expect(onPress).toHaveBeenCalled()
+})
+
+it('キャッチは小さめフォント＋2行分の固定高さで段ずれを防ぐ', async () => {
+	const { getByText } = await render(<GameCard game={baseGame} onPress={jest.fn()} />)
+	const style = StyleSheet.flatten(getByText('テスト用のゲーム').props.style)
+	expect(style.fontSize).toBe(12)
+	expect(style.lineHeight).toBe(16)
+	expect(style.minHeight).toBe(32)
 })
 
 describe('プレミアムロック表示', () => {
