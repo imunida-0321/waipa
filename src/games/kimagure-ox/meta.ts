@@ -4,7 +4,7 @@ import { KimagureOxGame } from './kimagure-ox-game'
 export const meta: GameMeta = {
 	id: 'kimagure-ox',
 	title: 'きまぐれ◯×',
-	tagline: '普通じゃない◯×ゲーム',
+	tagline: '普通とはちょっと違う\n◯×ゲーム',
 	emoji: '⭕',
 	gradient: ['#F7B731', '#E67E22'],
 	minPlayers: 2,

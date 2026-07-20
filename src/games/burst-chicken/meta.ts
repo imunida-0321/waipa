@@ -4,7 +4,7 @@ import { BurstChickenGame } from './burst-chicken-game'
 export const meta: GameMeta = {
 	id: 'burst-chicken',
 	title: 'バーストチキン',
-	tagline: '積みすぎたら爆発！宣言チキンレース',
+	tagline: '積みすぎたら爆発！\n宣言チキンレース',
 	emoji: '🐔',
 	gradient: ['#FF9F43', '#EE5253'],
 	minPlayers: 2,

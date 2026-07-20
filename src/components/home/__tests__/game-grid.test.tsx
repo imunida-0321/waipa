@@ -84,7 +84,8 @@ it('レジストリの全ゲームがカード表示される', async () => {
 		} else {
 			expect(getByText(g.title)).toBeTruthy()
 		}
-		expect(getByText(g.tagline)).toBeTruthy()
+		// RTL は描画テキストの空白を正規化するため、tagline 内の改行はスペースとして照合する
+		expect(getByText(g.tagline.replace('\n', ' '))).toBeTruthy()
 	}
 })
 

@@ -4,7 +4,7 @@ import { NoKingGame } from './no-king-game'
 export const meta: GameMeta = {
 	id: 'no-king-game',
 	title: '王様のいない王様ゲーム',
-	tagline: 'お題も実行役もランダム！',
+	tagline: 'お題も実行役も\nランダムで決まる！',
 	emoji: '👑',
 	gradient: ['#F1C40F', '#B7791F'],
 	minPlayers: 3,

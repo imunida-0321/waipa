@@ -4,7 +4,7 @@ import { BombSwipeGame } from './bomb-swipe-game'
 export const meta: GameMeta = {
 	id: 'bomb-swipe',
 	title: '爆弾スワイプ',
-	tagline: 'どこまで攻める？地雷を踏んだら即アウト！',
+	tagline: 'どこまで攻める？\n踏んだら即アウト！',
 	emoji: '🧨',
 	gradient: ['#FF4D4F', '#7B1E1E'],
 	minPlayers: 2,
