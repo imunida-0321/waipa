@@ -1,4 +1,5 @@
 import { act, fireEvent, render } from '@testing-library/react-native'
+import type { ReactTestInstance } from 'react-test-renderer'
 import type { State } from '../engine'
 import { RoundResult } from '../round-result'
 
@@ -33,6 +34,7 @@ jest.mock('react-native-reanimated', () => {
 		withRepeat: jest.fn((v: number) => v),
 		withSequence: jest.fn((v: number) => v),
 		withSpring: jest.fn((v: number) => v),
+		getUseOfValueInStyleWarning: jest.fn(() => ''),
 	}
 })
 
@@ -60,6 +62,15 @@ const settledTieState: State = {
 	contributions: [4, 4, 8],
 	losers: [0, 1],
 	stopperIndex: 2,
+}
+
+function hasAncestorTestId(node: ReactTestInstance, testID: string): boolean {
+	let current = node.parent
+	while (current) {
+		if (current.props.testID === testID) return true
+		current = current.parent
+	}
+	return false
 }
 
 it('バースト: 敗者名・上限の答え合わせ・全員の貢献を表示する', async () => {
@@ -99,4 +110,19 @@ it('もう一回 / ホームへ がコールバックを呼ぶ', async () => {
 		fireEvent.press(getByText('ホームへ'))
 	})
 	expect(onHome).toHaveBeenCalled()
+})
+
+describe('ガラス面', () => {
+	it('ランキングカードはガラス面で描画される', async () => {
+		const { getByText } = await render(
+			<RoundResult
+				state={explodedState}
+				names={names}
+				onRetry={jest.fn()}
+				onHome={jest.fn()}
+			/>,
+		)
+
+		expect(hasAncestorTestId(getByText(/6pt/), 'glass-surface-pseudo')).toBe(true)
+	})
 })

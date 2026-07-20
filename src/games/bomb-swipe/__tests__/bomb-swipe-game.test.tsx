@@ -1,4 +1,5 @@
 import { act, fireEvent, render } from '@testing-library/react-native'
+import type { ReactTestInstance } from 'react-test-renderer'
 import { BombSwipeGame } from '../bomb-swipe-game'
 
 jest.mock('@/lib/sound', () => ({ playSound: jest.fn(), registerSound: jest.fn() }))
@@ -84,6 +85,15 @@ async function press(target: Parameters<typeof fireEvent.press>[0]) {
 	await act(async () => {
 		fireEvent.press(target)
 	})
+}
+
+function hasAncestorTestId(node: ReactTestInstance, testID: string): boolean {
+	let current = node.parent
+	while (current) {
+		if (current.props.testID === testID) return true
+		current = current.parent
+	}
+	return false
 }
 
 type TrialStoreModule = {
@@ -175,4 +185,12 @@ it('決着画面到達でトライアルの1ラウンドを消費する', async 
 
 	expect(getByText(/あおさんの負け/)).toBeTruthy()
 	expect(consumerSpy).toHaveBeenCalledWith('bomb-swipe', true)
+})
+
+describe('ガラス面', () => {
+	it('手番行はガラス面で描画される', async () => {
+		const { getByText } = await render(<BombSwipeGame />)
+
+		expect(hasAncestorTestId(getByText(/あかさんの番/), 'glass-surface-pseudo')).toBe(true)
+	})
 })

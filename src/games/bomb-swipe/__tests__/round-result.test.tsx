@@ -1,4 +1,5 @@
 import { act, fireEvent, render } from '@testing-library/react-native'
+import type { ReactTestInstance } from 'react-test-renderer'
 import type { State } from '../engine'
 import { RoundResult } from '../round-result'
 
@@ -49,6 +50,15 @@ const base: State = {
 		{ score: 65, exploded: true },
 		{ score: 30, exploded: false },
 	],
+}
+
+function hasAncestorTestId(node: ReactTestInstance, testID: string): boolean {
+	let current = node.parent
+	while (current) {
+		if (current.props.testID === testID) return true
+		current = current.parent
+	}
+	return false
 }
 
 it('スコア順ランキングと地雷位置の答え合わせを表示する', async () => {
@@ -117,4 +127,19 @@ it('もう一回とホームのボタンが動く', async () => {
 	})
 	expect(onRetry).toHaveBeenCalledTimes(1)
 	expect(onHome).toHaveBeenCalledTimes(1)
+})
+
+describe('ガラス面', () => {
+	it('ランキング行はガラス面で描画される', async () => {
+		const { getByText } = await render(
+			<RoundResult
+				state={base}
+				names={['あか', 'あお', 'きいろ']}
+				onRetry={() => {}}
+				onHome={() => {}}
+			/>,
+		)
+
+		expect(hasAncestorTestId(getByText(/地雷: 70/), 'glass-surface-pseudo')).toBe(true)
+	})
 })

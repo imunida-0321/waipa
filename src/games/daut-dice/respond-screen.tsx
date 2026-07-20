@@ -1,5 +1,6 @@
 import { StyleSheet, Text, View } from 'react-native'
 import { GradientButton } from '@/components/ui/gradient-button'
+import { GlassSurface } from '@/components/ui/glass-surface'
 import { PillButton } from '@/components/ui/pill-button'
 import { colors, radii, spacing, typography } from '@/theme/tokens'
 import { MIE, declarationLabel } from './engine'
@@ -18,9 +19,9 @@ export function RespondScreen({ declarerName, declaration, onDoubt, onBelieve }:
 	return (
 		<View style={styles.container}>
 			<Text style={styles.who}>{declarerName}さんの宣言</Text>
-			<View style={styles.card}>
+			<GlassSurface style={styles.card}>
 				<Text style={styles.value}>{declarationLabel(declaration)}</Text>
-			</View>
+			</GlassSurface>
 			<Text style={styles.hint}>{mie ? '21はダウトのみ！' : '信じる？ 疑う？'}</Text>
 			<GradientButton title="ダウト！" onPress={onDoubt} />
 			{!mie && <PillButton title="信じて振る" onPress={onBelieve} />}
@@ -32,7 +33,6 @@ const styles = StyleSheet.create({
 	container: { gap: spacing.md, alignItems: 'stretch' },
 	who: { ...typography.body, color: colors.textMuted, textAlign: 'center' },
 	card: {
-		backgroundColor: colors.surface,
 		borderWidth: 2,
 		borderColor: DD.red,
 		borderRadius: radii.lg,

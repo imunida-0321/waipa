@@ -1,4 +1,5 @@
 import { act, fireEvent, render } from '@testing-library/react-native'
+import type { ReactTestInstance } from 'react-test-renderer'
 import { RevealOverlay } from '../reveal-overlay'
 
 jest.mock('@/lib/sound', () => ({ playSound: jest.fn(), registerSound: jest.fn() }))
@@ -27,6 +28,7 @@ jest.mock('react-native-reanimated', () => {
 		withSpring: jest.fn((toValue: number) => toValue),
 		withRepeat: jest.fn((toValue: number) => toValue),
 		withSequence: jest.fn((toValue: number) => toValue),
+		getUseOfValueInStyleWarning: jest.fn(() => ''),
 	}
 })
 jest.mock('../dice-roll-3d', () => {
@@ -50,6 +52,15 @@ afterEach(() => {
 	jest.useRealTimers()
 })
 
+function hasAncestorTestId(node: ReactTestInstance, testID: string): boolean {
+	let current = node.parent
+	while (current) {
+		if (current.props.testID === testID) return true
+		current = current.parent
+	}
+	return false
+}
+
 it('ドラムロール後に嘘判定とライフ-1 を発表し、つぎへで onDone', async () => {
 	const { getByText, queryByText } = await render(
 		<RevealOverlay {...base} wasBluff gameOver={false} />,
@@ -64,6 +75,18 @@ it('ドラムロール後に嘘判定とライフ-1 を発表し、つぎへで 
 		fireEvent.press(getByText('つぎへ'))
 	})
 	expect(base.onDone).toHaveBeenCalled()
+})
+
+describe('ガラス面', () => {
+	it('ペナルティ表示はガラス面で描画される', async () => {
+		const { getByText } = await render(<RevealOverlay {...base} wasBluff gameOver={false} />)
+
+		await act(async () => {
+			jest.advanceTimersByTime(2000)
+		})
+
+		expect(hasAncestorTestId(getByText(/あかさん ライフ-1/), 'glass-surface-blur')).toBe(true)
+	})
 })
 
 it('本当のときはダウト失敗の発表・gameOver では「結果へ」', async () => {

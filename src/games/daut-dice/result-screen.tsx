@@ -1,7 +1,8 @@
 import { StyleSheet, Text, View } from 'react-native'
 import { ResultOverlay } from '@/components/game/result-overlay'
+import { GlassSurface } from '@/components/ui/glass-surface'
 import { playerColor } from '@/theme/player-colors'
-import { colors, radii, spacing, typography } from '@/theme/tokens'
+import { radii, spacing, typography } from '@/theme/tokens'
 import { DD } from './theme'
 
 type Props = {
@@ -21,7 +22,7 @@ export function ResultScreen({ names, lives, loserIndex, onRetry, onHome }: Prop
 					// .value の style 直書きは worklets プラグインが warn を注入するため事前に取り出す
 					const color = playerColor(i).value
 					return (
-						<View key={i} style={styles.row}>
+						<GlassSurface key={i} style={styles.row}>
 							<View style={[styles.bar, { backgroundColor: color }]} />
 							<Text style={styles.name} numberOfLines={1}>
 								{name}
@@ -29,7 +30,7 @@ export function ResultScreen({ names, lives, loserIndex, onRetry, onHome }: Prop
 							<Text style={styles.hearts}>
 								{lives[i] > 0 ? '♥'.repeat(lives[i]) : '💔'}
 							</Text>
-						</View>
+						</GlassSurface>
 					)
 				})}
 			</View>
@@ -44,9 +45,6 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		alignItems: 'center',
 		gap: spacing.sm,
-		backgroundColor: colors.surface,
-		borderWidth: 1,
-		borderColor: colors.surfaceBorder,
 		borderRadius: radii.md,
 		paddingVertical: spacing.sm,
 		paddingHorizontal: spacing.md,

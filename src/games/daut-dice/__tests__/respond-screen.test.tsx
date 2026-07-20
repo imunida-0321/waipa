@@ -1,4 +1,5 @@
 import { act, fireEvent, render } from '@testing-library/react-native'
+import type { ReactTestInstance } from 'react-test-renderer'
 import { RespondScreen } from '../respond-screen'
 
 jest.mock('@/lib/haptics', () => ({
@@ -9,6 +10,15 @@ jest.mock('expo-linear-gradient', () => {
 	const { View } = require('react-native')
 	return { LinearGradient: View }
 })
+
+function hasAncestorTestId(node: ReactTestInstance, testID: string): boolean {
+	let current = node.parent
+	while (current) {
+		if (current.props.testID === testID) return true
+		current = current.parent
+	}
+	return false
+}
 
 it('宣言と2択を表示し、それぞれのコールバックが動く', async () => {
 	const onDoubt = jest.fn()
@@ -46,4 +56,19 @@ it('21（ミエ）宣言ではダウトのみ', async () => {
 	expect(getByText('21（ミエ）')).toBeTruthy()
 	expect(queryByText('信じて振る')).toBeNull()
 	expect(getByText(/21はダウトのみ/)).toBeTruthy()
+})
+
+describe('ガラス面', () => {
+	it('宣言カードはガラス面で描画される', async () => {
+		const { getByText } = await render(
+			<RespondScreen
+				declarerName="あか"
+				declaration={54}
+				onDoubt={jest.fn()}
+				onBelieve={jest.fn()}
+			/>,
+		)
+
+		expect(hasAncestorTestId(getByText('54'), 'glass-surface-pseudo')).toBe(true)
+	})
 })

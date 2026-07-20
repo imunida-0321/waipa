@@ -1,4 +1,5 @@
 import { StyleSheet, Text, View } from 'react-native'
+import { GlassSurface } from '@/components/ui/glass-surface'
 import { GradientButton } from '@/components/ui/gradient-button'
 import { playerColor } from '@/theme/player-colors'
 import { colors, radii, spacing, typography } from '@/theme/tokens'
@@ -28,7 +29,7 @@ export function RoundResult({ state, names, onRetry, onHome }: Props) {
 			</Text>
 			<Text style={styles.limitReveal}>上限は {state.limit} だった！</Text>
 
-			<View style={styles.rankingCard}>
+			<GlassSurface style={styles.rankingCard}>
 				{ranking.map(({ points, index }) => {
 					const color = playerColor(index).value
 					return (
@@ -47,7 +48,7 @@ export function RoundResult({ state, names, onRetry, onHome }: Props) {
 						</View>
 					)
 				})}
-			</View>
+			</GlassSurface>
 
 			<GradientButton title="もう一回" onPress={onRetry} />
 			<Text style={styles.homeLink} onPress={onHome}>
@@ -62,7 +63,6 @@ const styles = StyleSheet.create({
 	loser: { ...typography.title, textAlign: 'center', color: BC.red },
 	limitReveal: { ...typography.body, textAlign: 'center', color: colors.textMuted },
 	rankingCard: {
-		backgroundColor: colors.surface,
 		borderRadius: radii.lg,
 		padding: spacing.md,
 		gap: spacing.sm,

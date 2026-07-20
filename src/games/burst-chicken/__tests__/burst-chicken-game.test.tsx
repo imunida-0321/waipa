@@ -1,4 +1,5 @@
 import { act, fireEvent, render } from '@testing-library/react-native'
+import type { ReactTestInstance } from 'react-test-renderer'
 import { haptics } from '@/lib/haptics'
 import { BurstChickenGame } from '../burst-chicken-game'
 
@@ -30,6 +31,7 @@ jest.mock('react-native-reanimated', () => {
 		withRepeat: jest.fn((v: number) => v),
 		withSequence: jest.fn((v: number) => v),
 		withSpring: jest.fn((v: number) => v),
+		getUseOfValueInStyleWarning: jest.fn(() => ''),
 	}
 })
 
@@ -48,6 +50,15 @@ async function press(target: Parameters<typeof fireEvent.press>[0]) {
 	await act(async () => {
 		fireEvent.press(target)
 	})
+}
+
+function hasAncestorTestId(node: ReactTestInstance, testID: string): boolean {
+	let current = node.parent
+	while (current) {
+		if (current.props.testID === testID) return true
+		current = current.parent
+	}
+	return false
 }
 
 type TrialStoreModule = {
@@ -179,4 +190,12 @@ it('settled → もう一回 → 再度ストップまで進めてもドラム�
 		jest.advanceTimersByTime(2000)
 	})
 	expect(getByText(/の負け/)).toBeTruthy()
+})
+
+describe('ガラス面', () => {
+	it('手番行はガラス面で描画される', async () => {
+		const { getByText } = await render(<BurstChickenGame />)
+
+		expect(hasAncestorTestId(getByText(/あかさんの番/), 'glass-surface-pseudo')).toBe(true)
+	})
 })
