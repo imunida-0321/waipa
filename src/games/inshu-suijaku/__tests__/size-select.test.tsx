@@ -80,3 +80,11 @@ it('カスタムお題がオフなら「オフ」と表示する', async () => {
 	const utils = await render(<SizeSelect onStart={jest.fn()} />)
 	expect(utils.getByText('オフ')).toBeTruthy()
 })
+
+describe('ガラス面', () => {
+	it('カスタムお題入口とサイズ選択肢はガラス面で描画される', async () => {
+		const utils = await render(<SizeSelect onStart={jest.fn()} />)
+
+		expect(utils.getAllByTestId('glass-surface-pseudo').length).toBeGreaterThanOrEqual(2)
+	})
+})

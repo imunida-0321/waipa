@@ -1,8 +1,9 @@
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { GlassSurface } from '@/components/ui/glass-surface'
 import { GradientButton } from '@/components/ui/gradient-button'
 import { haptics } from '@/lib/haptics'
 import { playerColor } from '@/theme/player-colors'
-import { colors, radii, spacing, typography } from '@/theme/tokens'
+import { radii, spacing, typography } from '@/theme/tokens'
 import { NS } from './theme'
 
 export type RankingRow = {
@@ -40,7 +41,7 @@ export function ResultScreen({ names, scores, onRetry, onHome }: Props) {
 				{rows.map((row) => {
 					const isLast = !allTied && row.score === minScore
 					return (
-						<View key={row.index} style={[styles.row, isLast && styles.lastRow]}>
+						<GlassSurface key={row.index} style={[styles.row, isLast && styles.lastRow]}>
 							<Text style={styles.rank}>{row.rank}位</Text>
 							<View
 								style={[
@@ -53,7 +54,7 @@ export function ResultScreen({ names, scores, onRetry, onHome }: Props) {
 							</Text>
 							{isLast && <Text style={styles.lastBadge}>最下位</Text>}
 							<Text style={styles.score}>{row.score}ペア</Text>
-						</View>
+						</GlassSurface>
 					)
 				})}
 			</ScrollView>
@@ -80,9 +81,6 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		alignItems: 'center',
 		gap: spacing.sm,
-		backgroundColor: colors.surface,
-		borderWidth: 1,
-		borderColor: colors.surfaceBorder,
 		borderRadius: radii.md,
 		padding: spacing.md,
 	},

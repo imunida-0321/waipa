@@ -88,3 +88,18 @@ it('全員同点なら最下位バッジは出ない', async () => {
 	)
 	expect(utils.queryByText('最下位')).toBeNull()
 })
+
+describe('ガラス面', () => {
+	it('ランキング行はガラス面で描画される', async () => {
+		const utils = await render(
+			<ResultScreen
+				names={['あか', 'あお', 'みどり']}
+				scores={[2, 0, 0]}
+				onRetry={jest.fn()}
+				onHome={jest.fn()}
+			/>,
+		)
+
+		expect(utils.getAllByTestId('glass-surface-pseudo').length).toBeGreaterThan(0)
+	})
+})
