@@ -4,7 +4,7 @@ import { BombRelayGame } from './bomb-relay-game'
 export const meta: GameMeta = {
 	id: 'bomb-relay',
 	title: 'カウントダウン爆弾リレー',
-	tagline: '爆発した時に持ってた人が負け',
+	tagline: '爆発した時に\n持ってた人が負け！',
 	emoji: '🧨',
 	gradient: ['#A55EEA', '#8854D0'],
 	minPlayers: 3,

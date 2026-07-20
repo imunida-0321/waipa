@@ -4,7 +4,7 @@ import { ChinchiroGame } from './chinchiro-game'
 export const meta: GameMeta = {
 	id: 'chinchiro',
 	title: 'チンチロ',
-	tagline: '丼とサイコロ3つの真剣勝負！',
+	tagline: '丼とサイコロ3つで\n運だめし真剣勝負！',
 	emoji: '🎲',
 	gradient: ['#FF9F43', '#EE5253'],
 	minPlayers: 2,

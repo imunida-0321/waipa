@@ -4,7 +4,7 @@ import { ReactionPairsGame } from './reaction-pairs-game'
 export const meta: GameMeta = {
 	id: 'reaction-pairs',
 	title: 'リアクション神経衰弱',
-	tagline: 'ペアが揃ったら罰ゲーム!?',
+	tagline: 'ペアが揃ったら\nまさかの罰ゲーム!?',
 	emoji: '🃏',
 	gradient: ['#26DE81', '#20BF6B'],
 	minPlayers: 2,

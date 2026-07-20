@@ -4,7 +4,7 @@ import { SasayakiLimitGame } from './sasayaki-limit-game'
 export const meta: GameMeta = {
 	id: 'sasayaki-limit',
 	title: 'ささやきリミット',
-	tagline: '緑ゾーンの声量で言い切れ！',
+	tagline: '緑ゾーンの声量で\nお題を言い切れ！',
 	emoji: '🤫',
 	gradient: ['#3DDC84', '#0FA3B1'],
 	minPlayers: 2,

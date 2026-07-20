@@ -4,7 +4,7 @@ import { FiveSecStopGame } from './five-sec-stop-game'
 export const meta: GameMeta = {
 	id: 'five-sec-stop',
 	title: '5秒STOP',
-	tagline: '5秒ぴったりで止めろ！',
+	tagline: '体内時計を信じて\n5秒ぴったりで止めろ！',
 	emoji: '⏱️',
 	gradient: ['#4ECDC4', '#2C7A7B'],
 	minPlayers: 2,

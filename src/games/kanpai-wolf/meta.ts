@@ -4,7 +4,7 @@ import { KanpaiWolfGame } from './kanpai-wolf-game'
 export const meta: GameMeta = {
 	id: 'kanpai-wolf',
 	title: '乾杯ウルフ',
-	tagline: 'お題は推理、乾杯はルールで！',
+	tagline: 'お題は推理で、\n乾杯はルールで！',
 	emoji: '🍻',
 	gradient: ['#6C5CE7', '#4834D4'],
 	minPlayers: 3,

@@ -4,7 +4,7 @@ import { OdekoPokerGame } from './odeko-poker-game'
 export const meta: GameMeta = {
 	id: 'odeko-poker',
 	title: 'おでこインディアンポーカー',
-	tagline: '自分だけ見えないカードで勝負！',
+	tagline: '自分だけ見えない\nカードで勝負！',
 	emoji: '🎴',
 	gradient: ['#F368E0', '#8854D0'],
 	minPlayers: 3,
