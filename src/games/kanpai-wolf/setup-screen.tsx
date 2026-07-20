@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
 import { GradientButton } from '@/components/ui/gradient-button'
+import { GlassSurface } from '@/components/ui/glass-surface'
 import { haptics } from '@/lib/haptics'
 import { colors, radii, spacing, typography } from '@/theme/tokens'
 import { PACKS } from './engine'
@@ -87,9 +88,10 @@ function Chip({ label, active, onPress }: { label: string; active: boolean; onPr
 				haptics.tap()
 				onPress()
 			}}
-			style={[styles.chip, active && styles.chipActive]}
 		>
-			<Text style={[styles.chipText, active && styles.chipTextActive]}>{label}</Text>
+			<GlassSurface style={[styles.chip, active && styles.chipActive]}>
+				<Text style={[styles.chipText, active && styles.chipTextActive]}>{label}</Text>
+			</GlassSurface>
 		</Pressable>
 	)
 }
@@ -108,9 +110,6 @@ const styles = StyleSheet.create({
 		paddingVertical: spacing.sm,
 		paddingHorizontal: spacing.md,
 		borderRadius: radii.md,
-		backgroundColor: colors.surface,
-		borderWidth: 1,
-		borderColor: colors.surfaceBorder,
 	},
 	chipActive: { borderColor: KW.wolf, backgroundColor: KW.night },
 	chipText: { ...typography.body },

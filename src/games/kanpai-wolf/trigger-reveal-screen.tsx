@@ -1,5 +1,6 @@
 import { StyleSheet, Text, View } from 'react-native'
 import { GradientButton } from '@/components/ui/gradient-button'
+import { GlassSurface } from '@/components/ui/glass-surface'
 import { colors, radii, spacing, typography } from '@/theme/tokens'
 import { KW } from './theme'
 
@@ -13,9 +14,9 @@ export function TriggerRevealScreen({ triggerText, onDone }: Props) {
 	return (
 		<View style={styles.container}>
 			<Text style={styles.title}>🍻 今回の乾杯ルール</Text>
-			<View style={styles.card}>
+			<GlassSurface style={styles.card}>
 				<Text style={styles.trigger}>{triggerText}</Text>
-			</View>
+			</GlassSurface>
 			<Text style={styles.hint}>議論中にこのルールが起きたら、みんなで乾杯！</Text>
 			<GradientButton title="議論スタート" onPress={onDone} />
 		</View>
@@ -34,7 +35,6 @@ const styles = StyleSheet.create({
 		minHeight: 160,
 		padding: spacing.lg,
 		borderRadius: radii.lg,
-		backgroundColor: colors.surface,
 		borderWidth: 1,
 		borderColor: KW.wolf,
 		alignItems: 'center',

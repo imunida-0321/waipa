@@ -1,4 +1,5 @@
 import { act, fireEvent, render } from '@testing-library/react-native'
+import type { ReactTestInstance } from 'react-test-renderer'
 import { playSound } from '@/lib/sound'
 import { DiscussScreen } from '../discuss-screen'
 
@@ -16,6 +17,15 @@ const baseProps = {
 	trigger: '誰かが質問されたら全員乾杯',
 	kanpaiCount: 0,
 	onKanpai: jest.fn(),
+}
+
+function hasAncestorTestId(node: ReactTestInstance, testID: string): boolean {
+	let current = node.parent
+	while (current) {
+		if (current.props.testID === testID) return true
+		current = current.parent
+	}
+	return false
 }
 
 beforeEach(() => {
@@ -139,4 +149,16 @@ it('乾杯回数が表示される（0回のときはバッジ非表示）', asy
 	expect(ui.getByText('× 3')).toBeTruthy()
 	const zero = await render(<DiscussScreen seconds={180} onDone={jest.fn()} {...baseProps} />)
 	expect(zero.queryByText(/× \d/)).toBeNull()
+})
+
+describe('ガラス面', () => {
+	it('乾杯ルールカードはガラス面で描画される', async () => {
+		const { getByText } = await render(
+			<DiscussScreen seconds={180} onDone={jest.fn()} {...baseProps} />,
+		)
+
+		expect(hasAncestorTestId(getByText('誰かが質問されたら全員乾杯'), 'glass-surface-pseudo')).toBe(
+			true,
+		)
+	})
 })

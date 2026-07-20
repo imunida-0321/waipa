@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Animated, Pressable, StyleSheet, Text, View } from 'react-native'
 import { GradientButton } from '@/components/ui/gradient-button'
+import { GlassSurface } from '@/components/ui/glass-surface'
 import { haptics } from '@/lib/haptics'
 import { playSound } from '@/lib/sound'
 import { colors, radii, spacing, typography } from '@/theme/tokens'
@@ -81,10 +82,10 @@ export function DiscussScreen({
 
 	return (
 		<View style={styles.container}>
-			<View style={styles.triggerCard}>
+			<GlassSurface style={styles.triggerCard}>
 				<Text style={styles.triggerLabel}>🍻 今回の乾杯ルール</Text>
 				<Text style={styles.triggerText}>{trigger}</Text>
-			</View>
+			</GlassSurface>
 			<Text style={styles.title}>
 				{isRunoff ? '🗳️ 決選投票の前に、もう一度話し合おう' : '💬 議論タイム！'}
 			</Text>
@@ -125,7 +126,6 @@ const styles = StyleSheet.create({
 	triggerCard: {
 		padding: spacing.md,
 		borderRadius: radii.md,
-		backgroundColor: colors.surface,
 		borderWidth: 1,
 		borderColor: KW.wolf,
 		gap: spacing.xs,

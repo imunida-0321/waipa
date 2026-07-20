@@ -9,6 +9,7 @@ import Animated, {
 } from 'react-native-reanimated'
 import { lottieAssets } from '@/components/game/lottie-assets'
 import { LottieEffect } from '@/components/game/lottie-effect'
+import { GlassSurface } from '@/components/ui/glass-surface'
 import { haptics } from '@/lib/haptics'
 import { playSound } from '@/lib/sound'
 import { colors, radii, spacing, typography } from '@/theme/tokens'
@@ -46,10 +47,12 @@ export function EventCutin({ event, onDone }: Props) {
 			{/* カットイン背景素材（未登録なら何も出さず現行と同じ見た目）。
 			    16:9 素材を縦画面に fit させるとカードの裏に隠れるため、カードより大きい正方形で再生する */}
 			<LottieEffect source={lottieAssets.cutinFlash} style={styles.burst} />
-			<Animated.View style={[styles.card, animatedStyle]}>
-				<Text style={styles.emoji}>{meta.emoji}</Text>
-				<Text style={styles.label}>きまぐれ発動！</Text>
-				<Text style={styles.name}>{meta.name}</Text>
+			<Animated.View style={animatedStyle}>
+				<GlassSurface variant="overlay" style={styles.card}>
+					<Text style={styles.emoji}>{meta.emoji}</Text>
+					<Text style={styles.label}>きまぐれ発動！</Text>
+					<Text style={styles.name}>{meta.name}</Text>
+				</GlassSurface>
 			</Animated.View>
 		</View>
 	)
@@ -69,9 +72,6 @@ const styles = StyleSheet.create({
 		paddingVertical: spacing.xl,
 		paddingHorizontal: spacing.xl,
 		borderRadius: radii.lg,
-		borderWidth: 1,
-		borderColor: colors.surfaceBorder,
-		backgroundColor: colors.surface,
 	},
 	emoji: { fontSize: 72 },
 	label: { ...typography.caption, color: colors.accentFrom },

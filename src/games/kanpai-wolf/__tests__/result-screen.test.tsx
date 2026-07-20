@@ -1,4 +1,5 @@
 import { render } from '@testing-library/react-native'
+import type { ReactTestInstance } from 'react-test-renderer'
 import { ResultScreen } from '../result-screen'
 
 jest.mock('@/lib/haptics', () => ({
@@ -14,6 +15,15 @@ jest.mock('expo-linear-gradient', () => {
 })
 
 const words = { majority: 'ラーメン', wolf: 'うどん' }
+
+function hasAncestorTestId(node: ReactTestInstance, testID: string): boolean {
+	let current = node.parent
+	while (current) {
+		if (current.props.testID === testID) return true
+		current = current.parent
+	}
+	return false
+}
 
 it('勝敗・お題・乾杯回数を表示する', async () => {
 	const { getByText } = await render(
@@ -45,4 +55,20 @@ it('0回でも乾杯行を表示する', async () => {
 	)
 	expect(getByText('ウルフの勝利！')).toBeTruthy()
 	expect(getByText('このラウンドの乾杯 🍻 × 0回')).toBeTruthy()
+})
+
+describe('ガラス面', () => {
+	it('結果カードはガラス面で描画される', async () => {
+		const { getByText } = await render(
+			<ResultScreen
+				outcome="citizens"
+				wolfNames={['あか']}
+				words={words}
+				kanpaiCount={3}
+				onRetry={jest.fn()}
+			/>,
+		)
+
+		expect(hasAncestorTestId(getByText('市民のお題: ラーメン'), 'glass-surface-pseudo')).toBe(true)
+	})
 })

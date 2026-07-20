@@ -1,4 +1,5 @@
 import { act, fireEvent, render } from '@testing-library/react-native'
+import type { ReactTestInstance } from 'react-test-renderer'
 import { TriggerRevealScreen } from '../trigger-reveal-screen'
 
 jest.mock('@/lib/haptics', () => ({
@@ -9,6 +10,15 @@ jest.mock('expo-linear-gradient', () => {
 	const { View } = require('react-native')
 	return { LinearGradient: View }
 })
+
+function hasAncestorTestId(node: ReactTestInstance, testID: string): boolean {
+	let current = node.parent
+	while (current) {
+		if (current.props.testID === testID) return true
+		current = current.parent
+	}
+	return false
+}
 
 it('乾杯ルールを表示し「議論スタート」で onDone を呼ぶ', async () => {
 	const onDone = jest.fn()
@@ -22,4 +32,16 @@ it('乾杯ルールを表示し「議論スタート」で onDone を呼ぶ', as
 		fireEvent.press(getByText('議論スタート'))
 	})
 	expect(onDone).toHaveBeenCalledTimes(1)
+})
+
+describe('ガラス面', () => {
+	it('乾杯ルールカードはガラス面で描画される', async () => {
+		const { getByText } = await render(
+			<TriggerRevealScreen triggerText="誰かが質問されたら全員乾杯" onDone={jest.fn()} />,
+		)
+
+		expect(hasAncestorTestId(getByText('誰かが質問されたら全員乾杯'), 'glass-surface-pseudo')).toBe(
+			true,
+		)
+	})
 })

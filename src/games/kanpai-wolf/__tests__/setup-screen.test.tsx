@@ -1,4 +1,5 @@
 import { act, fireEvent, render } from '@testing-library/react-native'
+import type { ReactTestInstance } from 'react-test-renderer'
 import { SetupScreen } from '../setup-screen'
 
 jest.mock('@/lib/haptics', () => ({
@@ -9,6 +10,15 @@ jest.mock('expo-linear-gradient', () => {
 	const { View } = require('react-native')
 	return { LinearGradient: View }
 })
+
+function hasAncestorTestId(node: ReactTestInstance, testID: string): boolean {
+	let current = node.parent
+	while (current) {
+		if (current.props.testID === testID) return true
+		current = current.parent
+	}
+	return false
+}
 
 it('デフォルト設定（ウルフ1・3分・たべもの）で開始できる', async () => {
 	const onStart = jest.fn()
@@ -40,4 +50,12 @@ it('7人以上でウルフ2人・時間・パックを選んで開始できる',
 		fireEvent.press(getByText('はじめる'))
 	})
 	expect(onStart).toHaveBeenCalledWith({ wolfCount: 2, discussSeconds: 300, pack: 'place' })
+})
+
+describe('ガラス面', () => {
+	it('設定チップはガラス面で描画される', async () => {
+		const { getByText } = await render(<SetupScreen playerCount={5} onStart={jest.fn()} />)
+
+		expect(hasAncestorTestId(getByText('3分'), 'glass-surface-pseudo')).toBe(true)
+	})
 })

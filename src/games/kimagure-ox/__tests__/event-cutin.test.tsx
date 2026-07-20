@@ -1,4 +1,5 @@
 import { act, render } from '@testing-library/react-native'
+import type { ReactTestInstance } from 'react-test-renderer'
 import { playSound } from '@/lib/sound'
 import { haptics } from '@/lib/haptics'
 import { CUTIN_DURATION_MS, EventCutin } from '../event-cutin'
@@ -27,6 +28,15 @@ beforeEach(() => {
 })
 afterEach(() => jest.useRealTimers())
 
+function hasAncestorTestId(node: ReactTestInstance, testID: string): boolean {
+	let current = node.parent
+	while (current) {
+		if (current.props.testID === testID) return true
+		current = current.parent
+	}
+	return false
+}
+
 it('イベント名を表示し、効果音とバイブを鳴らす', async () => {
 	const { getByText } = await render(<EventCutin event="shuffle" onDone={jest.fn()} />)
 	expect(getByText('マスシャッフル')).toBeTruthy()
@@ -52,4 +62,12 @@ it('アンマウント後はタイマーが発火せず onDone は呼ばれな�
 		jest.advanceTimersByTime(CUTIN_DURATION_MS)
 	})
 	expect(onDone).not.toHaveBeenCalled()
+})
+
+describe('ガラス面', () => {
+	it('イベントカットインのパネルはガラス面で描画される', async () => {
+		const { getByText } = await render(<EventCutin event="shuffle" onDone={jest.fn()} />)
+
+		expect(hasAncestorTestId(getByText('マスシャッフル'), 'glass-surface-blur')).toBe(true)
+	})
 })
