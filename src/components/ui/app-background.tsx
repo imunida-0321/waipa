@@ -28,5 +28,5 @@ export function AppBackground() {
 }
 
 const styles = StyleSheet.create({
-	fill: StyleSheet.absoluteFillObject,
+	fill: { ...StyleSheet.absoluteFill },
 })

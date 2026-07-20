@@ -69,6 +69,6 @@ export function GlassSurface({ children, style, variant = 'card' }: Props) {
 const styles = StyleSheet.create({
 	base: { borderRadius: radii.lg, overflow: 'hidden' },
 	bordered: { borderWidth: 1, borderColor: glass.borderHighlight },
-	blurTint: { ...StyleSheet.absoluteFillObject, backgroundColor: glass.tint },
+	blurTint: { ...StyleSheet.absoluteFill, backgroundColor: glass.tint },
 	pseudoFill: { backgroundColor: glass.fallbackFill },
 })
