@@ -26,45 +26,47 @@ export function GameCard({ game, onPress }: Props) {
 			onPress={onPress}
 			style={({ pressed }) => [styles.container, pressed && styles.pressed]}
 		>
-			<View style={styles.thumbWrap}>
-				{game.cardThumbnail !== undefined ? (
-					<Image
-						testID="card-thumb-image"
-						source={game.cardThumbnail}
-						style={styles.thumbImage}
-						contentFit="cover"
-					/>
-				) : (
-					<LinearGradient
-						colors={[game.gradient[0], game.gradient[1]]}
-						start={{ x: 0, y: 0 }}
-						end={{ x: 1, y: 1 }}
-						style={styles.thumb}
-					>
-						<Text style={styles.emoji}>{game.emoji}</Text>
-						<Text style={styles.title} numberOfLines={2}>
-							{game.title}
-						</Text>
-					</LinearGradient>
-				)}
-				<PlayerCountBadge game={game} />
-				{locked && (
-					<View testID="premium-lock-mask" style={styles.lockMask}>
-						<View style={styles.lockBadge}>
-							<MaterialCommunityIcons
-								name="crown"
-								testID="icon-crown"
-								size={13}
-								color={colors.premiumGold}
-							/>
-							<Text style={styles.lockBadgeText}>プレミアム</Text>
+			<View testID="game-card-surface" style={styles.surface}>
+				<View style={styles.thumbWrap}>
+					{game.cardThumbnail !== undefined ? (
+						<Image
+							testID="card-thumb-image"
+							source={game.cardThumbnail}
+							style={styles.thumbImage}
+							contentFit="cover"
+						/>
+					) : (
+						<LinearGradient
+							colors={[game.gradient[0], game.gradient[1]]}
+							start={{ x: 0, y: 0 }}
+							end={{ x: 1, y: 1 }}
+							style={styles.thumb}
+						>
+							<Text style={styles.emoji}>{game.emoji}</Text>
+							<Text style={styles.title} numberOfLines={2}>
+								{game.title}
+							</Text>
+						</LinearGradient>
+					)}
+					<PlayerCountBadge game={game} />
+					{locked && (
+						<View testID="premium-lock-mask" style={styles.lockMask}>
+							<View style={styles.lockBadge}>
+								<MaterialCommunityIcons
+									name="crown"
+									testID="icon-crown"
+									size={13}
+									color={colors.premiumGold}
+								/>
+								<Text style={styles.lockBadgeText}>プレミアム</Text>
+							</View>
 						</View>
-					</View>
-				)}
+					)}
+				</View>
+				<Text style={styles.tagline} numberOfLines={2}>
+					{game.tagline}
+				</Text>
 			</View>
-			<Text style={styles.tagline} numberOfLines={2}>
-				{game.tagline}
-			</Text>
 		</Pressable>
 	)
 }
@@ -72,26 +74,30 @@ export function GameCard({ game, onPress }: Props) {
 const styles = StyleSheet.create({
 	container: { width: '100%', marginBottom: spacing.lg },
 	pressed: { opacity: 0.8 },
-	thumbWrap: { position: 'relative' },
-	thumb: {
-		aspectRatio: 1.3,
+	// サムネとキャッチを包むカード面（参考デザイン準拠）。枠線はこの面にだけ付ける
+	surface: {
+		backgroundColor: colors.surface,
 		borderRadius: radii.lg,
 		borderWidth: 1,
 		borderColor: colors.surfaceBorder,
+		padding: spacing.sm,
+	},
+	thumbWrap: { position: 'relative' },
+	thumb: {
+		aspectRatio: 1.3,
+		borderRadius: radii.md,
 		justifyContent: 'flex-end',
 		padding: spacing.sm,
 		overflow: 'hidden',
 	},
 	thumbImage: {
 		aspectRatio: 1.3,
-		borderRadius: radii.lg,
-		borderWidth: 1,
-		borderColor: colors.surfaceBorder,
+		borderRadius: radii.md,
 	},
 	lockMask: {
 		...StyleSheet.absoluteFill,
 		backgroundColor: 'rgba(10, 8, 20, 0.55)',
-		borderRadius: radii.lg,
+		borderRadius: radii.md,
 		alignItems: 'center',
 		justifyContent: 'center',
 	},

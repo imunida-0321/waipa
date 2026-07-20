@@ -1,6 +1,7 @@
-import { fireEvent, render } from '@testing-library/react-native'
+import { fireEvent, render, within } from '@testing-library/react-native'
 import { StyleSheet } from 'react-native'
 import type { GameMeta } from '@/games/registry'
+import { colors, radii, spacing } from '@/theme/tokens'
 import { GameCard } from '../game-card'
 
 jest.mock('expo-linear-gradient', () => {
@@ -69,6 +70,19 @@ it('キャッチは小さめフォント＋2行分の固定高さで段ずれを
 	expect(style.fontSize).toBe(12)
 	expect(style.lineHeight).toBe(16)
 	expect(style.minHeight).toBe(32)
+})
+
+it('サムネとキャッチをサーフェス背景のカード面で包む', async () => {
+	const { getByTestId, getByText } = await render(<GameCard game={baseGame} onPress={jest.fn()} />)
+	const surface = getByTestId('game-card-surface')
+	const style = StyleSheet.flatten(surface.props.style)
+	expect(style.backgroundColor).toBe(colors.surface)
+	expect(style.borderColor).toBe(colors.surfaceBorder)
+	expect(style.borderRadius).toBe(radii.lg)
+	expect(style.padding).toBe(spacing.sm)
+	// キャッチはカード面の中に入る
+	const tagline = getByText('テスト用のゲーム')
+	expect(within(surface).getByText('テスト用のゲーム')).toBe(tagline)
 })
 
 describe('プレミアムロック表示', () => {
