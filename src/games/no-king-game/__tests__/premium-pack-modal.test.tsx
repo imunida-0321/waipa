@@ -1,6 +1,5 @@
 import { fireEvent, render, waitFor } from '@testing-library/react-native'
 import { useRewardedAd } from 'react-native-google-mobile-ads'
-import type { ReactTestInstance } from 'react-test-renderer'
 import { PremiumPackModal } from '@/games/no-king-game/premium-pack-modal'
 import { isPackUnlocked, packUnlockStore } from '@/lib/pack-unlock-store'
 import { getTopicsByPack, topicsStore, type Topic } from '@/lib/topics-store'
@@ -50,7 +49,10 @@ beforeEach(() => {
 	mockedHook.mockReturnValue(hookState({}))
 })
 
-function hasAncestorTestId(node: ReactTestInstance, testID: string): boolean {
+// RNTL v14 の要素型と react-test-renderer の型が非互換のため、必要な形だけの構造的型で受ける
+type AncestorNode = { parent: AncestorNode | null; props: { testID?: unknown } }
+
+function hasAncestorTestId(node: AncestorNode, testID: string): boolean {
 	let current = node.parent
 	while (current) {
 		if (current.props.testID === testID) return true

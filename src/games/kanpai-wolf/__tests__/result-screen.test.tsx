@@ -1,5 +1,4 @@
 import { render } from '@testing-library/react-native'
-import type { ReactTestInstance } from 'react-test-renderer'
 import { ResultScreen } from '../result-screen'
 
 jest.mock('@/lib/haptics', () => ({
@@ -16,7 +15,10 @@ jest.mock('expo-linear-gradient', () => {
 
 const words = { majority: 'ラーメン', wolf: 'うどん' }
 
-function hasAncestorTestId(node: ReactTestInstance, testID: string): boolean {
+// RNTL v14 の要素型と react-test-renderer の型が非互換のため、必要な形だけの構造的型で受ける
+type AncestorNode = { parent: AncestorNode | null; props: { testID?: unknown } }
+
+function hasAncestorTestId(node: AncestorNode, testID: string): boolean {
 	let current = node.parent
 	while (current) {
 		if (current.props.testID === testID) return true

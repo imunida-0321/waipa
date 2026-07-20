@@ -1,7 +1,7 @@
 import { fireEvent, render, within } from '@testing-library/react-native'
 import { StyleSheet } from 'react-native'
 import type { GameMeta } from '@/games/registry'
-import { colors, radii, spacing } from '@/theme/tokens'
+import { radii, spacing } from '@/theme/tokens'
 import { GameCard } from '../game-card'
 
 jest.mock('expo-linear-gradient', () => {
@@ -105,7 +105,9 @@ describe('プレミアムロック表示', () => {
 		const { getByTestId } = await render(
 			<GameCard game={{ ...baseGame, premium: true }} onPress={jest.fn()} />,
 		)
-		expect(getByTestId('glass-surface-pseudo')).toBeTruthy()
+		// カード面もガラスのため、ロックマスク内にスコープして検証する
+		const mask = getByTestId('premium-lock-mask')
+		expect(within(mask).getByTestId('glass-surface-pseudo')).toBeTruthy()
 	})
 
 	it('premium かつ未解放: cardThumbnail ありでもマスクを重ねる', async () => {
