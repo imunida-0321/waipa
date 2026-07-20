@@ -2,6 +2,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons'
 import { Image } from 'expo-image'
 import { LinearGradient } from 'expo-linear-gradient'
 import { Pressable, StyleSheet, Text, View } from 'react-native'
+import { GlassSurface } from '@/components/ui/glass-surface'
 import type { GameMeta } from '@/games/registry'
 import { usePremium } from '@/lib/premium'
 import { colors, radii, spacing, typography } from '@/theme/tokens'
@@ -47,7 +48,7 @@ export function GameCard({ game, onPress }: Props) {
 				)}
 				{locked && (
 					<View testID="premium-lock-mask" style={styles.lockMask}>
-						<View style={styles.lockBadge}>
+						<GlassSurface style={styles.lockBadge}>
 							<MaterialCommunityIcons
 								name="crown"
 								testID="icon-crown"
@@ -55,7 +56,7 @@ export function GameCard({ game, onPress }: Props) {
 								color={colors.premiumGold}
 							/>
 							<Text style={styles.lockBadgeText}>プレミアム</Text>
-						</View>
+						</GlassSurface>
 					</View>
 				)}
 			</View>
@@ -94,7 +95,6 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 	},
 	lockBadge: {
-		backgroundColor: 'rgba(23, 20, 42, 0.9)',
 		borderWidth: 1,
 		borderColor: colors.premiumGold,
 		borderRadius: radii.pill,
