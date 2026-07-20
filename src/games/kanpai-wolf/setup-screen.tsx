@@ -111,7 +111,7 @@ const styles = StyleSheet.create({
 		paddingHorizontal: spacing.md,
 		borderRadius: radii.md,
 	},
-	chipActive: { borderColor: KW.wolf, backgroundColor: KW.night },
+	chipActive: { borderWidth: 1, borderColor: KW.wolf, backgroundColor: KW.night },
 	chipText: { ...typography.body },
 	chipTextActive: { color: colors.text, fontWeight: '700' },
 })

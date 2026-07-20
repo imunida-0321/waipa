@@ -214,7 +214,7 @@ const styles = StyleSheet.create({
 		borderRadius: radii.md,
 		overflow: 'hidden',
 	},
-	cardError: { borderColor: colors.danger },
+	cardError: { borderWidth: 1, borderColor: colors.danger },
 	colorBar: { width: 5 },
 	cardBody: { flex: 1, padding: spacing.md, gap: spacing.sm },
 	colorLabel: { fontSize: 13, fontWeight: '700' },

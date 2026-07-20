@@ -84,7 +84,7 @@ const styles = StyleSheet.create({
 		borderRadius: radii.md,
 		padding: spacing.md,
 	},
-	lastRow: { borderColor: NS.rose },
+	lastRow: { borderWidth: 1, borderColor: NS.rose },
 	rank: { ...typography.body, fontWeight: '800', width: 44 },
 	colorBar: { width: 4, alignSelf: 'stretch', borderRadius: 2 },
 	name: { ...typography.body, flex: 1 },
