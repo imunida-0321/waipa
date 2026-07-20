@@ -257,7 +257,7 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 		gap: spacing.xs,
 	},
-	selectedPlan: { borderColor: colors.premiumGold },
+	selectedPlan: { borderWidth: 1, borderColor: colors.premiumGold },
 	planLabel: { ...typography.body, fontWeight: '700', textAlign: 'center' },
 	planPrice: { ...typography.title, color: colors.premiumGold, textAlign: 'center' },
 	badge: {

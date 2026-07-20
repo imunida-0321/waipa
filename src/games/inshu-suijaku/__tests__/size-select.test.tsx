@@ -1,7 +1,10 @@
 import { act, fireEvent, render } from '@testing-library/react-native'
+import * as React from 'react'
+import { StyleSheet } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { customPunishmentsStore } from '@/lib/custom-punishments-store'
 import { SizeSelect } from '../size-select'
+import { NS } from '../theme'
 
 jest.mock('@react-native-async-storage/async-storage', () =>
 	// eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -87,4 +90,31 @@ describe('ガラス面', () => {
 
 		expect(utils.getAllByTestId('glass-surface-pseudo').length).toBeGreaterThanOrEqual(2)
 	})
+})
+
+it('ネイティブガラスでも選択中サイズの枠線が見える', async () => {
+	// GlassSurface のネイティブ分岐は共通枠線を持たないため、
+	// optionActive 側が borderWidth を持たないと iOS 26 で選択表示が消える（PR #126 レビュー指摘）。
+	// フレッシュな registry で require しつつ、React だけ元のインスタンスに固定して
+	// 既存レンダラとのフック不整合を防ぐ（RNTL はテスト内 require 不可のため）
+	jest.resetModules()
+	jest.doMock('react', () => React)
+	jest.doMock('expo-glass-effect', () => {
+		// eslint-disable-next-line @typescript-eslint/no-require-imports
+		const { View } = require('react-native')
+		return {
+			GlassView: (props: object) => <View {...props} />,
+			isLiquidGlassAvailable: () => true,
+		}
+	})
+	// eslint-disable-next-line @typescript-eslint/no-require-imports
+	const { SizeSelect: NativeSizeSelect } = require('../size-select') as typeof import('../size-select')
+	const { getAllByTestId } = await render(<NativeSizeSelect onStart={jest.fn()} />)
+	const active = getAllByTestId('glass-surface-native')
+		.map((node) => StyleSheet.flatten(node.props.style))
+		.find((style) => style?.borderColor === NS.rose)
+	expect(active).toBeTruthy()
+	expect(active?.borderWidth).toBe(1)
+	jest.dontMock('expo-glass-effect')
+	jest.dontMock('react')
 })

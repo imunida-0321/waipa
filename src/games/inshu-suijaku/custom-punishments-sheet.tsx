@@ -326,7 +326,7 @@ const styles = StyleSheet.create({
 		paddingVertical: spacing.sm,
 		paddingHorizontal: spacing.md,
 	},
-	setChipActive: { borderColor: colors.accentFrom },
+	setChipActive: { borderWidth: 1, borderColor: colors.accentFrom },
 	setChipText: { ...typography.body, fontWeight: '700' },
 	disabledChip: { opacity: 0.5 },
 	toggleRow: {

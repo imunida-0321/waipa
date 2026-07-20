@@ -145,9 +145,11 @@ const styles = StyleSheet.create({
 		minHeight: 52,
 	},
 	topCard: {
+		borderWidth: 1,
 		borderColor: colors.gold,
 	},
 	loserCard: {
+		borderWidth: 1,
 		borderColor: FSS.tierColors.far,
 	},
 	hiddenMark: {

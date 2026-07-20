@@ -115,7 +115,7 @@ const styles = StyleSheet.create({
 		padding: spacing.md,
 		gap: spacing.xs,
 	},
-	optionActive: { borderColor: NS.rose },
+	optionActive: { borderWidth: 1, borderColor: NS.rose },
 	optionLabel: { ...typography.title },
 	optionMeta: { ...typography.caption },
 })
