@@ -102,6 +102,13 @@ describe('プレミアムロック表示', () => {
 		expect(queryByText('👑 プレミアム')).toBeNull()
 	})
 
+	it('ロックバッジはガラス面で描画される', async () => {
+		const { getByTestId } = await render(
+			<GameCard game={{ ...baseGame, premium: true }} onPress={jest.fn()} />,
+		)
+		expect(getByTestId('glass-surface-pseudo')).toBeTruthy()
+	})
+
 	it('premium かつ未解放: cardThumbnail ありでもマスクを重ねる', async () => {
 		const { getByTestId } = await render(
 			<GameCard

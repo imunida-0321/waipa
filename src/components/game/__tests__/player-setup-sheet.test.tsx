@@ -59,6 +59,13 @@ it('人数分のプレイヤーカードが表示される', async () => {
 	expect(getAllByPlaceholderText('プレイヤー名を入力...')).toHaveLength(4)
 })
 
+describe('PlayerSetupSheet', () => {
+	it('プレイヤーカードはガラス面で描画される', async () => {
+		const { getAllByTestId } = await render(<PlayerSetupSheet onProceed={jest.fn()} />)
+		expect(getAllByTestId('glass-surface-pseudo').length).toBeGreaterThan(0)
+	})
+})
+
 it('「追加」で1人増える', async () => {
 	const { getByText } = await render(<PlayerSetupSheet onProceed={jest.fn()} />)
 	fireEvent.press(getByText('⊕ 追加'))

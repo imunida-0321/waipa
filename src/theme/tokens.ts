@@ -36,3 +36,12 @@ export const typography = {
 	body: { fontSize: 16, fontWeight: '400', color: colors.text },
 	caption: { fontSize: 13, fontWeight: '400', color: colors.textMuted },
 } as const satisfies Record<string, TextStyle>
+
+// Liquid Glass / ガラスモーフィズム用トークン。
+// fallbackFill の不透明度 0.72 は白文字コントラストの下限保証（下げない）
+export const glass = {
+	fallbackFill: 'rgba(33, 29, 58, 0.72)',
+	borderHighlight: 'rgba(255, 255, 255, 0.14)',
+	blurIntensity: 40,
+	tint: 'rgba(123, 92, 250, 0.10)',
+} as const

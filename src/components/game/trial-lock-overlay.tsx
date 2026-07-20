@@ -2,6 +2,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons'
 import { router } from 'expo-router'
 import { Pressable, StyleSheet, Text, View } from 'react-native'
 import { GradientButton } from '@/components/ui/gradient-button'
+import { GlassSurface } from '@/components/ui/glass-surface'
 import { usePremium } from '@/lib/premium'
 import { useTrialExhausted } from '@/lib/trial-store'
 import { colors, radii, spacing, typography } from '@/theme/tokens'
@@ -20,7 +21,7 @@ export function TrialLockOverlay({ gameId }: Props) {
 
 	return (
 		<View testID="trial-lock-overlay" style={styles.overlay}>
-			<View style={styles.panel}>
+			<GlassSurface variant="overlay" style={styles.panel}>
 				<MaterialCommunityIcons name="crown" size={52} color={colors.premiumGold} />
 				<Text style={styles.title}>お試しはここまで！</Text>
 				<Text style={styles.desc}>続きは WaiPa プレミアムで遊べます。</Text>
@@ -37,7 +38,7 @@ export function TrialLockOverlay({ gameId }: Props) {
 				>
 					<Text style={styles.linkText}>ホームへ戻る</Text>
 				</Pressable>
-			</View>
+			</GlassSurface>
 		</View>
 	)
 }
@@ -53,10 +54,7 @@ const styles = StyleSheet.create({
 	},
 	panel: {
 		width: '100%',
-		backgroundColor: colors.surface,
 		borderRadius: radii.lg,
-		borderWidth: 1,
-		borderColor: colors.surfaceBorder,
 		padding: spacing.xl,
 		alignItems: 'center',
 		gap: spacing.md,

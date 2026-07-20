@@ -1,20 +1,18 @@
 import type { PropsWithChildren } from 'react'
-import { StyleSheet, View, type ViewStyle } from 'react-native'
-import { colors, radii, spacing } from '@/theme/tokens'
+import { StyleSheet, type StyleProp, type ViewStyle } from 'react-native'
+import { radii, spacing } from '@/theme/tokens'
+import { GlassSurface } from './glass-surface'
 
-type Props = PropsWithChildren<{ style?: ViewStyle }>
+type Props = PropsWithChildren<{ style?: StyleProp<ViewStyle> }>
 
-// サーフェス色＋薄枠＋大きめ角丸の基本カード（ゲームカード・設定カード共通の土台）
+// ガラス面＋大きめ角丸の基本カード（ゲームカード・設定カード共通の土台）
 export function Card({ children, style }: Props) {
-	return <View style={[styles.card, style]}>{children}</View>
+	return <GlassSurface style={[styles.card, style]}>{children}</GlassSurface>
 }
 
 const styles = StyleSheet.create({
 	card: {
-		backgroundColor: colors.surface,
 		borderRadius: radii.lg,
-		borderWidth: 1,
-		borderColor: colors.surfaceBorder,
 		padding: spacing.md,
 	},
 })

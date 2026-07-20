@@ -45,3 +45,12 @@ it('「次へ」で2ページ目、最終ページの「閉じる」で onClose'
 	fireEvent.press(getByText('閉じる'))
 	expect(onClose).toHaveBeenCalledTimes(1)
 })
+
+describe('Task 7 Step 1', () => {
+	it('パネルはガラス面（overlay）で描画される', async () => {
+		const { getByTestId } = await render(
+			<HowToPlayModal visible title="テスト" pages={['1ページ']} onClose={() => {}} />,
+		)
+		expect(getByTestId('glass-surface-blur')).toBeTruthy()
+	})
+})

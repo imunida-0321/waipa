@@ -3,6 +3,7 @@ import type { ReactNode } from 'react'
 import { Text } from 'react-native'
 import { GradientButton } from '../gradient-button'
 import { PillButton } from '../pill-button'
+import { SecondaryButton } from '../secondary-button'
 
 jest.mock('@react-native-async-storage/async-storage', () =>
 	// eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -51,6 +52,25 @@ describe('PillButton', () => {
 		expect(getByTestId('icon-crown')).toBeTruthy()
 		expect(queryByText('👑 プレミアム')).toBeNull()
 		fireEvent.press(getByText('プレミアム'))
+		expect(onPress).toHaveBeenCalledTimes(1)
+	})
+
+	it('ガラス面を土台にする', async () => {
+		const { getByTestId } = await render(
+			<PillButton title="プレミアム" onPress={() => {}} />,
+		)
+		expect(getByTestId('glass-surface-pseudo')).toBeTruthy()
+	})
+})
+
+describe('SecondaryButton', () => {
+	it('ガラス面を土台にし、タップで onPress が呼ばれる', async () => {
+		const onPress = jest.fn()
+		const { getByTestId, getByText } = await render(
+			<SecondaryButton title="ホームへ" onPress={onPress} />,
+		)
+		expect(getByTestId('glass-surface-pseudo')).toBeTruthy()
+		fireEvent.press(getByText('ホームへ'))
 		expect(onPress).toHaveBeenCalledTimes(1)
 	})
 })

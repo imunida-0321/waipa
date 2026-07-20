@@ -31,3 +31,10 @@ it('王冠アイコンとプレミアム案内を表示し、アップグレー�
 	fireEvent.press(getByText('アップグレード'))
 	expect(onUpgradePress).toHaveBeenCalledTimes(1)
 })
+
+describe('PremiumUpsellCard', () => {
+	it('ガラス面を土台にする', async () => {
+		const { getAllByTestId } = await render(<PremiumUpsellCard onUpgradePress={jest.fn()} />)
+		expect(getAllByTestId('glass-surface-pseudo').length).toBeGreaterThan(0)
+	})
+})

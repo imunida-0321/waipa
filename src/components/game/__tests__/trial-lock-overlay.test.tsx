@@ -83,3 +83,16 @@ it('アップグレードとホーム導線で正しい遷移を呼ぶ', async (
 	})
 	expect(router.back).toHaveBeenCalledTimes(1)
 })
+
+describe('Task 7 Step 1', () => {
+	it('パネルはガラス面（overlay）で描画される', async () => {
+		const { trialStore } = requireTrialStore()
+		trialStore._resetForTest()
+		await trialStore.startTrial('burst-chicken')
+		trialStore.consumeRound('burst-chicken')
+		trialStore.consumeRound('burst-chicken')
+
+		const { getByTestId } = await render(<TrialLockOverlay gameId="burst-chicken" />)
+		expect(getByTestId('glass-surface-blur')).toBeTruthy()
+	})
+})

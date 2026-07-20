@@ -1,6 +1,7 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons'
 import { Image } from 'expo-image'
 import { StyleSheet, Text, View } from 'react-native'
+import { GlassSurface } from '@/components/ui/glass-surface'
 import { GradientButton } from '@/components/ui/gradient-button'
 import { colors, radii, spacing, typography } from '@/theme/tokens'
 
@@ -11,7 +12,7 @@ type Props = {
 // 設定画面上部のプレミアム誘導カード（参考スクショ準拠: マスコット＋王冠＋グラデボタン）
 export function PremiumUpsellCard({ onUpgradePress }: Props) {
 	return (
-		<View style={styles.card}>
+		<GlassSurface style={styles.card}>
 			<View style={styles.mascotWrap}>
 				<MaterialCommunityIcons
 					name="crown"
@@ -31,15 +32,12 @@ export function PremiumUpsellCard({ onUpgradePress }: Props) {
 			<View style={styles.buttonWrap}>
 				<GradientButton title="アップグレード" onPress={onUpgradePress} />
 			</View>
-		</View>
+		</GlassSurface>
 	)
 }
 
 const styles = StyleSheet.create({
 	card: {
-		backgroundColor: colors.surface,
-		borderWidth: 1,
-		borderColor: colors.surfaceBorder,
 		borderRadius: radii.lg,
 		padding: spacing.lg,
 		alignItems: 'center',

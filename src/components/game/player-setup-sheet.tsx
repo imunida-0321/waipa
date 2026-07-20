@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { router } from 'expo-router'
+import { GlassSurface } from '@/components/ui/glass-surface'
 import { haptics } from '@/lib/haptics'
 import {
 	allNamesFilled,
@@ -93,11 +94,11 @@ export function PlayerSetupSheet({
 			)}
 
 			{rangeAdjusted && (
-				<View style={[styles.banner, styles.bannerNotice]}>
+				<GlassSurface style={[styles.banner, styles.bannerNotice]}>
 					<Text style={styles.bannerText}>
 						このゲームは{rangeLabel}用のため人数を調整しました
 					</Text>
-				</View>
+				</GlassSurface>
 			)}
 
 			<ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
@@ -105,7 +106,7 @@ export function PlayerSetupSheet({
 					const color = playerColor(i)
 					const empty = !players.names[i]?.trim()
 					return (
-						<View
+						<GlassSurface
 							key={`${i}-${players.count}`}
 							style={[styles.card, showError && empty && styles.cardError]}
 						>
@@ -136,7 +137,7 @@ export function PlayerSetupSheet({
 									<Text style={styles.removeIcon}>×</Text>
 								</Pressable>
 							)}
-						</View>
+						</GlassSurface>
 					)
 				})}
 
@@ -154,7 +155,7 @@ export function PlayerSetupSheet({
 				)}
 
 				<Text style={styles.sectionTitle}>履歴</Text>
-				<View style={styles.historyBox}>
+				<GlassSurface style={styles.historyBox}>
 					{players.history.length === 0 ? (
 						<Text style={styles.historyEmpty}>履歴がまだありません。</Text>
 					) : (
@@ -174,7 +175,7 @@ export function PlayerSetupSheet({
 							</Pressable>
 						))
 					)}
-				</View>
+				</GlassSurface>
 			</ScrollView>
 
 			<View style={[styles.footer, { paddingBottom: insets.bottom + spacing.md }]}>
@@ -205,15 +206,12 @@ const styles = StyleSheet.create({
 		paddingVertical: spacing.sm,
 		paddingHorizontal: spacing.md,
 	},
-	bannerNotice: { backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.accentTo },
+	bannerNotice: { borderWidth: 1, borderColor: colors.accentTo },
 	bannerText: { ...typography.body, fontWeight: '700', textAlign: 'center' },
 	content: { padding: spacing.md, gap: spacing.md },
 	card: {
 		flexDirection: 'row',
-		backgroundColor: colors.surface,
 		borderRadius: radii.md,
-		borderWidth: 1,
-		borderColor: colors.surfaceBorder,
 		overflow: 'hidden',
 	},
 	cardError: { borderColor: colors.danger },
@@ -239,7 +237,6 @@ const styles = StyleSheet.create({
 	addLabel: { ...typography.body, fontWeight: '700' },
 	sectionTitle: { ...typography.title, fontSize: 18, marginTop: spacing.md },
 	historyBox: {
-		backgroundColor: colors.surface,
 		borderRadius: radii.md,
 		padding: spacing.md,
 		minHeight: 96,

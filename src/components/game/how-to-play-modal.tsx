@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Modal, StyleSheet, Text, View } from 'react-native'
 import { GradientButton } from '@/components/ui/gradient-button'
+import { GlassSurface } from '@/components/ui/glass-surface'
 import { colors, radii, spacing, typography } from '@/theme/tokens'
 
 type Props = {
@@ -25,7 +26,7 @@ export function HowToPlayModal({ visible, title, pages, onClose }: Props) {
 	return (
 		<Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
 			<View style={styles.backdrop}>
-				<View style={styles.card}>
+				<GlassSurface variant="overlay" style={styles.card}>
 					<Text style={styles.title}>{title}</Text>
 					<Text style={styles.howto}>あそびかた</Text>
 					<Text style={styles.body}>{pages[page]}</Text>
@@ -38,7 +39,7 @@ export function HowToPlayModal({ visible, title, pages, onClose }: Props) {
 						title={isLast ? '閉じる' : '次へ'}
 						onPress={() => (isLast ? onClose() : setPage((p) => p + 1))}
 					/>
-				</View>
+				</GlassSurface>
 			</View>
 		</Modal>
 	)
@@ -52,10 +53,7 @@ const styles = StyleSheet.create({
 		padding: spacing.lg,
 	},
 	card: {
-		backgroundColor: colors.surface,
 		borderRadius: radii.lg,
-		borderWidth: 1,
-		borderColor: colors.surfaceBorder,
 		padding: spacing.lg,
 		gap: spacing.md,
 	},

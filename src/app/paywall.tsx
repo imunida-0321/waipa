@@ -4,6 +4,8 @@ import type { ComponentProps } from 'react'
 import { useEffect, useState } from 'react'
 import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
 import type { PurchasesPackage } from 'react-native-purchases'
+import { AppBackground } from '@/components/ui/app-background'
+import { GlassSurface } from '@/components/ui/glass-surface'
 import { GradientButton } from '@/components/ui/gradient-button'
 import {
 	getPremiumPackages,
@@ -101,85 +103,88 @@ export default function PaywallScreen() {
 	}
 
 	return (
-		<ScrollView style={styles.screen} contentContainerStyle={styles.content}>
-			<Pressable
-				testID="paywall-close"
-				accessibilityRole="button"
-				onPress={() => router.back()}
-				style={styles.closeButton}
-			>
-				<MaterialCommunityIcons name="close" size={24} color={colors.text} />
-			</Pressable>
+		<View style={styles.screen}>
+			<AppBackground />
+			<ScrollView contentContainerStyle={styles.content}>
+				<Pressable
+					testID="paywall-close"
+					accessibilityRole="button"
+					onPress={() => router.back()}
+					style={styles.closeButton}
+				>
+					<MaterialCommunityIcons name="close" size={24} color={colors.text} />
+				</Pressable>
 
-			<View style={styles.hero}>
-				<MaterialCommunityIcons
-					name="crown"
-					size={52}
-					color={colors.premiumGold}
-					testID="icon-crown"
-				/>
-				<Text style={styles.title}>WaiPa プレミアム</Text>
-				<Text style={styles.copy}>広告なしで、もっと快適に遊べます。</Text>
-			</View>
-
-			<View style={styles.benefits}>
-				{BENEFITS.map((benefit) => (
-					<View key={benefit.title} style={styles.benefitRow}>
-						<MaterialCommunityIcons
-							name={benefit.icon}
-							size={22}
-							color={colors.premiumGold}
-						/>
-						<Text style={styles.benefitText}>{benefit.title}</Text>
-					</View>
-				))}
-			</View>
-
-			{premiumUnlocked ? (
-				<View style={styles.activeBox}>
-					<Text style={styles.activeText}>プレミアム利用中</Text>
-				</View>
-			) : (
-				<>
-					<View style={styles.plans}>
-						<PlanOption
-							label="月額"
-							price={monthlyPackage?.product.priceString ?? FALLBACK_PRICES.monthly}
-							selected={selectedPlan === 'monthly'}
-							hasPackages={packages !== null}
-							onPress={() => setSelectedPlan('monthly')}
-						/>
-						<PlanOption
-							label="年額"
-							price={annualPackage?.product.priceString ?? FALLBACK_PRICES.annual}
-							selected={selectedPlan === 'annual'}
-							hasPackages={packages !== null}
-							onPress={() => setSelectedPlan('annual')}
-						/>
-					</View>
-					<View style={styles.badge}>
-						<Text style={styles.badgeText}>約39%お得</Text>
-					</View>
-					{packages === null && <Text style={styles.comingSoon}>近日対応予定</Text>}
-					<GradientButton
-						testID="paywall-purchase"
-						title={purchasing ? '処理中...' : 'プレミアムを開始'}
-						onPress={() => handlePurchase(selectedPackage)}
-						disabled={purchaseDisabled}
+				<View style={styles.hero}>
+					<MaterialCommunityIcons
+						name="crown"
+						size={52}
+						color={colors.premiumGold}
+						testID="icon-crown"
 					/>
-				</>
-			)}
+					<Text style={styles.title}>WaiPa プレミアム</Text>
+					<Text style={styles.copy}>広告なしで、もっと快適に遊べます。</Text>
+				</View>
 
-			<Pressable
-				testID="paywall-restore"
-				accessibilityRole="button"
-				onPress={handleRestore}
-				disabled={restoring}
-				style={styles.restoreButton}
-			>
-				<Text style={styles.restoreText}>購入を復元する</Text>
-			</Pressable>
-		</ScrollView>
+				<View style={styles.benefits}>
+					{BENEFITS.map((benefit) => (
+						<GlassSurface key={benefit.title} style={styles.benefitRow}>
+							<MaterialCommunityIcons
+								name={benefit.icon}
+								size={22}
+								color={colors.premiumGold}
+							/>
+							<Text style={styles.benefitText}>{benefit.title}</Text>
+						</GlassSurface>
+					))}
+				</View>
+
+				{premiumUnlocked ? (
+					<GlassSurface style={styles.activeBox}>
+						<Text style={styles.activeText}>プレミアム利用中</Text>
+					</GlassSurface>
+				) : (
+					<>
+						<View style={styles.plans}>
+							<PlanOption
+								label="月額"
+								price={monthlyPackage?.product.priceString ?? FALLBACK_PRICES.monthly}
+								selected={selectedPlan === 'monthly'}
+								hasPackages={packages !== null}
+								onPress={() => setSelectedPlan('monthly')}
+							/>
+							<PlanOption
+								label="年額"
+								price={annualPackage?.product.priceString ?? FALLBACK_PRICES.annual}
+								selected={selectedPlan === 'annual'}
+								hasPackages={packages !== null}
+								onPress={() => setSelectedPlan('annual')}
+							/>
+						</View>
+						<GlassSurface style={styles.badge}>
+							<Text style={styles.badgeText}>約39%お得</Text>
+						</GlassSurface>
+						{packages === null && <Text style={styles.comingSoon}>近日対応予定</Text>}
+						<GradientButton
+							testID="paywall-purchase"
+							title={purchasing ? '処理中...' : 'プレミアムを開始'}
+							onPress={() => handlePurchase(selectedPackage)}
+							disabled={purchaseDisabled}
+						/>
+					</>
+				)}
+
+				<Pressable
+					testID="paywall-restore"
+					accessibilityRole="button"
+					onPress={handleRestore}
+					disabled={restoring}
+					style={styles.restoreButton}
+				>
+					<Text style={styles.restoreText}>購入を復元する</Text>
+				</Pressable>
+			</ScrollView>
+		</View>
 	)
 }
 
@@ -200,10 +205,12 @@ function PlanOption({
 		<Pressable
 			accessibilityRole="button"
 			onPress={onPress}
-			style={[styles.plan, selected && styles.selectedPlan]}
+			style={styles.planWrap}
 		>
-			<Text style={styles.planLabel}>{hasPackages ? label : `${label} ${price}`}</Text>
-			{hasPackages && <Text style={styles.planPrice}>{price}</Text>}
+			<GlassSurface style={[styles.plan, selected && styles.selectedPlan]}>
+				<Text style={styles.planLabel}>{hasPackages ? label : `${label} ${price}`}</Text>
+				{hasPackages && <Text style={styles.planPrice}>{price}</Text>}
+			</GlassSurface>
 		</Pressable>
 	)
 }
@@ -231,9 +238,6 @@ const styles = StyleSheet.create({
 	copy: { ...typography.body, color: colors.textMuted, textAlign: 'center' },
 	benefits: { gap: spacing.sm },
 	benefitRow: {
-		backgroundColor: colors.surface,
-		borderWidth: 1,
-		borderColor: colors.surfaceBorder,
 		borderRadius: radii.sm,
 		padding: spacing.md,
 		flexDirection: 'row',
@@ -245,12 +249,9 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		gap: spacing.sm,
 	},
+	planWrap: { flex: 1 },
 	plan: {
-		flex: 1,
 		minHeight: 88,
-		backgroundColor: colors.surface,
-		borderWidth: 1,
-		borderColor: colors.surfaceBorder,
 		borderRadius: radii.sm,
 		padding: spacing.md,
 		justifyContent: 'center',
@@ -261,7 +262,6 @@ const styles = StyleSheet.create({
 	planPrice: { ...typography.title, color: colors.premiumGold, textAlign: 'center' },
 	badge: {
 		alignSelf: 'center',
-		backgroundColor: colors.surface,
 		borderWidth: 1,
 		borderColor: colors.premiumGold,
 		borderRadius: radii.pill,
@@ -271,7 +271,6 @@ const styles = StyleSheet.create({
 	badgeText: { ...typography.caption, color: colors.premiumGold, fontWeight: '700' },
 	comingSoon: { ...typography.caption, textAlign: 'center' },
 	activeBox: {
-		backgroundColor: colors.surface,
 		borderWidth: 1,
 		borderColor: colors.premiumGold,
 		borderRadius: radii.sm,

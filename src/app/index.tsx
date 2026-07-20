@@ -5,6 +5,7 @@ import { GameGrid } from '@/components/home/game-grid'
 import { HeroBanner } from '@/components/home/hero-banner'
 import { HomeBannerAd } from '@/components/home/home-banner-ad'
 import { HomeHeader } from '@/components/home/home-header'
+import { AppBackground } from '@/components/ui/app-background'
 import { SectionHeader } from '@/components/ui/section-header'
 import { colors, spacing, typography } from '@/theme/tokens'
 
@@ -13,6 +14,7 @@ export default function HomeScreen() {
 
 	return (
 		<View style={[styles.screen, { paddingTop: insets.top }]}>
+			<AppBackground />
 			<ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
 				<HomeHeader />
 				<HeroBanner />
