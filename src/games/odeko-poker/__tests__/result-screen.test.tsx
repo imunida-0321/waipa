@@ -40,6 +40,18 @@ afterEach(() => {
 const names = ['あか', 'あお', 'みどり']
 const cards = [5, 13, 2]
 
+// RNTL v14 の要素型と react-test-renderer の型が非互換のため、必要な形だけの構造的型で受ける
+type AncestorNode = { parent: AncestorNode | null; props: { testID?: unknown } }
+
+function hasAncestorTestId(node: AncestorNode, testID: string): boolean {
+	let current = node.parent
+	while (current) {
+		if (current.props.testID === testID) return true
+		current = current.parent
+	}
+	return false
+}
+
 async function renderRevealed(judgement: Judgement, declarations: ('fight' | 'fold')[]) {
 	const onNextRound = jest.fn()
 	const utils = await render(
@@ -146,4 +158,18 @@ it('「次のラウンド」で onNextRound が呼ばれる', async () => {
 	const { getByText, onNextRound } = await renderRevealed(j, ['fold', 'fold', 'fold'])
 	await act(async () => fireEvent.press(getByText(/次のラウンド/)))
 	expect(onNextRound).toHaveBeenCalledTimes(1)
+})
+
+describe('ガラス面', () => {
+	it('結果行はガラス面で描画される', async () => {
+		const j: Judgement = {
+			outcome: 'normal',
+			loserIndices: [0],
+			winnerIndex: null,
+			hetareIndex: null,
+		}
+		const { getByText } = await renderRevealed(j, ['fight', 'fight', 'fight'])
+
+		expect(hasAncestorTestId(getByText('あか'), 'glass-surface-pseudo')).toBe(true)
+	})
 })

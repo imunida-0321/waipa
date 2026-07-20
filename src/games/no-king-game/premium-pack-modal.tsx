@@ -2,6 +2,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons'
 import { useCallback, useEffect, useState } from 'react'
 import { Modal, Pressable, StyleSheet, Text } from 'react-native'
 import { GradientButton } from '@/components/ui/gradient-button'
+import { GlassSurface } from '@/components/ui/glass-surface'
 import { AD_UNIT_IDS } from '@/constants/ads'
 import { useRewardedAd } from '@/lib/gma'
 import { packUnlockStore, usePackUnlocked } from '@/lib/pack-unlock-store'
@@ -63,47 +64,49 @@ export function PremiumPackModal({ visible, onClose }: Props) {
 	return (
 		<Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
 			<Pressable style={styles.backdrop} onPress={onClose}>
-				<Pressable style={styles.sheet} onPress={() => {}}>
-					<MaterialCommunityIcons
-						name={unlocked ? 'lock-open-variant' : 'lock'}
-						testID={unlocked ? 'icon-lock-open' : 'icon-lock'}
-						size={48}
-						color={colors.premiumGold}
-					/>
-					<Text style={styles.title}>限定お題パック</Text>
-					{unlocked ? (
-						<Text style={styles.desc}>
-							このセッション中は解放中！{'\n'}
-							ドキドキ度アップの限定お題が混ざります。
-						</Text>
-					) : (
-						<>
+				<Pressable style={styles.sheetWrap} onPress={() => {}}>
+					<GlassSurface variant="overlay" style={styles.sheet}>
+						<MaterialCommunityIcons
+							name={unlocked ? 'lock-open-variant' : 'lock'}
+							testID={unlocked ? 'icon-lock-open' : 'icon-lock'}
+							size={48}
+							color={colors.premiumGold}
+						/>
+						<Text style={styles.title}>限定お題パック</Text>
+						{unlocked ? (
 							<Text style={styles.desc}>
-								ドキドキ度アップの限定お題が遊べるパックです。{'\n'}
-								動画を見るとこのセッション中だけ解放されます。
+								このセッション中は解放中！{'\n'}
+								ドキドキ度アップの限定お題が混ざります。
 							</Text>
-							<GradientButton
-								title="動画を見て解放する"
-								disabled={!isLoaded}
-								onPress={() => show()}
-							/>
-							{fetchFailed ? (
-								<>
-									<Text style={styles.error}>お題の取得に失敗しました</Text>
-									<Pressable
-										accessibilityRole="button"
-										onPress={retryFetch}
-										style={styles.retry}
-									>
-										<Text style={styles.retryText}>再試行</Text>
-									</Pressable>
-								</>
-							) : null}
-						</>
-					)}
-					<Pressable accessibilityRole="button" onPress={onClose}>
-						<Text style={styles.close}>とじる</Text>
-					</Pressable>
+						) : (
+							<>
+								<Text style={styles.desc}>
+									ドキドキ度アップの限定お題が遊べるパックです。{'\n'}
+									動画を見るとこのセッション中だけ解放されます。
+								</Text>
+								<GradientButton
+									title="動画を見て解放する"
+									disabled={!isLoaded}
+									onPress={() => show()}
+								/>
+								{fetchFailed ? (
+									<>
+										<Text style={styles.error}>お題の取得に失敗しました</Text>
+										<Pressable
+											accessibilityRole="button"
+											onPress={retryFetch}
+											style={styles.retry}
+										>
+											<Text style={styles.retryText}>再試行</Text>
+										</Pressable>
+									</>
+								) : null}
+							</>
+						)}
+						<Pressable accessibilityRole="button" onPress={onClose}>
+							<Text style={styles.close}>とじる</Text>
+						</Pressable>
+					</GlassSurface>
 				</Pressable>
 			</Pressable>
 		</Modal>
@@ -118,12 +121,10 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 		padding: spacing.lg,
 	},
+	sheetWrap: { alignSelf: 'stretch' },
 	sheet: {
 		alignSelf: 'stretch',
-		backgroundColor: colors.surface,
 		borderRadius: radii.lg,
-		borderWidth: 1,
-		borderColor: colors.surfaceBorder,
 		padding: spacing.lg,
 		alignItems: 'center',
 		gap: spacing.md,

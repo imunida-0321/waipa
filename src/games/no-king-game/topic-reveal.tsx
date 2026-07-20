@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import { DrumrollReveal } from '@/components/game/drumroll-reveal'
 import { useDrumroll } from '@/components/game/use-drumroll'
+import { GlassSurface } from '@/components/ui/glass-surface'
 import { GradientButton } from '@/components/ui/gradient-button'
 import { PillButton } from '@/components/ui/pill-button'
 import { colors, radii, spacing, typography } from '@/theme/tokens'
@@ -44,10 +45,10 @@ export function TopicReveal({
 		<View style={styles.container}>
 			<Text style={styles.round}>ROUND {round}</Text>
 
-			<View style={styles.topicCard}>
+			<GlassSurface style={styles.topicCard}>
 				<Text style={styles.topicLabel}>お題</Text>
 				<Text style={styles.topicText}>{topicText}</Text>
-			</View>
+			</GlassSurface>
 
 			{drumroll.phase === 'idle' && (
 				<>
@@ -90,10 +91,7 @@ const styles = StyleSheet.create({
 	},
 	round: { ...typography.caption, textAlign: 'center', color: colors.gold },
 	topicCard: {
-		backgroundColor: colors.surface,
 		borderRadius: radii.lg,
-		borderWidth: 1,
-		borderColor: colors.surfaceBorder,
 		padding: spacing.lg,
 		alignItems: 'center',
 		gap: spacing.sm,

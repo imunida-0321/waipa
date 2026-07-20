@@ -25,6 +25,18 @@ jest.mock('react-native-worklets', () => ({
 	Worklets: { defaultContext: {} },
 }))
 
+// RNTL v14 の要素型と react-test-renderer の型が非互換のため、必要な形だけの構造的型で受ける
+type AncestorNode = { parent: AncestorNode | null; props: { testID?: unknown } }
+
+function hasAncestorTestId(node: AncestorNode, testID: string): boolean {
+	let current = node.parent
+	while (current) {
+		if (current.props.testID === testID) return true
+		current = current.parent
+	}
+	return false
+}
+
 it('対象者名とお題を表示し「実行した！」で onDone', async () => {
 	const onDone = jest.fn()
 	const { getByText } = await render(
@@ -41,4 +53,19 @@ it('対象者名とお題を表示し「実行した！」で onDone', async () 
 		fireEvent.press(getByText('実行した！'))
 	})
 	expect(onDone).toHaveBeenCalledTimes(1)
+})
+
+describe('ガラス面', () => {
+	it('罰カードはガラス面で描画される', async () => {
+		const { getByText } = await render(
+			<PunishReveal
+				playerName="あお"
+				playerIndex={1}
+				topicText="一発ギャグをする"
+				onDone={jest.fn()}
+			/>,
+		)
+
+		expect(hasAncestorTestId(getByText('一発ギャグをする'), 'glass-surface-blur')).toBe(true)
+	})
 })

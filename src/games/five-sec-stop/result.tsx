@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import { useDrumroll } from '@/components/game/use-drumroll'
+import { GlassSurface } from '@/components/ui/glass-surface'
 import { GradientButton } from '@/components/ui/gradient-button'
 import { SecondaryButton } from '@/components/ui/secondary-button'
 import { playerColor } from '@/theme/player-colors'
@@ -94,9 +95,9 @@ function RankCard({
 }) {
 	if (!shown) {
 		return (
-			<View style={styles.card}>
+			<GlassSurface style={styles.card}>
 				<Text style={styles.hiddenMark}>？？？</Text>
-			</View>
+			</GlassSurface>
 		)
 	}
 
@@ -105,7 +106,7 @@ function RankCard({
 	const playerColorValue = playerColor(entry.playerIndex).value
 
 	return (
-		<View style={[styles.card, isTop && styles.topCard, entry.isLoser && styles.loserCard]}>
+		<GlassSurface style={[styles.card, isTop && styles.topCard, entry.isLoser && styles.loserCard]}>
 			<Text style={styles.rank}>{rank}位</Text>
 			<View style={[styles.colorDot, { backgroundColor: playerColorValue }]} />
 			<Text style={styles.name}>{name}</Text>
@@ -117,7 +118,7 @@ function RankCard({
 			{entry.isLoser && <Text style={styles.loserMark}>敗者！</Text>}
 			<Text style={[styles.record, { color: tierColor }]}>{formatSeconds(entry.ms)}</Text>
 			<Text style={styles.deviation}>{formatDeviation(entry.ms)}</Text>
-		</View>
+		</GlassSurface>
 	)
 }
 
@@ -137,10 +138,7 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		alignItems: 'center',
 		gap: spacing.sm,
-		backgroundColor: colors.surface,
 		borderRadius: radii.md,
-		borderWidth: 1,
-		borderColor: colors.surfaceBorder,
 		paddingVertical: spacing.sm,
 		paddingHorizontal: spacing.md,
 		marginBottom: spacing.sm,

@@ -83,3 +83,23 @@ it('n40 ラッキーカード: 拍手の煽りになり「誰にやらせる？�
 	expect(utils.getByText(/ラッキー！全員から拍手！/)).toBeTruthy()
 	expect(utils.queryByText(/誰にやらせる？/)).toBeNull()
 })
+
+describe('ガラス面', () => {
+	it('罰テキストカードはガラス面で描画される', async () => {
+		const utils = await render(
+			<PunishReveal
+				punish={{
+					kind: 'pair',
+					punishmentId: 'n07',
+					text: '全員と乾杯して1杯',
+					playerIndex: 0,
+				}}
+				playerName="あか"
+				playerIndex={0}
+				onDone={jest.fn()}
+			/>,
+		)
+
+		expect(utils.getByTestId('glass-surface-blur')).toBeTruthy()
+	})
+})

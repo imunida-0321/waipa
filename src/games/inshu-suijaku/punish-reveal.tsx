@@ -7,11 +7,12 @@ import Animated, {
 	withSpring,
 	withTiming,
 } from 'react-native-reanimated'
+import { GlassSurface } from '@/components/ui/glass-surface'
 import { GradientButton } from '@/components/ui/gradient-button'
 import { haptics } from '@/lib/haptics'
 import { playSound } from '@/lib/sound'
 import { playerColor } from '@/theme/player-colors'
-import { colors, radii, spacing, typography } from '@/theme/tokens'
+import { radii, spacing, typography } from '@/theme/tokens'
 import { LUCKY_PUNISHMENT_ID } from './punishments'
 import type { Punish } from './reducer'
 import { NS } from './theme'
@@ -62,8 +63,10 @@ export function PunishReveal({ punish, playerName, playerIndex, onDone }: Props)
 					{isJoker ? '🃏 特大罰' : '罰ゲーム'}
 				</Text>
 			</Animated.View>
-			<Animated.View style={[styles.card, isJoker && styles.jokerCard, cardAnim]}>
-				<Text style={styles.punishText}>{punish.text}</Text>
+			<Animated.View style={cardAnim}>
+				<GlassSurface variant="overlay" style={[styles.card, isJoker && styles.jokerCard]}>
+					<Text style={styles.punishText}>{punish.text}</Text>
+				</GlassSurface>
 			</Animated.View>
 			<Animated.View style={restAnim}>
 				{isLucky ? (
@@ -107,7 +110,6 @@ const styles = StyleSheet.create({
 	},
 	jokerBadge: { color: NS.jokerPurple, fontSize: 16 },
 	card: {
-		backgroundColor: colors.surface,
 		borderWidth: 1,
 		borderColor: NS.rose,
 		borderRadius: radii.lg,

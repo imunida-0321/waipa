@@ -1,6 +1,7 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons'
 import { useState } from 'react'
 import { Pressable, StyleSheet, Text, View } from 'react-native'
+import { GlassSurface } from '@/components/ui/glass-surface'
 import { GradientButton } from '@/components/ui/gradient-button'
 import { getActiveSet, useCustomPunishments } from '@/lib/custom-punishments-store'
 import { haptics } from '@/lib/haptics'
@@ -33,21 +34,22 @@ export function SizeSelect({ onStart }: Props) {
 					haptics.tap()
 					setCustomVisible(true)
 				}}
-				style={styles.customRow}
 			>
-				<View style={styles.crownBadge}>
-					<MaterialCommunityIcons
-						name="crown"
-						testID="icon-crown"
-						size={18}
-						color={colors.premiumGold}
-					/>
-				</View>
-				<View style={styles.customBody}>
-					<Text style={styles.customTitle}>カスタムお題</Text>
-					<Text style={styles.customMeta}>自分たちの罰ゲームを追加</Text>
-				</View>
-				<Text style={styles.customStatus}>{customStatus}</Text>
+				<GlassSurface style={styles.customRow}>
+					<View style={styles.crownBadge}>
+						<MaterialCommunityIcons
+							name="crown"
+							testID="icon-crown"
+							size={18}
+							color={colors.premiumGold}
+						/>
+					</View>
+					<View style={styles.customBody}>
+						<Text style={styles.customTitle}>カスタムお題</Text>
+						<Text style={styles.customMeta}>自分たちの罰ゲームを追加</Text>
+					</View>
+					<Text style={styles.customStatus}>{customStatus}</Text>
+				</GlassSurface>
 			</Pressable>
 			<View style={styles.options}>
 				{SIZES.map((size) => {
@@ -62,12 +64,13 @@ export function SizeSelect({ onStart }: Props) {
 								haptics.tap()
 								setSelected(size)
 							}}
-							style={[styles.option, active && styles.optionActive]}
 						>
-							<Text style={styles.optionLabel}>{config.label}</Text>
-							<Text style={styles.optionMeta}>
-								{config.pairs}ペア＋ジョーカー{JOKER_COUNT} ・ {config.estimate}
-							</Text>
+							<GlassSurface style={[styles.option, active && styles.optionActive]}>
+								<Text style={styles.optionLabel}>{config.label}</Text>
+								<Text style={styles.optionMeta}>
+									{config.pairs}ペア＋ジョーカー{JOKER_COUNT} ・ {config.estimate}
+								</Text>
+							</GlassSurface>
 						</Pressable>
 					)
 				})}
@@ -87,7 +90,6 @@ const styles = StyleSheet.create({
 	customRow: {
 		flexDirection: 'row',
 		alignItems: 'center',
-		backgroundColor: colors.surface,
 		borderWidth: 1,
 		borderColor: colors.premiumGold,
 		borderRadius: radii.md,
@@ -109,9 +111,6 @@ const styles = StyleSheet.create({
 	customStatus: { ...typography.caption, color: colors.premiumGold, fontWeight: '700' },
 	options: { gap: spacing.sm },
 	option: {
-		backgroundColor: colors.surface,
-		borderWidth: 1,
-		borderColor: colors.surfaceBorder,
 		borderRadius: radii.md,
 		padding: spacing.md,
 		gap: spacing.xs,

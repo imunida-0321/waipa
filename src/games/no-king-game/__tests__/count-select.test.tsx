@@ -29,6 +29,18 @@ jest.mock('@/components/ui/gradient-button', () => {
 	}
 })
 
+// RNTL v14 の要素型と react-test-renderer の型が非互換のため、必要な形だけの構造的型で受ける
+type AncestorNode = { parent: AncestorNode | null; props: { testID?: unknown } }
+
+function hasAncestorTestId(node: AncestorNode, testID: string): boolean {
+	let current = node.parent
+	while (current) {
+		if (current.props.testID === testID) return true
+		current = current.parent
+	}
+	return false
+}
+
 describe('CountSelect', () => {
 	beforeEach(() => {
 		jest.clearAllMocks()
@@ -89,5 +101,13 @@ describe('CountSelect', () => {
 		})
 
 		expect(queryByText(/解放中/)).toBeNull()
+	})
+
+	it('限定パック行はガラス面で描画される', async () => {
+		const { getByText } = await render(
+			<CountSelect count={4} onChangeCount={jest.fn()} onDeal={jest.fn()} />,
+		)
+
+		expect(hasAncestorTestId(getByText('限定お題パック'), 'glass-surface-pseudo')).toBe(true)
 	})
 })

@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
 import { StyleSheet, Text, View } from 'react-native'
+import { GlassSurface } from '@/components/ui/glass-surface'
 import { haptics } from '@/lib/haptics'
 import { playSound } from '@/lib/sound'
 import { playerColor } from '@/theme/player-colors'
-import { colors, radii, spacing, typography } from '@/theme/tokens'
+import { radii, spacing, typography } from '@/theme/tokens'
 import { RP } from './theme'
 
 export const ROLL_MS = 2000
@@ -82,12 +83,13 @@ export function PlayerRoulette({ names, firstIndex, finalIndex, passConsumed, on
 				{names.map((name, i) => {
 					const highlightColor = playerColor(i).value
 					return (
-						<View
+						<GlassSurface
 							key={`${i}-${name}`}
 							style={[
 								styles.row,
 								i === highlight && {
 									backgroundColor: highlightColor,
+									borderWidth: 1,
 									borderColor: highlightColor,
 								},
 							]}
@@ -95,7 +97,7 @@ export function PlayerRoulette({ names, firstIndex, finalIndex, passConsumed, on
 							<Text style={[styles.name, i === highlight && styles.nameActive]}>
 								{name}
 							</Text>
-						</View>
+						</GlassSurface>
 					)
 				})}
 			</View>
@@ -116,12 +118,9 @@ const styles = StyleSheet.create({
 	title: { ...typography.title, color: RP.green },
 	list: { alignSelf: 'stretch', gap: spacing.xs },
 	row: {
-		borderWidth: 1,
-		borderColor: colors.surfaceBorder,
 		borderRadius: radii.sm,
 		paddingVertical: spacing.sm,
 		paddingHorizontal: spacing.md,
-		backgroundColor: colors.surface,
 	},
 	name: { ...typography.body, textAlign: 'center' },
 	nameActive: { fontWeight: '800' },

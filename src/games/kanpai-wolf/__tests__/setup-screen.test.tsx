@@ -10,6 +10,18 @@ jest.mock('expo-linear-gradient', () => {
 	return { LinearGradient: View }
 })
 
+// RNTL v14 の要素型と react-test-renderer の型が非互換のため、必要な形だけの構造的型で受ける
+type AncestorNode = { parent: AncestorNode | null; props: { testID?: unknown } }
+
+function hasAncestorTestId(node: AncestorNode, testID: string): boolean {
+	let current = node.parent
+	while (current) {
+		if (current.props.testID === testID) return true
+		current = current.parent
+	}
+	return false
+}
+
 it('デフォルト設定（ウルフ1・3分・たべもの）で開始できる', async () => {
 	const onStart = jest.fn()
 	const { getByText } = await render(<SetupScreen playerCount={5} onStart={onStart} />)
@@ -40,4 +52,12 @@ it('7人以上でウルフ2人・時間・パックを選んで開始できる',
 		fireEvent.press(getByText('はじめる'))
 	})
 	expect(onStart).toHaveBeenCalledWith({ wolfCount: 2, discussSeconds: 300, pack: 'place' })
+})
+
+describe('ガラス面', () => {
+	it('設定チップはガラス面で描画される', async () => {
+		const { getByText } = await render(<SetupScreen playerCount={5} onStart={jest.fn()} />)
+
+		expect(hasAncestorTestId(getByText('3分'), 'glass-surface-pseudo')).toBe(true)
+	})
 })

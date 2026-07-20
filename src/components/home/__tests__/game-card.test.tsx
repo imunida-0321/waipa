@@ -1,7 +1,7 @@
 import { fireEvent, render, within } from '@testing-library/react-native'
 import { StyleSheet } from 'react-native'
 import type { GameMeta } from '@/games/registry'
-import { colors, radii, spacing } from '@/theme/tokens'
+import { radii, spacing } from '@/theme/tokens'
 import { GameCard } from '../game-card'
 
 jest.mock('expo-linear-gradient', () => {
@@ -74,12 +74,11 @@ it('キャッチは小さめフォント＋2行分の固定高さで段ずれを
 	expect(style.minHeight).toBe(32)
 })
 
-it('サムネとキャッチをサーフェス背景のカード面で包む', async () => {
+it('サムネとキャッチをガラス面のカード面で包む', async () => {
 	const { getByTestId, getByText } = await render(<GameCard game={baseGame} onPress={jest.fn()} />)
 	const surface = getByTestId('game-card-surface')
-	const style = StyleSheet.flatten(surface.props.style)
-	expect(style.backgroundColor).toBe(colors.surface)
-	expect(style.borderColor).toBe(colors.surfaceBorder)
+	const glassFace = within(surface).getByTestId('glass-surface-pseudo')
+	const style = StyleSheet.flatten(glassFace.props.style)
 	expect(style.borderRadius).toBe(radii.lg)
 	expect(style.padding).toBe(spacing.sm)
 	// キャッチはカード面の中に入る
@@ -106,7 +105,9 @@ describe('プレミアムロック表示', () => {
 		const { getByTestId } = await render(
 			<GameCard game={{ ...baseGame, premium: true }} onPress={jest.fn()} />,
 		)
-		expect(getByTestId('glass-surface-pseudo')).toBeTruthy()
+		// カード面もガラスのため、ロックマスク内にスコープして検証する
+		const mask = getByTestId('premium-lock-mask')
+		expect(within(mask).getByTestId('glass-surface-pseudo')).toBeTruthy()
 	})
 
 	it('premium かつ未解放: cardThumbnail ありでもマスクを重ねる', async () => {

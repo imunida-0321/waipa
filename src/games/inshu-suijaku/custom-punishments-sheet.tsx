@@ -10,6 +10,7 @@ import {
 	TextInput,
 	View,
 } from 'react-native'
+import { GlassSurface } from '@/components/ui/glass-surface'
 import { GradientButton } from '@/components/ui/gradient-button'
 import {
 	countByType,
@@ -23,7 +24,7 @@ import {
 	useCustomPunishments,
 } from '@/lib/custom-punishments-store'
 import { haptics } from '@/lib/haptics'
-import { colors, radii, spacing, typography } from '@/theme/tokens'
+import { colors, glass, radii, spacing, typography } from '@/theme/tokens'
 
 type Props = {
 	visible: boolean
@@ -111,7 +112,7 @@ export function CustomPunishmentsSheet({ visible, onClose }: Props) {
 						contentContainerStyle={styles.content}
 						keyboardShouldPersistTaps="handled"
 					>
-						<View style={styles.segment}>
+						<GlassSurface style={styles.segment}>
 							{(['normal', 'special'] as const).map((type) => {
 								const active = formType === type
 								return (
@@ -134,9 +135,9 @@ export function CustomPunishmentsSheet({ visible, onClose }: Props) {
 									</Pressable>
 								)
 							})}
-						</View>
+						</GlassSurface>
 
-						<View style={styles.inputBox}>
+						<GlassSurface style={styles.inputBox}>
 							<TextInput
 								style={styles.input}
 								placeholder="お題を入力..."
@@ -149,7 +150,7 @@ export function CustomPunishmentsSheet({ visible, onClose }: Props) {
 							<Text style={styles.counter}>
 								{text.length}/{MAX_TEXT_LENGTH}
 							</Text>
-						</View>
+						</GlassSurface>
 
 						<GradientButton title="保存する" onPress={save} disabled={saveDisabled} />
 						<Text style={styles.note}>この端末にのみ保存されます</Text>
@@ -173,9 +174,10 @@ export function CustomPunishmentsSheet({ visible, onClose }: Props) {
 											customPunishmentsStore.selectSet(set.id)
 										}}
 										onLongPress={() => confirmRemoveSet(set.id)}
-										style={[styles.setChip, active && styles.setChipActive]}
 									>
-										<Text style={styles.setChipText}>{set.name}</Text>
+										<GlassSurface style={[styles.setChip, active && styles.setChipActive]}>
+											<Text style={styles.setChipText}>{set.name}</Text>
+										</GlassSurface>
 									</Pressable>
 								)
 							})}
@@ -185,17 +187,20 @@ export function CustomPunishmentsSheet({ visible, onClose }: Props) {
 									haptics.tap()
 									customPunishmentsStore.addSet('')
 								}}
-								style={[
-									styles.setChip,
-									custom.sets.length >= MAX_SETS && styles.disabledChip,
-								]}
 								disabled={custom.sets.length >= MAX_SETS}
 							>
-								<Text style={styles.setChipText}>＋セット</Text>
+								<GlassSurface
+									style={[
+										styles.setChip,
+										custom.sets.length >= MAX_SETS && styles.disabledChip,
+									]}
+								>
+									<Text style={styles.setChipText}>＋セット</Text>
+								</GlassSurface>
 							</Pressable>
 						</ScrollView>
 
-						<View style={styles.toggleRow}>
+						<GlassSurface style={styles.toggleRow}>
 							<View>
 								<Text style={styles.toggleTitle}>デッキに混ぜる</Text>
 								<Text style={styles.note}>この端末にのみ保存されます</Text>
@@ -210,14 +215,14 @@ export function CustomPunishmentsSheet({ visible, onClose }: Props) {
 								}}
 								thumbColor={colors.text}
 							/>
-						</View>
+						</GlassSurface>
 
 						<Text style={styles.tips}>
 							💡
 							カスタムお題は優先して盤面に入り、その分プリセットのお題と入れ替わります。盤面のペア数より多く登録すると、毎回その中からランダムに選ばれます。
 						</Text>
 
-						<View style={styles.tabs}>
+						<GlassSurface style={styles.tabs}>
 							<TabButton
 								active={selectedType === 'normal'}
 								label={`通常罰 ${normalCount}/${MAX_NORMAL_ITEMS}`}
@@ -228,11 +233,11 @@ export function CustomPunishmentsSheet({ visible, onClose }: Props) {
 								label={`特大罰 ${specialCount}/${MAX_SPECIAL_ITEMS}`}
 								onPress={() => setSelectedType('special')}
 							/>
-						</View>
+						</GlassSurface>
 
 						<View style={styles.list}>
 							{visibleItems.map((item) => (
-								<View key={item.id} style={styles.itemRow}>
+								<GlassSurface key={item.id} style={styles.itemRow}>
 									<View style={styles.itemAccent} />
 									<Text style={styles.itemText}>{item.text}</Text>
 									<Pressable
@@ -253,7 +258,7 @@ export function CustomPunishmentsSheet({ visible, onClose }: Props) {
 									>
 										<Text style={styles.iconText}>削除</Text>
 									</Pressable>
-								</View>
+								</GlassSurface>
 							))}
 						</View>
 
@@ -317,12 +322,9 @@ const styles = StyleSheet.create({
 	content: { padding: spacing.md, gap: spacing.md },
 	setRow: { gap: spacing.sm, paddingRight: spacing.md },
 	setChip: {
-		borderWidth: 1,
-		borderColor: colors.surfaceBorder,
 		borderRadius: radii.pill,
 		paddingVertical: spacing.sm,
 		paddingHorizontal: spacing.md,
-		backgroundColor: colors.surface,
 	},
 	setChipActive: { borderColor: colors.accentFrom },
 	setChipText: { ...typography.body, fontWeight: '700' },
@@ -331,9 +333,6 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'space-between',
-		backgroundColor: colors.surface,
-		borderWidth: 1,
-		borderColor: colors.surfaceBorder,
 		borderRadius: radii.md,
 		padding: spacing.md,
 		gap: spacing.md,
@@ -343,7 +342,6 @@ const styles = StyleSheet.create({
 	tips: { ...typography.caption, lineHeight: 19 },
 	tabs: {
 		flexDirection: 'row',
-		backgroundColor: colors.surface,
 		borderRadius: radii.md,
 		padding: spacing.xs,
 		gap: spacing.xs,
@@ -354,15 +352,12 @@ const styles = StyleSheet.create({
 		borderRadius: radii.sm,
 		paddingVertical: spacing.sm,
 	},
-	tabActive: { backgroundColor: colors.surfaceBorder },
+	tabActive: { backgroundColor: glass.fallbackFill },
 	tabText: { ...typography.body, fontWeight: '700' },
 	list: { gap: spacing.sm },
 	itemRow: {
 		flexDirection: 'row',
 		alignItems: 'center',
-		backgroundColor: colors.surface,
-		borderWidth: 1,
-		borderColor: colors.surfaceBorder,
 		borderRadius: radii.md,
 		overflow: 'hidden',
 	},
@@ -383,7 +378,6 @@ const styles = StyleSheet.create({
 	addLabel: { ...typography.body, fontWeight: '700' },
 	segment: {
 		flexDirection: 'row',
-		backgroundColor: colors.surface,
 		borderRadius: radii.md,
 		padding: spacing.xs,
 		gap: spacing.xs,
@@ -394,12 +388,9 @@ const styles = StyleSheet.create({
 		borderRadius: radii.sm,
 		paddingVertical: spacing.sm,
 	},
-	segmentBtnActive: { backgroundColor: colors.surfaceBorder },
+	segmentBtnActive: { backgroundColor: glass.fallbackFill },
 	segmentText: { ...typography.body, fontWeight: '700' },
 	inputBox: {
-		backgroundColor: colors.surface,
-		borderWidth: 1,
-		borderColor: colors.surfaceBorder,
 		borderRadius: radii.md,
 		padding: spacing.md,
 		gap: spacing.sm,

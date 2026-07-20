@@ -1,10 +1,11 @@
 import { useEffect } from 'react'
 import { StyleSheet, Text, View } from 'react-native'
+import { GlassSurface } from '@/components/ui/glass-surface'
 import { GradientButton } from '@/components/ui/gradient-button'
 import { haptics } from '@/lib/haptics'
 import { playSound } from '@/lib/sound'
 import { playerColor } from '@/theme/player-colors'
-import { colors, radii, spacing, typography } from '@/theme/tokens'
+import { radii, spacing, typography } from '@/theme/tokens'
 import { RP } from './theme'
 
 type Props = {
@@ -26,9 +27,9 @@ export function PunishReveal({ playerName, playerIndex, topicText, onDone }: Pro
 	return (
 		<View style={styles.backdrop}>
 			<Text style={[styles.who, { color: playerColorValue }]}>{playerName}さんが罰！</Text>
-			<View style={styles.card}>
+			<GlassSurface variant="overlay" style={styles.card}>
 				<Text style={styles.topic}>{topicText}</Text>
-			</View>
+			</GlassSurface>
 			<GradientButton title="実行した！" onPress={onDone} />
 		</View>
 	)
@@ -45,7 +46,6 @@ const styles = StyleSheet.create({
 	},
 	who: { ...typography.hero, textAlign: 'center' },
 	card: {
-		backgroundColor: colors.surface,
 		borderWidth: 1,
 		borderColor: RP.green,
 		borderRadius: radii.lg,

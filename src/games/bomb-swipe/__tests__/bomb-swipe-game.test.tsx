@@ -86,6 +86,18 @@ async function press(target: Parameters<typeof fireEvent.press>[0]) {
 	})
 }
 
+// RNTL v14 の要素型と react-test-renderer の型が非互換のため、必要な形だけの構造的型で受ける
+type AncestorNode = { parent: AncestorNode | null; props: { testID?: unknown } }
+
+function hasAncestorTestId(node: AncestorNode, testID: string): boolean {
+	let current = node.parent
+	while (current) {
+		if (current.props.testID === testID) return true
+		current = current.parent
+	}
+	return false
+}
+
 type TrialStoreModule = {
 	useTrialRoundConsumer: (gameId: string, isRoundEnd: boolean) => void
 }
@@ -175,4 +187,12 @@ it('決着画面到達でトライアルの1ラウンドを消費する', async 
 
 	expect(getByText(/あおさんの負け/)).toBeTruthy()
 	expect(consumerSpy).toHaveBeenCalledWith('bomb-swipe', true)
+})
+
+describe('ガラス面', () => {
+	it('手番行はガラス面で描画される', async () => {
+		const { getByText } = await render(<BombSwipeGame />)
+
+		expect(hasAncestorTestId(getByText(/あかさんの番/), 'glass-surface-pseudo')).toBe(true)
+	})
 })

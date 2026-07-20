@@ -1,6 +1,8 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { act, fireEvent, render } from '@testing-library/react-native'
+import { StyleSheet } from 'react-native'
 import { customPunishmentsStore, getActiveSet } from '@/lib/custom-punishments-store'
+import { glass } from '@/theme/tokens'
 import { CustomPunishmentsSheet } from '../custom-punishments-sheet'
 
 jest.mock('@react-native-async-storage/async-storage', () =>
@@ -109,4 +111,36 @@ it('×ボタンで onClose が呼ばれる', async () => {
 		fireEvent.press(utils.getByLabelText('閉じる'))
 	})
 	expect(onClose).toHaveBeenCalledTimes(1)
+})
+
+describe('ガラス面', () => {
+	it('シート内の行・チップはガラス面で描画される', async () => {
+		await customPunishmentsStore.addItem('normal', '右隣の人を褒めて1杯')
+		const utils = await render(<CustomPunishmentsSheet visible onClose={jest.fn()} />)
+
+		expect(utils.getAllByTestId('glass-surface-pseudo').length).toBeGreaterThan(0)
+
+		await act(async () => {
+			fireEvent.press(utils.getByText('⊕ 追加'))
+		})
+
+		expect(utils.getAllByTestId('glass-surface-pseudo').length).toBeGreaterThan(0)
+	})
+
+	it('アクティブタブは半透明の塗りになる', async () => {
+		const utils = await render(<CustomPunishmentsSheet visible onClose={jest.fn()} />)
+		const activeTab = utils.getByRole('button', { name: /通常罰 \d+\/20/ })
+		const tabStyle = StyleSheet.flatten(activeTab.props.style)
+
+		expect(tabStyle.backgroundColor).toBe(glass.fallbackFill)
+
+		await act(async () => {
+			fireEvent.press(utils.getByText('⊕ 追加'))
+		})
+
+		const activeSegment = utils.getByRole('button', { name: '通常罰' })
+		const segmentStyle = StyleSheet.flatten(activeSegment.props.style)
+
+		expect(segmentStyle.backgroundColor).toBe(glass.fallbackFill)
+	})
 })

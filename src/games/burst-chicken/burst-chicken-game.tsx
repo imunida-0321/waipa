@@ -5,6 +5,7 @@ import { DrumrollReveal } from '@/components/game/drumroll-reveal'
 import { lottieAssets } from '@/components/game/lottie-assets'
 import { LottieEffect } from '@/components/game/lottie-effect'
 import { useDrumroll } from '@/components/game/use-drumroll'
+import { GlassSurface } from '@/components/ui/glass-surface'
 import { haptics } from '@/lib/haptics'
 import { getDisplayNames, usePlayers } from '@/lib/players-store'
 import { playSound } from '@/lib/sound'
@@ -115,10 +116,10 @@ export function BurstChickenGame() {
 				</Text>
 			</View>
 
-			<View style={styles.turnRow}>
+			<GlassSurface style={styles.turnRow}>
 				<View style={[styles.turnBar, { backgroundColor: turnColor }]} />
 				<Text style={styles.turnText}>{names[state.turnIndex]}さんの番</Text>
-			</View>
+			</GlassSurface>
 
 			<View style={styles.addRow}>
 				{([1, 2, 3] as const).map((n) => (
@@ -171,7 +172,6 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		gap: spacing.sm,
 		alignSelf: 'center',
-		backgroundColor: colors.surface,
 		borderRadius: radii.md,
 		paddingHorizontal: spacing.md,
 		paddingVertical: spacing.sm,

@@ -18,6 +18,18 @@ const baseProps = {
 	onKanpai: jest.fn(),
 }
 
+// RNTL v14 の要素型と react-test-renderer の型が非互換のため、必要な形だけの構造的型で受ける
+type AncestorNode = { parent: AncestorNode | null; props: { testID?: unknown } }
+
+function hasAncestorTestId(node: AncestorNode, testID: string): boolean {
+	let current = node.parent
+	while (current) {
+		if (current.props.testID === testID) return true
+		current = current.parent
+	}
+	return false
+}
+
 beforeEach(() => {
 	jest.useFakeTimers()
 	;(playSound as jest.Mock).mockClear()
@@ -139,4 +151,16 @@ it('乾杯回数が表示される（0回のときはバッジ非表示）', asy
 	expect(ui.getByText('× 3')).toBeTruthy()
 	const zero = await render(<DiscussScreen seconds={180} onDone={jest.fn()} {...baseProps} />)
 	expect(zero.queryByText(/× \d/)).toBeNull()
+})
+
+describe('ガラス面', () => {
+	it('乾杯ルールカードはガラス面で描画される', async () => {
+		const { getByText } = await render(
+			<DiscussScreen seconds={180} onDone={jest.fn()} {...baseProps} />,
+		)
+
+		expect(hasAncestorTestId(getByText('誰かが質問されたら全員乾杯'), 'glass-surface-pseudo')).toBe(
+			true,
+		)
+	})
 })

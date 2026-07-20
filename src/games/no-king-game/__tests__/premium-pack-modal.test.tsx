@@ -49,6 +49,18 @@ beforeEach(() => {
 	mockedHook.mockReturnValue(hookState({}))
 })
 
+// RNTL v14 の要素型と react-test-renderer の型が非互換のため、必要な形だけの構造的型で受ける
+type AncestorNode = { parent: AncestorNode | null; props: { testID?: unknown } }
+
+function hasAncestorTestId(node: AncestorNode, testID: string): boolean {
+	let current = node.parent
+	while (current) {
+		if (current.props.testID === testID) return true
+		current = current.parent
+	}
+	return false
+}
+
 describe('PremiumPackModal', () => {
 	it('表示時にリワードを読み込み、未ロード中はボタンが無効', async () => {
 		const state = hookState({})
@@ -121,5 +133,11 @@ describe('PremiumPackModal', () => {
 		)
 		expect(queryByText('動画を見て解放する')).toBeNull()
 		expect(getByText(/解放中/)).toBeTruthy()
+	})
+
+	it('シートはガラス面で描画される', async () => {
+		const { getByText } = await render(<PremiumPackModal visible onClose={() => {}} />)
+
+		expect(hasAncestorTestId(getByText('限定お題パック'), 'glass-surface-blur')).toBe(true)
 	})
 })

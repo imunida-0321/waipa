@@ -57,6 +57,18 @@ jest.mock('@/components/ui/pill-button', () => {
 	}
 })
 
+// RNTL v14 の要素型と react-test-renderer の型が非互換のため、必要な形だけの構造的型で受ける
+type AncestorNode = { parent: AncestorNode | null; props: { testID?: unknown } }
+
+function hasAncestorTestId(node: AncestorNode, testID: string): boolean {
+	let current = node.parent
+	while (current) {
+		if (current.props.testID === testID) return true
+		current = current.parent
+	}
+	return false
+}
+
 describe('TopicReveal', () => {
 	beforeEach(() => {
 		mockDrumroll = {
@@ -160,5 +172,22 @@ describe('TopicReveal', () => {
 			fireEvent.press(getByText('次のラウンド（番号を配り直す）'))
 		})
 		expect(onNextRound).toHaveBeenCalledTimes(1)
+	})
+
+	it('お題カードはガラス面で描画される', async () => {
+		const { getByText } = await render(
+			<TopicReveal
+				phase="reveal"
+				round={1}
+				topicText="全力で拍手する"
+				executorNumber={2}
+				skipsLeft={2}
+				onSkip={jest.fn()}
+				onRevealDone={jest.fn()}
+				onNextRound={jest.fn()}
+			/>,
+		)
+
+		expect(hasAncestorTestId(getByText('全力で拍手する'), 'glass-surface-pseudo')).toBe(true)
 	})
 })

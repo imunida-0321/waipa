@@ -30,6 +30,7 @@ jest.mock('react-native-reanimated', () => {
 		withRepeat: jest.fn((v: number) => v),
 		withSequence: jest.fn((v: number) => v),
 		withSpring: jest.fn((v: number) => v),
+		getUseOfValueInStyleWarning: jest.fn(() => ''),
 	}
 })
 
@@ -48,6 +49,18 @@ async function press(target: Parameters<typeof fireEvent.press>[0]) {
 	await act(async () => {
 		fireEvent.press(target)
 	})
+}
+
+// RNTL v14 の要素型と react-test-renderer の型が非互換のため、必要な形だけの構造的型で受ける
+type AncestorNode = { parent: AncestorNode | null; props: { testID?: unknown } }
+
+function hasAncestorTestId(node: AncestorNode, testID: string): boolean {
+	let current = node.parent
+	while (current) {
+		if (current.props.testID === testID) return true
+		current = current.parent
+	}
+	return false
 }
 
 type TrialStoreModule = {
@@ -179,4 +192,12 @@ it('settled → もう一回 → 再度ストップまで進めてもドラム�
 		jest.advanceTimersByTime(2000)
 	})
 	expect(getByText(/の負け/)).toBeTruthy()
+})
+
+describe('ガラス面', () => {
+	it('手番行はガラス面で描画される', async () => {
+		const { getByText } = await render(<BurstChickenGame />)
+
+		expect(hasAncestorTestId(getByText(/あかさんの番/), 'glass-surface-pseudo')).toBe(true)
+	})
 })

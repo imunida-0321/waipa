@@ -51,6 +51,18 @@ const base: State = {
 	],
 }
 
+// RNTL v14 の要素型と react-test-renderer の型が非互換のため、必要な形だけの構造的型で受ける
+type AncestorNode = { parent: AncestorNode | null; props: { testID?: unknown } }
+
+function hasAncestorTestId(node: AncestorNode, testID: string): boolean {
+	let current = node.parent
+	while (current) {
+		if (current.props.testID === testID) return true
+		current = current.parent
+	}
+	return false
+}
+
 it('スコア順ランキングと地雷位置の答え合わせを表示する', async () => {
 	const { getByText } = await render(
 		<RoundResult
@@ -117,4 +129,19 @@ it('もう一回とホームのボタンが動く', async () => {
 	})
 	expect(onRetry).toHaveBeenCalledTimes(1)
 	expect(onHome).toHaveBeenCalledTimes(1)
+})
+
+describe('ガラス面', () => {
+	it('ランキング行はガラス面で描画される', async () => {
+		const { getByText } = await render(
+			<RoundResult
+				state={base}
+				names={['あか', 'あお', 'きいろ']}
+				onRetry={() => {}}
+				onHome={() => {}}
+			/>,
+		)
+
+		expect(hasAncestorTestId(getByText(/地雷: 70/), 'glass-surface-pseudo')).toBe(true)
+	})
 })

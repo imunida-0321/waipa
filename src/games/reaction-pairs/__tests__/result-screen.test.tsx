@@ -32,6 +32,18 @@ const base = {
 	onHome: jest.fn(),
 }
 
+// RNTL v14 の要素型と react-test-renderer の型が非互換のため、必要な形だけの構造的型で受ける
+type AncestorNode = { parent: AncestorNode | null; props: { testID?: unknown } }
+
+function hasAncestorTestId(node: AncestorNode, testID: string): boolean {
+	let current = node.parent
+	while (current) {
+		if (current.props.testID === testID) return true
+		current = current.parent
+	}
+	return false
+}
+
 it('スコア降順・同数同順位のランキングを表示する', async () => {
 	const { getAllByText, getByText } = await render(<ResultScreen {...base} loserIndex={null} />)
 	expect(getAllByText('1位')).toHaveLength(2) // あか・みどり が同率1位
@@ -54,4 +66,12 @@ it('もう一回 / ホームへ が動く', async () => {
 		fireEvent.press(getByText('ホームへ'))
 	})
 	expect(base.onHome).toHaveBeenCalled()
+})
+
+describe('ガラス面', () => {
+	it('ランキング行はガラス面で描画される', async () => {
+		const { getByText } = await render(<ResultScreen {...base} loserIndex={null} />)
+
+		expect(hasAncestorTestId(getByText('あか'), 'glass-surface-pseudo')).toBe(true)
+	})
 })

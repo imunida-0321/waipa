@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import { DrumrollReveal } from '@/components/game/drumroll-reveal'
 import { useDrumroll } from '@/components/game/use-drumroll'
+import { GlassSurface } from '@/components/ui/glass-surface'
 import { GradientButton } from '@/components/ui/gradient-button'
 import { colors, radii, spacing, typography } from '@/theme/tokens'
 import { DiceRoll3D } from './dice-roll-3d'
@@ -41,7 +42,9 @@ export function RevealOverlay({
 					<Text style={[styles.verdict, { color: wasBluff ? DD.red : DD.gold }]}>
 						{wasBluff ? 'ウソだった！' : 'ホントだった！ ダウト失敗…'}
 					</Text>
-					<Text style={styles.penalty}>{lifeLoserName}さん ライフ-1</Text>
+					<GlassSurface variant="overlay" style={styles.penalty}>
+						<Text style={styles.penaltyText}>{lifeLoserName}さん ライフ-1</Text>
+					</GlassSurface>
 				</View>
 			</DrumrollReveal>
 			{phase === 'revealed' && (
@@ -64,12 +67,9 @@ const styles = StyleSheet.create({
 	actual: { ...typography.body, color: colors.textMuted },
 	verdict: { ...typography.hero, textAlign: 'center' },
 	penalty: {
-		...typography.title,
-		textAlign: 'center',
-		backgroundColor: colors.surface,
 		borderRadius: radii.md,
 		paddingHorizontal: spacing.md,
 		paddingVertical: spacing.xs,
-		overflow: 'hidden',
 	},
+	penaltyText: { ...typography.title, textAlign: 'center' },
 })

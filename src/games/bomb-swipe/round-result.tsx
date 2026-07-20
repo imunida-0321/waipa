@@ -1,8 +1,9 @@
 import { StyleSheet, Text, View } from 'react-native'
 import { GradientButton } from '@/components/ui/gradient-button'
+import { GlassSurface } from '@/components/ui/glass-surface'
 import { SecondaryButton } from '@/components/ui/secondary-button'
 import { playerColor } from '@/theme/player-colors'
-import { colors, radii, spacing, typography } from '@/theme/tokens'
+import { radii, spacing, typography } from '@/theme/tokens'
 import { decideLosers, type PlayerResult, type State } from './engine'
 import { BS } from './theme'
 
@@ -30,7 +31,7 @@ export function RoundResult({ state, names, onRetry, onHome }: Props) {
 					// console.warn を挿入してしまう。style 属性の外で変数に受けて回避する
 					const barColor = playerColor(r.index).value
 					return (
-						<View
+						<GlassSurface
 							key={r.index}
 							style={[styles.row, losers.includes(r.index) && styles.loserRow]}
 						>
@@ -41,7 +42,7 @@ export function RoundResult({ state, names, onRetry, onHome }: Props) {
 								{r.exploded ? '💥' : ''}
 								{r.score}
 							</Text>
-						</View>
+						</GlassSurface>
 					)
 				})}
 			</View>
@@ -59,14 +60,11 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		alignItems: 'center',
 		gap: spacing.sm,
-		backgroundColor: colors.surface,
 		borderRadius: radii.md,
-		borderWidth: 1,
-		borderColor: colors.surfaceBorder,
 		paddingHorizontal: spacing.md,
 		paddingVertical: spacing.sm,
 	},
-	loserRow: { borderColor: BS.red },
+	loserRow: { borderWidth: 1, borderColor: BS.red },
 	bar: { width: 4, height: 24, borderRadius: 2 },
 	name: { ...typography.body, flex: 1 },
 	mine: { ...typography.caption },
