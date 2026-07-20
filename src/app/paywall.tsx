@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react'
 import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
 import type { PurchasesPackage } from 'react-native-purchases'
 import { AppBackground } from '@/components/ui/app-background'
+import { GlassSurface } from '@/components/ui/glass-surface'
 import { GradientButton } from '@/components/ui/gradient-button'
 import {
 	getPremiumPackages,
@@ -127,21 +128,21 @@ export default function PaywallScreen() {
 
 				<View style={styles.benefits}>
 					{BENEFITS.map((benefit) => (
-						<View key={benefit.title} style={styles.benefitRow}>
+						<GlassSurface key={benefit.title} style={styles.benefitRow}>
 							<MaterialCommunityIcons
 								name={benefit.icon}
 								size={22}
 								color={colors.premiumGold}
 							/>
 							<Text style={styles.benefitText}>{benefit.title}</Text>
-						</View>
+						</GlassSurface>
 					))}
 				</View>
 
 				{premiumUnlocked ? (
-					<View style={styles.activeBox}>
+					<GlassSurface style={styles.activeBox}>
 						<Text style={styles.activeText}>プレミアム利用中</Text>
-					</View>
+					</GlassSurface>
 				) : (
 					<>
 						<View style={styles.plans}>
@@ -160,9 +161,9 @@ export default function PaywallScreen() {
 								onPress={() => setSelectedPlan('annual')}
 							/>
 						</View>
-						<View style={styles.badge}>
+						<GlassSurface style={styles.badge}>
 							<Text style={styles.badgeText}>約39%お得</Text>
-						</View>
+						</GlassSurface>
 						{packages === null && <Text style={styles.comingSoon}>近日対応予定</Text>}
 						<GradientButton
 							testID="paywall-purchase"
@@ -204,10 +205,12 @@ function PlanOption({
 		<Pressable
 			accessibilityRole="button"
 			onPress={onPress}
-			style={[styles.plan, selected && styles.selectedPlan]}
+			style={styles.planWrap}
 		>
-			<Text style={styles.planLabel}>{hasPackages ? label : `${label} ${price}`}</Text>
-			{hasPackages && <Text style={styles.planPrice}>{price}</Text>}
+			<GlassSurface style={[styles.plan, selected && styles.selectedPlan]}>
+				<Text style={styles.planLabel}>{hasPackages ? label : `${label} ${price}`}</Text>
+				{hasPackages && <Text style={styles.planPrice}>{price}</Text>}
+			</GlassSurface>
 		</Pressable>
 	)
 }
@@ -235,9 +238,6 @@ const styles = StyleSheet.create({
 	copy: { ...typography.body, color: colors.textMuted, textAlign: 'center' },
 	benefits: { gap: spacing.sm },
 	benefitRow: {
-		backgroundColor: colors.surface,
-		borderWidth: 1,
-		borderColor: colors.surfaceBorder,
 		borderRadius: radii.sm,
 		padding: spacing.md,
 		flexDirection: 'row',
@@ -249,12 +249,9 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		gap: spacing.sm,
 	},
+	planWrap: { flex: 1 },
 	plan: {
-		flex: 1,
 		minHeight: 88,
-		backgroundColor: colors.surface,
-		borderWidth: 1,
-		borderColor: colors.surfaceBorder,
 		borderRadius: radii.sm,
 		padding: spacing.md,
 		justifyContent: 'center',
@@ -265,7 +262,6 @@ const styles = StyleSheet.create({
 	planPrice: { ...typography.title, color: colors.premiumGold, textAlign: 'center' },
 	badge: {
 		alignSelf: 'center',
-		backgroundColor: colors.surface,
 		borderWidth: 1,
 		borderColor: colors.premiumGold,
 		borderRadius: radii.pill,
@@ -275,7 +271,6 @@ const styles = StyleSheet.create({
 	badgeText: { ...typography.caption, color: colors.premiumGold, fontWeight: '700' },
 	comingSoon: { ...typography.caption, textAlign: 'center' },
 	activeBox: {
-		backgroundColor: colors.surface,
 		borderWidth: 1,
 		borderColor: colors.premiumGold,
 		borderRadius: radii.sm,

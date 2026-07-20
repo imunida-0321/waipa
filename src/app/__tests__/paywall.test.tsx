@@ -102,6 +102,11 @@ describe('PaywallScreen', () => {
 		expect(router.back).toHaveBeenCalledTimes(1)
 	})
 
+	it('特典行・プランカードはガラス面で描画される', async () => {
+		const { getAllByTestId } = await render(<PaywallScreen />)
+		expect(getAllByTestId('glass-surface-pseudo').length).toBeGreaterThan(0)
+	})
+
 	it('商品が取得できたら SDK の価格を表示し、初期選択の年額パッケージを購入する', async () => {
 		const monthly = makePackage(PACKAGE_TYPE.MONTHLY, '¥180')
 		const annual = makePackage(PACKAGE_TYPE.ANNUAL, '¥1,200')
