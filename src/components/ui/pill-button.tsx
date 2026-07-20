@@ -1,7 +1,8 @@
 import type { ReactNode } from 'react'
 import { Pressable, StyleSheet, Text } from 'react-native'
 import { haptics } from '@/lib/haptics'
-import { colors, radii, spacing, typography } from '@/theme/tokens'
+import { radii, spacing, typography } from '@/theme/tokens'
+import { GlassSurface } from './glass-surface'
 
 type Props = {
 	title: string
@@ -9,7 +10,7 @@ type Props = {
 	onPress: () => void
 }
 
-// ヘッダーの「プレミアム」（王冠アイコン付き）等、枠線ピル型の小ボタン
+// ヘッダーの「プレミアム」（王冠アイコン付き）等、ガラス面ピル型の小ボタン
 export function PillButton({ title, icon, onPress }: Props) {
 	return (
 		<Pressable
@@ -18,10 +19,12 @@ export function PillButton({ title, icon, onPress }: Props) {
 				haptics.tap()
 				onPress()
 			}}
-			style={({ pressed }) => [styles.pill, pressed && styles.pressed]}
+			style={({ pressed }) => pressed && styles.pressed}
 		>
-			{icon}
-			<Text style={styles.title}>{title}</Text>
+			<GlassSurface style={styles.pill}>
+				{icon}
+				<Text style={styles.title}>{title}</Text>
+			</GlassSurface>
 		</Pressable>
 	)
 }
@@ -29,9 +32,6 @@ export function PillButton({ title, icon, onPress }: Props) {
 const styles = StyleSheet.create({
 	pill: {
 		borderRadius: radii.pill,
-		borderWidth: 1,
-		borderColor: colors.surfaceBorder,
-		backgroundColor: colors.surface,
 		paddingVertical: spacing.sm,
 		paddingHorizontal: spacing.md,
 		flexDirection: 'row',
