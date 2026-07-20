@@ -217,3 +217,12 @@ it('別のゲームで開き直したとき、再度リワード獲得でお試�
 		JSON.stringify(['burst-chicken', 'daut-dice']),
 	)
 })
+
+describe('Task 7 Step 1', () => {
+	it('シートはガラス面（overlay）で描画される', async () => {
+		const { getByTestId } = await render(
+			<PremiumLockModal visible gameId="chinchiro" gameTitle="チンチロ" onClose={() => {}} />,
+		)
+		expect(getByTestId('glass-surface-blur')).toBeTruthy()
+	})
+})

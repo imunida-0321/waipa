@@ -3,6 +3,7 @@ import { router } from 'expo-router'
 import { useEffect, useRef } from 'react'
 import { Modal, Pressable, StyleSheet, Text, View } from 'react-native'
 import { GradientButton } from '@/components/ui/gradient-button'
+import { GlassSurface } from '@/components/ui/glass-surface'
 import { AD_UNIT_IDS } from '@/constants/ads'
 import { useRewardedAd } from '@/lib/gma'
 import { trialStore, useTrialOffer } from '@/lib/trial-store'
@@ -52,43 +53,45 @@ export function PremiumLockModal({ visible, gameId, gameTitle, onClose }: Props)
 	return (
 		<Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
 			<Pressable style={styles.backdrop} onPress={onClose}>
-				<Pressable style={styles.sheet} onPress={() => {}}>
-					<MaterialCommunityIcons
-						name="crown"
-						testID="icon-crown"
-						size={48}
-						color={colors.premiumGold}
-					/>
-					<Text style={styles.title}>{gameTitle}</Text>
-					<Text style={styles.desc}>このゲームは WaiPa プレミアムで遊べます。</Text>
-					{canOffer ? (
-						<>
-							<Text style={styles.desc}>
-								動画を見ると2ラウンドだけお試しできます。お試しは1回だけです。
-							</Text>
-							<View style={styles.buttonWrap}>
-								<GradientButton
-									title="動画を見てお試しプレイ"
-									disabled={!isLoaded}
-									onPress={() => show()}
-								/>
-							</View>
-						</>
-					) : null}
-					{used ? <Text style={styles.trialUsed}>お試しプレイは利用済みです</Text> : null}
-					<View style={styles.buttonWrap}>
-						<GradientButton
-							title="プレミアムにアップグレード"
-							onPress={handleUpgrade}
+				<Pressable style={styles.sheetWrap} onPress={() => {}}>
+					<GlassSurface variant="overlay" style={styles.sheet}>
+						<MaterialCommunityIcons
+							name="crown"
+							testID="icon-crown"
+							size={48}
+							color={colors.premiumGold}
 						/>
-					</View>
-					<Pressable
-						accessibilityRole="button"
-						onPress={onClose}
-						style={styles.closeLink}
-					>
-						<Text style={styles.closeLinkText}>とじる</Text>
-					</Pressable>
+						<Text style={styles.title}>{gameTitle}</Text>
+						<Text style={styles.desc}>このゲームは WaiPa プレミアムで遊べます。</Text>
+						{canOffer ? (
+							<>
+								<Text style={styles.desc}>
+									動画を見ると2ラウンドだけお試しできます。お試しは1回だけです。
+								</Text>
+								<View style={styles.buttonWrap}>
+									<GradientButton
+										title="動画を見てお試しプレイ"
+										disabled={!isLoaded}
+										onPress={() => show()}
+									/>
+								</View>
+							</>
+						) : null}
+						{used ? <Text style={styles.trialUsed}>お試しプレイは利用済みです</Text> : null}
+						<View style={styles.buttonWrap}>
+							<GradientButton
+								title="プレミアムにアップグレード"
+								onPress={handleUpgrade}
+							/>
+						</View>
+						<Pressable
+							accessibilityRole="button"
+							onPress={onClose}
+							style={styles.closeLink}
+						>
+							<Text style={styles.closeLinkText}>とじる</Text>
+						</Pressable>
+					</GlassSurface>
 				</Pressable>
 			</Pressable>
 		</Modal>
@@ -103,11 +106,8 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 		padding: spacing.lg,
 	},
+	sheetWrap: { width: '100%' },
 	sheet: {
-		width: '100%',
-		backgroundColor: colors.surface,
-		borderWidth: 1,
-		borderColor: colors.surfaceBorder,
 		borderRadius: radii.lg,
 		padding: spacing.xl,
 		alignItems: 'center',
