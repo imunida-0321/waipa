@@ -84,6 +84,7 @@ it('レジストリの全ゲームがカード表示される', async () => {
 		} else {
 			expect(getByText(g.title)).toBeTruthy()
 		}
+		expect(getByText(g.tagline)).toBeTruthy()
 	}
 })
 

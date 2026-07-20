@@ -14,7 +14,7 @@ type Props = {
 
 // ゲーム一覧のカード。cardThumbnail があれば画像（タイトル入りキービジュアル前提で文字は重ねない）、
 // なければテーマ色グラデ＋右上絵文字＋左下タイトルのフォールバック（Issue #44 モック準拠）。
-// 人数バッジを左上に重ねる。カード下キャッチ（tagline）は廃止。
+// 人数バッジを左上に重ねる。カード下キャッチ（tagline）はサムネ下に表示する。
 // プレミアム限定ゲームは未解放の間、薄い黒マスク＋👑バッジを重ねて課金枠だと分かるようにする
 export function GameCard({ game, onPress }: Props) {
 	const premiumUnlocked = usePremium()
@@ -62,6 +62,9 @@ export function GameCard({ game, onPress }: Props) {
 					</View>
 				)}
 			</View>
+			<Text style={styles.tagline} numberOfLines={2}>
+				{game.tagline}
+			</Text>
 		</Pressable>
 	)
 }
@@ -112,4 +115,5 @@ const styles = StyleSheet.create({
 		opacity: 0.55,
 	},
 	title: { ...typography.body, fontWeight: '800', textAlign: 'left' },
+	tagline: { ...typography.caption, textAlign: 'center', marginTop: spacing.sm },
 })
