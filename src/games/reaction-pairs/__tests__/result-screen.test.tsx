@@ -1,4 +1,5 @@
 import { act, fireEvent, render } from '@testing-library/react-native'
+import type { ReactTestInstance } from 'react-test-renderer'
 import { ResultScreen } from '../result-screen'
 
 jest.mock('expo-linear-gradient', () => {
@@ -32,6 +33,15 @@ const base = {
 	onHome: jest.fn(),
 }
 
+function hasAncestorTestId(node: ReactTestInstance, testID: string): boolean {
+	let current = node.parent
+	while (current) {
+		if (current.props.testID === testID) return true
+		current = current.parent
+	}
+	return false
+}
+
 it('スコア降順・同数同順位のランキングを表示する', async () => {
 	const { getAllByText, getByText } = await render(<ResultScreen {...base} loserIndex={null} />)
 	expect(getAllByText('1位')).toHaveLength(2) // あか・みどり が同率1位
@@ -54,4 +64,12 @@ it('もう一回 / ホームへ が動く', async () => {
 		fireEvent.press(getByText('ホームへ'))
 	})
 	expect(base.onHome).toHaveBeenCalled()
+})
+
+describe('ガラス面', () => {
+	it('ランキング行はガラス面で描画される', async () => {
+		const { getByText } = await render(<ResultScreen {...base} loserIndex={null} />)
+
+		expect(hasAncestorTestId(getByText('あか'), 'glass-surface-pseudo')).toBe(true)
+	})
 })

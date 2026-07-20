@@ -1,4 +1,5 @@
 import { act, render } from '@testing-library/react-native'
+import type { ReactTestInstance } from 'react-test-renderer'
 import { LANDED_MS, PASS_PAUSE_MS, PlayerRoulette, REROLL_MS, ROLL_MS } from '../player-roulette'
 
 jest.mock('@/lib/sound', () => ({ playSound: jest.fn(), registerSound: jest.fn() }))
@@ -7,6 +8,15 @@ jest.mock('@/lib/haptics', () => ({
 }))
 
 const names = ['あか', 'あお', 'みどり']
+
+function hasAncestorTestId(node: ReactTestInstance, testID: string): boolean {
+	let current = node.parent
+	while (current) {
+		if (current.props.testID === testID) return true
+		current = current.parent
+	}
+	return false
+}
 
 beforeEach(() => {
 	jest.useFakeTimers()
@@ -79,4 +89,20 @@ it('全員の名前が表示される', async () => {
 	for (const n of names) {
 		expect(getAllByText(n).length).toBeGreaterThanOrEqual(1)
 	}
+})
+
+describe('ガラス面', () => {
+	it('プレイヤー行はガラス面で描画される', async () => {
+		const { getByText } = await render(
+			<PlayerRoulette
+				names={names}
+				firstIndex={0}
+				finalIndex={0}
+				passConsumed={false}
+				onDone={jest.fn()}
+			/>,
+		)
+
+		expect(hasAncestorTestId(getByText('あお'), 'glass-surface-pseudo')).toBe(true)
+	})
 })

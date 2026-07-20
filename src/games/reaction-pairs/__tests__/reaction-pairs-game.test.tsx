@@ -1,4 +1,5 @@
 import { act, fireEvent, render } from '@testing-library/react-native'
+import type { ReactTestInstance } from 'react-test-renderer'
 import { LUCKY_MS } from '../lucky-cutin'
 import { LANDED_MS, ROLL_MS } from '../player-roulette'
 import { MISMATCH_MS, ReactionPairsGame } from '../reaction-pairs-game'
@@ -33,6 +34,15 @@ jest.mock('react-native-reanimated', () => {
 		withTiming: jest.fn((toValue: number) => toValue),
 	}
 })
+
+function hasAncestorTestId(node: ReactTestInstance, testID: string): boolean {
+	let current = node.parent
+	while (current) {
+		if (current.props.testID === testID) return true
+		current = current.parent
+	}
+	return false
+}
 
 // Math.random を固定してデッキ順を決定的にする。
 // shuffle が Fisher–Yates（後ろから rng() * (i+1)）なので、常に 0.999… を返すと
@@ -108,4 +118,12 @@ it('不成立の2枚は MISMATCH_MS 後に裏へ戻り手番交代', async () =>
 	})
 	expect(getByText(/あおさんの番/)).toBeTruthy()
 	expect(getByLabelText('カード1')).toBeTruthy() // 裏に戻っている
+})
+
+describe('ガラス面', () => {
+	it('ヘッダーはガラス面で描画される', async () => {
+		const { getByText } = await render(<ReactionPairsGame />)
+
+		expect(hasAncestorTestId(getByText(/あかさんの番/), 'glass-surface-pseudo')).toBe(true)
+	})
 })

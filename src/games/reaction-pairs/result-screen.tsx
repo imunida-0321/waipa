@@ -1,7 +1,8 @@
 import { StyleSheet, Text, View } from 'react-native'
 import { ResultOverlay } from '@/components/game/result-overlay'
+import { GlassSurface } from '@/components/ui/glass-surface'
 import { playerColor } from '@/theme/player-colors'
-import { colors, radii, spacing, typography } from '@/theme/tokens'
+import { radii, spacing, typography } from '@/theme/tokens'
 import { RP } from './theme'
 
 type Props = {
@@ -32,7 +33,7 @@ export function ResultScreen({ names, scores, punishCounts, loserIndex, onRetry,
 				{order.map((i) => {
 					const rowColor = playerColor(i).value
 					return (
-						<View key={i} style={styles.row}>
+						<GlassSurface key={i} style={styles.row}>
 							<Text style={styles.rank}>{ranks[i]}位</Text>
 							<View style={[styles.colorBar, { backgroundColor: rowColor }]} />
 							<Text style={styles.name} numberOfLines={1}>
@@ -40,7 +41,7 @@ export function ResultScreen({ names, scores, punishCounts, loserIndex, onRetry,
 							</Text>
 							<Text style={styles.score}>{scores[i]}ペア</Text>
 							<Text style={styles.punish}>罰 {punishCounts[i]}回</Text>
-						</View>
+						</GlassSurface>
 					)
 				})}
 			</View>
@@ -56,9 +57,6 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		alignItems: 'center',
 		gap: spacing.sm,
-		backgroundColor: colors.surface,
-		borderWidth: 1,
-		borderColor: colors.surfaceBorder,
 		borderRadius: radii.md,
 		paddingVertical: spacing.sm,
 		paddingHorizontal: spacing.md,

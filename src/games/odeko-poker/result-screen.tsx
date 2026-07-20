@@ -3,6 +3,7 @@ import { useEffect } from 'react'
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
 import { DrumrollReveal } from '@/components/game/drumroll-reveal'
 import { useDrumroll } from '@/components/game/use-drumroll'
+import { GlassSurface } from '@/components/ui/glass-surface'
 import { GradientButton } from '@/components/ui/gradient-button'
 import { playerColor } from '@/theme/player-colors'
 import { colors, radii, spacing, typography } from '@/theme/tokens'
@@ -61,7 +62,7 @@ export function ResultScreen({
 					const isWinner = judgement.winnerIndex === i
 					const isHetare = judgement.hetareIndex === i
 					return (
-						<View key={i} style={[styles.row, isLoser && styles.rowLoser]}>
+						<GlassSurface key={i} style={[styles.row, isLoser && styles.rowLoser]}>
 							<View
 								style={[styles.colorBar, { backgroundColor: playerColor(i).value }]}
 							/>
@@ -93,7 +94,7 @@ export function ResultScreen({
 								{isHetare && <Text style={styles.badgeText}>🐔ヘタレ賞</Text>}
 							</View>
 							<Text style={styles.cardValue}>{cards[i]}</Text>
-						</View>
+						</GlassSurface>
 					)
 				})}
 			</View>
@@ -122,13 +123,10 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		alignItems: 'center',
 		gap: spacing.sm,
-		backgroundColor: colors.surface,
-		borderWidth: 1,
-		borderColor: colors.surfaceBorder,
 		borderRadius: radii.md,
 		padding: spacing.sm,
 	},
-	rowLoser: { borderColor: colors.danger },
+	rowLoser: { borderWidth: 1, borderColor: colors.danger },
 	colorBar: { width: 4, alignSelf: 'stretch', borderRadius: 2 },
 	name: { ...typography.body, flex: 1 },
 	chip: { borderRadius: radii.pill, paddingHorizontal: spacing.sm, paddingVertical: 2 },

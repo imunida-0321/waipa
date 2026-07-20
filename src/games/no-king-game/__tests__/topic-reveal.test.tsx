@@ -1,4 +1,5 @@
 import { act, fireEvent, render, waitFor } from '@testing-library/react-native'
+import type { ReactTestInstance } from 'react-test-renderer'
 import { TopicReveal } from '../topic-reveal'
 
 type MockDrumrollPhase = 'idle' | 'rolling' | 'revealed'
@@ -56,6 +57,15 @@ jest.mock('@/components/ui/pill-button', () => {
 		),
 	}
 })
+
+function hasAncestorTestId(node: ReactTestInstance, testID: string): boolean {
+	let current = node.parent
+	while (current) {
+		if (current.props.testID === testID) return true
+		current = current.parent
+	}
+	return false
+}
 
 describe('TopicReveal', () => {
 	beforeEach(() => {
@@ -160,5 +170,22 @@ describe('TopicReveal', () => {
 			fireEvent.press(getByText('次のラウンド（番号を配り直す）'))
 		})
 		expect(onNextRound).toHaveBeenCalledTimes(1)
+	})
+
+	it('お題カードはガラス面で描画される', async () => {
+		const { getByText } = await render(
+			<TopicReveal
+				phase="reveal"
+				round={1}
+				topicText="全力で拍手する"
+				executorNumber={2}
+				skipsLeft={2}
+				onSkip={jest.fn()}
+				onRevealDone={jest.fn()}
+				onNextRound={jest.fn()}
+			/>,
+		)
+
+		expect(hasAncestorTestId(getByText('全力で拍手する'), 'glass-surface-pseudo')).toBe(true)
 	})
 })

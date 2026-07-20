@@ -1,6 +1,7 @@
 import { router } from 'expo-router'
 import { useEffect, useReducer } from 'react'
 import { StyleSheet, Text, View } from 'react-native'
+import { GlassSurface } from '@/components/ui/glass-surface'
 import { getDisplayNames, usePlayers } from '@/lib/players-store'
 import { useTopics } from '@/lib/topics-store'
 import { playerColor } from '@/theme/player-colors'
@@ -36,13 +37,13 @@ export function ReactionPairsGame() {
 
 	return (
 		<View style={styles.container}>
-			<View style={styles.header}>
+			<GlassSurface style={styles.header}>
 				<View style={[styles.turnDot, { backgroundColor: turnColor }]} />
 				<Text style={styles.turnText}>{names[state.turnIndex]}さんの番</Text>
 				{state.passHolder !== null && (
 					<Text style={styles.passBadge}>🍀 {names[state.passHolder]}</Text>
 				)}
-			</View>
+			</GlassSurface>
 
 			<CardGrid
 				cards={state.cards}
@@ -101,9 +102,6 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		alignItems: 'center',
 		gap: spacing.sm,
-		backgroundColor: colors.surface,
-		borderWidth: 1,
-		borderColor: colors.surfaceBorder,
 		borderRadius: radii.md,
 		paddingVertical: spacing.sm,
 		paddingHorizontal: spacing.md,

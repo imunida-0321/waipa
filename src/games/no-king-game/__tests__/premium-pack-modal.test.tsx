@@ -1,5 +1,6 @@
 import { fireEvent, render, waitFor } from '@testing-library/react-native'
 import { useRewardedAd } from 'react-native-google-mobile-ads'
+import type { ReactTestInstance } from 'react-test-renderer'
 import { PremiumPackModal } from '@/games/no-king-game/premium-pack-modal'
 import { isPackUnlocked, packUnlockStore } from '@/lib/pack-unlock-store'
 import { getTopicsByPack, topicsStore, type Topic } from '@/lib/topics-store'
@@ -48,6 +49,15 @@ beforeEach(() => {
 	refreshPremiumPackMock.mockResolvedValue(true)
 	mockedHook.mockReturnValue(hookState({}))
 })
+
+function hasAncestorTestId(node: ReactTestInstance, testID: string): boolean {
+	let current = node.parent
+	while (current) {
+		if (current.props.testID === testID) return true
+		current = current.parent
+	}
+	return false
+}
 
 describe('PremiumPackModal', () => {
 	it('表示時にリワードを読み込み、未ロード中はボタンが無効', async () => {
@@ -121,5 +131,11 @@ describe('PremiumPackModal', () => {
 		)
 		expect(queryByText('動画を見て解放する')).toBeNull()
 		expect(getByText(/解放中/)).toBeTruthy()
+	})
+
+	it('シートはガラス面で描画される', async () => {
+		const { getByText } = await render(<PremiumPackModal visible onClose={() => {}} />)
+
+		expect(hasAncestorTestId(getByText('限定お題パック'), 'glass-surface-blur')).toBe(true)
 	})
 })

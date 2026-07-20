@@ -1,4 +1,5 @@
 import { act, fireEvent, render } from '@testing-library/react-native'
+import type { ReactTestInstance } from 'react-test-renderer'
 import { haptics } from '@/lib/haptics'
 import { CountSelect } from '../count-select'
 
@@ -28,6 +29,15 @@ jest.mock('@/components/ui/gradient-button', () => {
 		),
 	}
 })
+
+function hasAncestorTestId(node: ReactTestInstance, testID: string): boolean {
+	let current = node.parent
+	while (current) {
+		if (current.props.testID === testID) return true
+		current = current.parent
+	}
+	return false
+}
 
 describe('CountSelect', () => {
 	beforeEach(() => {
@@ -89,5 +99,13 @@ describe('CountSelect', () => {
 		})
 
 		expect(queryByText(/解放中/)).toBeNull()
+	})
+
+	it('限定パック行はガラス面で描画される', async () => {
+		const { getByText } = await render(
+			<CountSelect count={4} onChangeCount={jest.fn()} onDeal={jest.fn()} />,
+		)
+
+		expect(hasAncestorTestId(getByText('限定お題パック'), 'glass-surface-pseudo')).toBe(true)
 	})
 })
