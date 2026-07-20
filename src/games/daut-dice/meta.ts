@@ -4,7 +4,7 @@ import { DautDiceGame } from './daut-dice-game'
 export const meta: GameMeta = {
 	id: 'daut-dice',
 	title: 'ダウトダイス',
-	tagline: '嘘か本当か、宣言ブラフ勝負',
+	tagline: '嘘か本当か？\nサイコロ宣言ブラフ勝負',
 	emoji: '🎲',
 	gradient: ['#EE5253', '#B33939'],
 	minPlayers: 3,

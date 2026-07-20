@@ -13,7 +13,8 @@ type Props = {
 }
 
 // ゲーム一覧のカード。cardThumbnail があれば画像（タイトル入りキービジュアル前提で文字は重ねない）、
-// なければテーマ色グラデ＋絵文字のフォールバック（イントロ用 thumbnail とは独立）。
+// なければテーマ色グラデ＋右上絵文字＋左下タイトルのフォールバック（Issue #44 モック準拠）。
+// カード下キャッチ（tagline）はサムネ下・カード面の中に表示する。
 // プレミアム限定ゲームは未解放の間、薄い黒マスク＋👑バッジを重ねて課金枠だと分かるようにする
 export function GameCard({ game, onPress }: Props) {
 	const premiumUnlocked = usePremium()
@@ -25,72 +26,77 @@ export function GameCard({ game, onPress }: Props) {
 			onPress={onPress}
 			style={({ pressed }) => [styles.container, pressed && styles.pressed]}
 		>
-			<View style={styles.thumbWrap}>
-				{game.cardThumbnail !== undefined ? (
-					<Image
-						testID="card-thumb-image"
-						source={game.cardThumbnail}
-						style={styles.thumbImage}
-						contentFit="cover"
-					/>
-				) : (
-					<LinearGradient
-						colors={[game.gradient[0], game.gradient[1]]}
-						start={{ x: 0, y: 0 }}
-						end={{ x: 1, y: 1 }}
-						style={styles.thumb}
-					>
-						<Text style={styles.emoji}>{game.emoji}</Text>
-						<Text style={styles.title} numberOfLines={2}>
-							{game.title}
-						</Text>
-					</LinearGradient>
-				)}
-				{locked && (
-					<View testID="premium-lock-mask" style={styles.lockMask}>
-						<GlassSurface style={styles.lockBadge}>
-							<MaterialCommunityIcons
-								name="crown"
-								testID="icon-crown"
-								size={13}
-								color={colors.premiumGold}
-							/>
-							<Text style={styles.lockBadgeText}>プレミアム</Text>
-						</GlassSurface>
-					</View>
-				)}
+			<View testID="game-card-surface" style={styles.surface}>
+				<View style={styles.thumbWrap}>
+					{game.cardThumbnail !== undefined ? (
+						<Image
+							testID="card-thumb-image"
+							source={game.cardThumbnail}
+							style={styles.thumbImage}
+							contentFit="cover"
+						/>
+					) : (
+						<LinearGradient
+							colors={[game.gradient[0], game.gradient[1]]}
+							start={{ x: 0, y: 0 }}
+							end={{ x: 1, y: 1 }}
+							style={styles.thumb}
+						>
+							<Text style={styles.emoji}>{game.emoji}</Text>
+							<Text style={styles.title} numberOfLines={2}>
+								{game.title}
+							</Text>
+						</LinearGradient>
+					)}
+					{locked && (
+						<View testID="premium-lock-mask" style={styles.lockMask}>
+							<GlassSurface style={styles.lockBadge}>
+								<MaterialCommunityIcons
+									name="crown"
+									testID="icon-crown"
+									size={13}
+									color={colors.premiumGold}
+								/>
+								<Text style={styles.lockBadgeText}>プレミアム</Text>
+							</GlassSurface>
+						</View>
+					)}
+				</View>
+				<Text style={styles.tagline} numberOfLines={2}>
+					{game.tagline}
+				</Text>
 			</View>
-			<Text style={styles.tagline} numberOfLines={2}>
-				{game.tagline}
-			</Text>
 		</Pressable>
 	)
 }
 
 const styles = StyleSheet.create({
-	container: { width: '48%', marginBottom: spacing.lg },
+	container: { width: '100%', marginBottom: spacing.lg },
 	pressed: { opacity: 0.8 },
+	// サムネとキャッチを包むカード面（参考デザイン準拠）。枠線はこの面にだけ付ける
+	surface: {
+		backgroundColor: colors.surface,
+		borderRadius: radii.lg,
+		borderWidth: 1,
+		borderColor: colors.surfaceBorder,
+		padding: spacing.sm,
+	},
 	thumbWrap: { position: 'relative' },
 	thumb: {
 		aspectRatio: 1.3,
-		borderRadius: radii.lg,
-		borderWidth: 1,
-		borderColor: colors.surfaceBorder,
-		alignItems: 'center',
-		justifyContent: 'center',
-		gap: spacing.xs,
+		borderRadius: radii.md,
+		justifyContent: 'flex-end',
 		padding: spacing.sm,
+		overflow: 'hidden',
 	},
 	thumbImage: {
 		aspectRatio: 1.3,
-		borderRadius: radii.lg,
-		borderWidth: 1,
-		borderColor: colors.surfaceBorder,
+		borderRadius: radii.md,
 	},
 	lockMask: {
 		...StyleSheet.absoluteFill,
 		backgroundColor: 'rgba(10, 8, 20, 0.55)',
-		borderRadius: radii.lg,
+		borderRadius: radii.md,
 		alignItems: 'center',
 		justifyContent: 'center',
 	},
@@ -105,7 +111,21 @@ const styles = StyleSheet.create({
 		gap: spacing.xs,
 	},
 	lockBadgeText: { ...typography.caption, color: colors.premiumGold },
-	emoji: { fontSize: 40 },
-	title: { ...typography.body, fontWeight: '800', textAlign: 'center' },
-	tagline: { ...typography.caption, textAlign: 'center', marginTop: spacing.sm },
+	emoji: {
+		position: 'absolute',
+		top: spacing.xs,
+		right: spacing.sm,
+		fontSize: 44,
+		opacity: 0.55,
+	},
+	title: { ...typography.body, fontWeight: '800', textAlign: 'left' },
+	// 1行/2行のキャッチ混在でもカード高さが揃うよう常に2行分を確保（千鳥の段ずれ防止）
+	tagline: {
+		...typography.caption,
+		fontSize: 12,
+		lineHeight: 16,
+		minHeight: 32,
+		textAlign: 'center',
+		marginTop: spacing.sm,
+	},
 })

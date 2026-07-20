@@ -4,7 +4,7 @@ import { WhoWillPayGame } from './who-will-pay-game'
 export const meta: GameMeta = {
 	id: 'who-will-pay',
 	title: 'Who will pay',
-	tagline: '会計はルーレットで決めよう！',
+	tagline: '会計はルーレットで、\n1桁ずつ決めよう！',
 	emoji: '💸',
 	gradient: ['#E85BF7', '#7B5CFA'],
 	minPlayers: 2,

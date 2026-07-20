@@ -4,7 +4,7 @@ import { InshuSuijakuGame } from './inshu-suijaku-game'
 export const meta: GameMeta = {
 	id: 'inshu-suijaku',
 	title: '飲酒衰弱',
-	tagline: 'ペアを揃えたら罰ゲーム発表！',
+	tagline: 'ペアを揃えたら\n罰ゲーム発表！',
 	emoji: '🍻',
 	gradient: ['#FF6B81', '#B33939'],
 	minPlayers: 2,

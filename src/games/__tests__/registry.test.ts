@@ -120,6 +120,17 @@ describe('ゲームレジストリ', () => {
 		}
 	})
 
+	it('全ゲームの tagline がホームカードで確実に2行になる（\\n 区切り・各行1〜12文字）', () => {
+		for (const g of games) {
+			const lines = g.tagline.split('\n')
+			expect(lines).toHaveLength(2)
+			for (const line of lines) {
+				expect(line.length).toBeGreaterThanOrEqual(1)
+				expect(line.length).toBeLessThanOrEqual(12)
+			}
+		}
+	})
+
 	it('getGame が id で引ける・不明 id は undefined', () => {
 		expect(getGame('who-will-pay')?.title).toBe('Who will pay')
 		expect(getGame('unknown')).toBeUndefined()

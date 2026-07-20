@@ -4,7 +4,7 @@ import { BombGame } from './bomb-game'
 export const meta: GameMeta = {
 	id: 'bomb-2-16',
 	title: 'BOMB!! 2/16',
-	tagline: '16個のボタンにハズレが2個！',
+	tagline: '16個のボタンに\nハズレが2個！',
 	emoji: '💣',
 	gradient: ['#FF6B6B', '#C0392B'],
 	minPlayers: 2,
