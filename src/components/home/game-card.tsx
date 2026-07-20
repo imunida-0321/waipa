@@ -26,45 +26,47 @@ export function GameCard({ game, onPress }: Props) {
 			onPress={onPress}
 			style={({ pressed }) => [styles.container, pressed && styles.pressed]}
 		>
-			<View testID="game-card-surface" style={styles.surface}>
-				<View style={styles.thumbWrap}>
-					{game.cardThumbnail !== undefined ? (
-						<Image
-							testID="card-thumb-image"
-							source={game.cardThumbnail}
-							style={styles.thumbImage}
-							contentFit="cover"
-						/>
-					) : (
-						<LinearGradient
-							colors={[game.gradient[0], game.gradient[1]]}
-							start={{ x: 0, y: 0 }}
-							end={{ x: 1, y: 1 }}
-							style={styles.thumb}
-						>
-							<Text style={styles.emoji}>{game.emoji}</Text>
-							<Text style={styles.title} numberOfLines={2}>
-								{game.title}
-							</Text>
-						</LinearGradient>
-					)}
-					{locked && (
-						<View testID="premium-lock-mask" style={styles.lockMask}>
-							<GlassSurface style={styles.lockBadge}>
-								<MaterialCommunityIcons
-									name="crown"
-									testID="icon-crown"
-									size={13}
-									color={colors.premiumGold}
-								/>
-								<Text style={styles.lockBadgeText}>プレミアム</Text>
-							</GlassSurface>
-						</View>
-					)}
-				</View>
-				<Text style={styles.tagline} numberOfLines={2}>
-					{game.tagline}
-				</Text>
+			<View testID="game-card-surface">
+				<GlassSurface style={styles.surface}>
+					<View style={styles.thumbWrap}>
+						{game.cardThumbnail !== undefined ? (
+							<Image
+								testID="card-thumb-image"
+								source={game.cardThumbnail}
+								style={styles.thumbImage}
+								contentFit="cover"
+							/>
+						) : (
+							<LinearGradient
+								colors={[game.gradient[0], game.gradient[1]]}
+								start={{ x: 0, y: 0 }}
+								end={{ x: 1, y: 1 }}
+								style={styles.thumb}
+							>
+								<Text style={styles.emoji}>{game.emoji}</Text>
+								<Text style={styles.title} numberOfLines={2}>
+									{game.title}
+								</Text>
+							</LinearGradient>
+						)}
+						{locked && (
+							<View testID="premium-lock-mask" style={styles.lockMask}>
+								<GlassSurface style={styles.lockBadge}>
+									<MaterialCommunityIcons
+										name="crown"
+										testID="icon-crown"
+										size={13}
+										color={colors.premiumGold}
+									/>
+									<Text style={styles.lockBadgeText}>プレミアム</Text>
+								</GlassSurface>
+							</View>
+						)}
+					</View>
+					<Text style={styles.tagline} numberOfLines={2}>
+						{game.tagline}
+					</Text>
+				</GlassSurface>
 			</View>
 		</Pressable>
 	)
@@ -73,12 +75,9 @@ export function GameCard({ game, onPress }: Props) {
 const styles = StyleSheet.create({
 	container: { width: '100%', marginBottom: spacing.lg },
 	pressed: { opacity: 0.8 },
-	// サムネとキャッチを包むカード面（参考デザイン準拠）。枠線はこの面にだけ付ける
+	// サムネとキャッチを包むガラスのカード面（塗り・枠は GlassSurface が持つ）
 	surface: {
-		backgroundColor: colors.surface,
 		borderRadius: radii.lg,
-		borderWidth: 1,
-		borderColor: colors.surfaceBorder,
 		padding: spacing.sm,
 	},
 	thumbWrap: { position: 'relative' },
