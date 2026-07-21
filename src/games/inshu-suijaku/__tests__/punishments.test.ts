@@ -1,4 +1,9 @@
-import { LUCKY_PUNISHMENT_ID, NORMAL_PUNISHMENTS, SPECIAL_PUNISHMENTS } from '../punishments'
+import {
+	LUCKY_PUNISHMENT_ID,
+	NORMAL_PUNISHMENTS,
+	SPECIAL_PUNISHMENTS,
+	punishmentIcon,
+} from '../punishments'
 
 it('通常罰は40個・特大罰は10個ある', () => {
 	expect(NORMAL_PUNISHMENTS).toHaveLength(40)
@@ -23,4 +28,15 @@ it('type が正しく、テキストは空でなく重複しない', () => {
 it('ラッキーカードは n40', () => {
 	expect(LUCKY_PUNISHMENT_ID).toBe('n40')
 	expect(NORMAL_PUNISHMENTS.find((p) => p.id === 'n40')?.text).toContain('ラッキー')
+})
+
+it('飲む系の罰だけグラスアイコンを返す', () => {
+	expect(punishmentIcon('n01')).toBe('glass')
+	expect(punishmentIcon('n14')).toBe('glass')
+	expect(punishmentIcon('n15')).toBeNull()
+	expect(punishmentIcon('n40')).toBeNull()
+	expect(punishmentIcon('s01')).toBe('glass')
+	expect(punishmentIcon('s02')).toBe('glass')
+	expect(punishmentIcon('s03')).toBeNull()
+	expect(punishmentIcon('custom-abc')).toBeNull()
 })
