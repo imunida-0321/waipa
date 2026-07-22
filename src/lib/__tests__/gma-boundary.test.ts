@@ -8,7 +8,7 @@ import * as path from 'node:path'
 const SRC_DIR = path.resolve(__dirname, '../..')
 
 // ネイティブ専用モジュール → 直接 import を許可するラッパーファイル
-const NATIVE_ONLY_MODULES: Array<[string, Set<string>]> = [
+const NATIVE_ONLY_MODULES: [string, Set<string>][] = [
 	['react-native-google-mobile-ads', new Set(['lib/gma.ts', 'lib/gma.web.ts'])],
 	['expo-tracking-transparency', new Set(['lib/att.ts', 'lib/att.web.ts'])],
 ]
