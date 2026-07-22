@@ -4,6 +4,7 @@ export type Punishment = {
 	id: string
 	text: string
 	type: PunishmentType
+	icon?: 'glass'
 }
 
 // n40 は罰なしのラッキーカード。punish-reveal で煽り文言を差し替える
@@ -11,20 +12,20 @@ export const LUCKY_PUNISHMENT_ID = 'n40'
 
 // 将来 topics-store の pack（Supabase 配信）に載せ替えられるよう ID を固定する
 export const NORMAL_PUNISHMENTS: readonly Punishment[] = [
-	{ id: 'n01', text: '1杯飲む', type: 'normal' },
-	{ id: 'n02', text: '2杯飲む', type: 'normal' },
-	{ id: 'n03', text: '3杯飲む', type: 'normal' },
-	{ id: 'n04', text: 'グラス半分まで飲む', type: 'normal' },
-	{ id: 'n05', text: '左隣の人と乾杯して1杯', type: 'normal' },
-	{ id: 'n06', text: '右隣の人と乾杯して1杯', type: 'normal' },
-	{ id: 'n07', text: '全員と乾杯して1杯', type: 'normal' },
-	{ id: 'n08', text: 'ペアを揃えた人と乾杯して1杯', type: 'normal' },
-	{ id: 'n09', text: '利き手と逆の手で1杯', type: 'normal' },
-	{ id: 'n10', text: '目をつぶって1杯', type: 'normal' },
-	{ id: 'n11', text: '「ありがとうございます！」とお礼を言ってから1杯', type: 'normal' },
-	{ id: 'n12', text: '乾杯の音頭をとってから全員で1杯（自分は2杯）', type: 'normal' },
-	{ id: 'n13', text: '片足立ちのまま1杯', type: 'normal' },
-	{ id: 'n14', text: '立ち上がって一礼してから1杯', type: 'normal' },
+	{ id: 'n01', text: '1杯飲む', type: 'normal', icon: 'glass' },
+	{ id: 'n02', text: '2杯飲む', type: 'normal', icon: 'glass' },
+	{ id: 'n03', text: '3杯飲む', type: 'normal', icon: 'glass' },
+	{ id: 'n04', text: 'グラス半分まで飲む', type: 'normal', icon: 'glass' },
+	{ id: 'n05', text: '左隣の人と乾杯して1杯', type: 'normal', icon: 'glass' },
+	{ id: 'n06', text: '右隣の人と乾杯して1杯', type: 'normal', icon: 'glass' },
+	{ id: 'n07', text: '全員と乾杯して1杯', type: 'normal', icon: 'glass' },
+	{ id: 'n08', text: 'ペアを揃えた人と乾杯して1杯', type: 'normal', icon: 'glass' },
+	{ id: 'n09', text: '利き手と逆の手で1杯', type: 'normal', icon: 'glass' },
+	{ id: 'n10', text: '目をつぶって1杯', type: 'normal', icon: 'glass' },
+	{ id: 'n11', text: '「ありがとうございます！」とお礼を言ってから1杯', type: 'normal', icon: 'glass' },
+	{ id: 'n12', text: '乾杯の音頭をとってから全員で1杯（自分は2杯）', type: 'normal', icon: 'glass' },
+	{ id: 'n13', text: '片足立ちのまま1杯', type: 'normal', icon: 'glass' },
+	{ id: 'n14', text: '立ち上がって一礼してから1杯', type: 'normal', icon: 'glass' },
 	{ id: 'n15', text: 'ものまねを1つ披露、スベったら2杯', type: 'normal' },
 	{ id: 'n16', text: '一発ギャグ、スベったら2杯', type: 'normal' },
 	{ id: 'n17', text: '隣の人を30秒褒め続ける、噛んだら1杯', type: 'normal' },
@@ -54,8 +55,8 @@ export const NORMAL_PUNISHMENTS: readonly Punishment[] = [
 ]
 
 export const SPECIAL_PUNISHMENTS: readonly Punishment[] = [
-	{ id: 's01', text: 'グラスの残りを飲み干す（無理は禁物！）', type: 'special' },
-	{ id: 's02', text: '全員のグラスにドリンクを注いで乾杯の音頭、自分は3杯', type: 'special' },
+	{ id: 's01', text: 'グラスの残りを飲み干す（無理は禁物！）', type: 'special', icon: 'glass' },
+	{ id: 's02', text: '全員のグラスにドリンクを注いで乾杯の音頭、自分は3杯', type: 'special', icon: 'glass' },
 	{ id: 's03', text: '次のドリンクを全員分おごる宣言、できなければグラス半分', type: 'special' },
 	{ id: 's04', text: '全員に一発芸、スベったら追加で2杯', type: 'special' },
 	{
@@ -73,3 +74,10 @@ export const SPECIAL_PUNISHMENTS: readonly Punishment[] = [
 	{ id: 's09', text: '電話帳の5番目の人との思い出を語る、拒否ならグラス半分', type: 'special' },
 	{ id: 's10', text: '幹事（いなければ最年長）に感謝を全力で伝えてグラス半分', type: 'special' },
 ]
+
+export function punishmentIcon(punishmentId: string): 'glass' | null {
+	const punishment = [...NORMAL_PUNISHMENTS, ...SPECIAL_PUNISHMENTS].find(
+		(p) => p.id === punishmentId,
+	)
+	return punishment?.icon ?? null
+}

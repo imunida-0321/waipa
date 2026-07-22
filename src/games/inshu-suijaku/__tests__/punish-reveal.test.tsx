@@ -103,3 +103,42 @@ describe('ガラス面', () => {
 		expect(utils.getByTestId('glass-surface-blur')).toBeTruthy()
 	})
 })
+
+describe('飲む系の罰カードUI', () => {
+	it('飲む系の罰はグラスアイコンと罰テキストを表示する', async () => {
+		const utils = await render(
+			<PunishReveal
+				punish={{
+					kind: 'pair',
+					punishmentId: 'n01',
+					text: '1杯飲む',
+					playerIndex: 0,
+				}}
+				playerName="あか"
+				playerIndex={0}
+				onDone={jest.fn()}
+			/>,
+		)
+
+		expect(utils.getByTestId('punish-glass-icon')).toBeTruthy()
+		expect(utils.getByText('1杯飲む')).toBeTruthy()
+	})
+
+	it('飲む系ではない罰はグラスアイコンを表示しない', async () => {
+		const utils = await render(
+			<PunishReveal
+				punish={{
+					kind: 'pair',
+					punishmentId: 'n15',
+					text: 'ものまねを1つ披露、スベったら2杯',
+					playerIndex: 0,
+				}}
+				playerName="あか"
+				playerIndex={0}
+				onDone={jest.fn()}
+			/>,
+		)
+
+		expect(utils.queryByTestId('punish-glass-icon')).toBeNull()
+	})
+})

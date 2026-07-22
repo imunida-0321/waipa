@@ -1,4 +1,5 @@
 import { useEffect } from 'react'
+import { Image } from 'expo-image'
 import { StyleSheet, Text, View } from 'react-native'
 import Animated, {
 	useAnimatedStyle,
@@ -13,7 +14,7 @@ import { haptics } from '@/lib/haptics'
 import { playSound } from '@/lib/sound'
 import { playerColor } from '@/theme/player-colors'
 import { radii, spacing, typography } from '@/theme/tokens'
-import { LUCKY_PUNISHMENT_ID } from './punishments'
+import { LUCKY_PUNISHMENT_ID, punishmentIcon } from './punishments'
 import type { Punish } from './reducer'
 import { NS } from './theme'
 
@@ -31,6 +32,7 @@ const REST_FADE_MS = 250
 export function PunishReveal({ punish, playerName, playerIndex, onDone }: Props) {
 	const isJoker = punish.kind === 'joker'
 	const isLucky = punish.punishmentId === LUCKY_PUNISHMENT_ID
+	const hasGlassIcon = punishmentIcon(punish.punishmentId) === 'glass'
 
 	useEffect(() => {
 		haptics.heavy()
@@ -65,7 +67,20 @@ export function PunishReveal({ punish, playerName, playerIndex, onDone }: Props)
 			</Animated.View>
 			<Animated.View style={cardAnim}>
 				<GlassSurface variant="overlay" style={[styles.card, isJoker && styles.jokerCard]}>
-					<Text style={styles.punishText}>{punish.text}</Text>
+					{hasGlassIcon ? (
+						<View style={styles.iconCardContent}>
+							<Image
+								testID="punish-glass-icon"
+								source={require('@/assets/images/inshu-suijaku/punish-glass.png')}
+								style={styles.glassIcon}
+								contentFit="contain"
+								tintColor="#FFFFFF"
+							/>
+							<Text style={styles.punishText}>{punish.text}</Text>
+						</View>
+					) : (
+						<Text style={styles.punishText}>{punish.text}</Text>
+					)}
 				</GlassSurface>
 			</Animated.View>
 			<Animated.View style={restAnim}>
@@ -116,6 +131,14 @@ const styles = StyleSheet.create({
 		padding: spacing.lg,
 	},
 	jokerCard: { borderColor: NS.jokerPurple, borderWidth: 2 },
+	iconCardContent: {
+		alignItems: 'center',
+		gap: spacing.md,
+	},
+	glassIcon: {
+		width: 96,
+		height: 96,
+	},
 	punishText: { ...typography.title, textAlign: 'center', lineHeight: 32 },
 	aori: { ...typography.title, textAlign: 'center' },
 })
