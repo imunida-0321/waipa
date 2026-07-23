@@ -1,6 +1,7 @@
 import { act, fireEvent, render } from '@testing-library/react-native'
+import { StyleSheet, type StyleProp, type ViewStyle } from 'react-native'
 import type { Card } from '../engine'
-import { CardGrid, cellWidthFor } from '../card-grid'
+import { CardGrid, cellHeightFor, cellWidthFor } from '../card-grid'
 
 jest.mock('@/lib/haptics', () => ({
 	haptics: { tap: jest.fn(), heavy: jest.fn(), success: jest.fn() },
@@ -56,6 +57,16 @@ const deck = [
 // テスト環境では onLayout が自動発火しないため、実測相当のレイアウトを手動で発火する
 function fireGridLayout(grid: Parameters<typeof fireEvent>[0], width = 360, height = 600) {
 	fireEvent(grid, 'layout', { nativeEvent: { layout: { x: 0, y: 0, width, height } } })
+}
+
+function expectExplicitCellHeight(style: StyleProp<ViewStyle>) {
+	const flattened = StyleSheet.flatten(style)
+	expect(typeof flattened?.width).toBe('number')
+	const width = flattened?.width
+	if (typeof width !== 'number') {
+		throw new Error('cell width must be measured before height assertion')
+	}
+	expect(flattened?.height).toBe(Math.floor(width / 0.7))
 }
 
 it('hidden カードのタップで onFlip が呼ばれる', async () => {
@@ -117,6 +128,34 @@ it('成立演出: matchAnimIds のカードにだけ罰テキストがうっす�
 	})
 	expect(utils.getAllByText('全員と乾杯して1杯')).toHaveLength(2)
 	expect(utils.queryByText(/グラスの残りを飲み干す/)).toBeNull()
+})
+
+describe('cellHeightFor', () => {
+	it('セル幅からカード素材比率の高さを返す', () => {
+		expect(cellHeightFor(84)).toBe(120)
+	})
+
+	it('未測定（0）のときは 0 を返す', () => {
+		expect(cellHeightFor(0)).toBe(0)
+	})
+})
+
+it('全セルに明示的な height が付く', async () => {
+	const mixedDeck = [
+		card('hidden-card', { state: 'hidden' }),
+		card('removed-card', { state: 'removed' }),
+		card('revealed-card', { state: 'revealed' }),
+	]
+	const utils = await render(
+		<CardGrid cards={mixedDeck} columns={3} matchAnimIds={[]} onFlip={jest.fn()} />,
+	)
+	await act(async () => {
+		fireGridLayout(utils.getByTestId('ns-card-grid'))
+	})
+
+	expectExplicitCellHeight(utils.getByLabelText('カード1').props.style)
+	expectExplicitCellHeight(utils.getByLabelText('7♥').props.style)
+	expectExplicitCellHeight(utils.getByTestId('ns-cell-removed-2').props.style)
 })
 
 describe('cellWidthFor', () => {

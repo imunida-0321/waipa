@@ -37,6 +37,10 @@ export function cellWidthFor(
 	return Math.max(0, Math.floor(Math.min(byWidth, byHeight)))
 }
 
+export function cellHeightFor(cellWidth: number): number {
+	return Math.floor(cellWidth / CARD_ASPECT)
+}
+
 type Props = {
 	cards: Card[]
 	columns: number
@@ -53,6 +57,8 @@ export function CardGrid({ cards, columns, matchAnimIds, onFlip, disabled = fals
 		setSize({ width, height })
 	}
 	const cellWidth = cellWidthFor(size.width, size.height, columns, cards.length, spacing.sm)
+	// RN New Architecture の overflow:'hidden' + aspectRatio バグ回避のため高さを明示する
+	const cellHeight = cellHeightFor(cellWidth)
 	return (
 		<View testID="ns-card-grid" style={styles.grid} onLayout={onLayout}>
 			{cellWidth > 0 &&
@@ -62,6 +68,7 @@ export function CardGrid({ cards, columns, matchAnimIds, onFlip, disabled = fals
 						card={card}
 						position={i + 1}
 						width={cellWidth}
+						height={cellHeight}
 						matchAnim={matchAnimIds.includes(card.id)}
 						onPress={() => {
 							if (disabled || card.state !== 'hidden') return
@@ -78,17 +85,24 @@ function CardCell({
 	card,
 	position,
 	width,
+	height,
 	matchAnim,
 	onPress,
 }: {
 	card: Card
 	position: number
 	width: number
+	height: number
 	matchAnim: boolean
 	onPress: () => void
 }) {
 	if (card.state === 'removed') {
-		return <View style={[styles.cell, { width }, styles.removed]} />
+		return (
+			<View
+				testID={`ns-cell-removed-${position}`}
+				style={[styles.cell, { width, height }, styles.removed]}
+			/>
+		)
 	}
 	if (card.state === 'hidden') {
 		return (
@@ -96,7 +110,7 @@ function CardCell({
 				accessibilityRole="button"
 				accessibilityLabel={`カード${position}`}
 				onPress={onPress}
-				style={[styles.cell, { width }]}
+				style={[styles.cell, { width, height }]}
 			>
 				<LinearGradient
 					colors={[colors.accentFrom, colors.accentTo]}
@@ -116,7 +130,7 @@ function CardCell({
 	return (
 		<View
 			accessibilityLabel={isJoker ? 'ジョーカー' : `${card.rank}${card.suit}`}
-			style={[styles.cell, { width }]}
+			style={[styles.cell, { width, height }]}
 		>
 			<FlipIn style={[styles.face, isJoker && styles.jokerFace]}>
 				{matchAnim ? (
@@ -190,7 +204,6 @@ const styles = StyleSheet.create({
 		flex: 1,
 	},
 	cell: {
-		aspectRatio: CARD_ASPECT, // 素材（250×360）に合わせた縦長
 		borderRadius: radii.sm,
 		overflow: 'hidden',
 	},
