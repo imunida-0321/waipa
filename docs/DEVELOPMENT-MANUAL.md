@@ -1,18 +1,18 @@
 # WaiPa 手動開発ガイド（AI を使わない場合）
 
-AI（Claude / Codex）を介さず、**人間が直接コーディングする場合**のガイドです。このファイルだけ読めば開発を始められます。
+AI（Claude / Codex）を介さず、**人間が直接コーディングする場合**のガイドです。共通ルールはリンク先の開発ガイドを参照し、本書では手動開発の具体的な手順を説明します。
 
 AI 協働体制での開発や、プロジェクト全体の構成・ゲーム追加手順は [DEVELOPMENT.md](DEVELOPMENT.md) を参照してください。守るべきルール（ブランチ運用・TDD・コーディング規約）は AI 利用時と共通です。
 
 ## セットアップ
 
-リポジトリ直下の [README.md](../README.md#セットアップ) を参照してください。手動開発の場合、AI 用の追加セットアップ（Claude Code / Codex CLI）は不要です。
+[開発ガイドのセットアップ](DEVELOPMENT.md#セットアップ) を参照してください。手動開発の場合、AI 用の追加セットアップ（Claude Code / Codex CLI）は不要です。
 
 ## 開発フロー
 
 ### 1. Issue を確認してブランチを切る
 
-作業は必ず Issue 単位。`develop` が統合ブランチです（`main` への直接変更は禁止）。
+Issue・ブランチの共通ルールは [開発ガイドの開発フロー](DEVELOPMENT.md#開発フロー) を参照してください。コマンド例:
 
 ```bash
 git checkout develop && git pull
@@ -22,7 +22,7 @@ git checkout -b feature/<issue番号>-<短い名前>   # 例: feature/64-cross-d
 
 ### 2. RED — 先にテストを書く
 
-実装より先にテストを書きます（テストファースト必須）。
+RED → GREEN → REFACTOR の定義・禁止事項は [開発ガイドの TDD 運用](DEVELOPMENT.md#tdd-運用2026-07-15-導入) を参照してください。手動開発では watch モードで継続実行します:
 
 ```bash
 # 例: 新ゲームの engine を作る場合
@@ -30,15 +30,13 @@ git checkout -b feature/<issue番号>-<短い名前>   # 例: feature/64-cross-d
 npx jest src/games/<game-id>/ --watch
 ```
 
-この時点でテストが**失敗することを確認**してください。「書いたテストがまだ落ちる」ことが、テストが仕様を検証している証拠になります。
-
 ### 3. GREEN — テストを通す最小実装を書く
 
-watch モードのまま実装し、グリーンになるまで直します。テストが要求していない先回りの処理（エラーハンドリング・最適化・汎用化）はこの段階では書きません。
+watch モードのまま、[TDD 運用の GREEN](DEVELOPMENT.md#tdd-運用2026-07-15-導入) に従って実装します。
 
 ### 4. REFACTOR — テストを緑に保ったまま整理する
 
-重複除去・命名改善・関数分割のみ。ここで新機能やテストの変更はしません。
+[TDD 運用の REFACTOR](DEVELOPMENT.md#tdd-運用2026-07-15-導入) に従って整理します。
 
 ### 5. セルフチェック — PR 前に全部通す
 
@@ -46,7 +44,7 @@ watch モードのまま実装し、グリーンになるまで直します。�
 npm test              # 全テスト
 npm run typecheck     # TypeScript 型チェック
 npm run lint          # ESLint
-npm run format:check  # フォーマット確認（崩れていたら npm run format で整形）
+npm run format:check  # フォーマット確認（整形方法は開発ガイドのコーディング規約を参照）
 ```
 
 ### 6. 動作確認
@@ -55,48 +53,30 @@ npm run format:check  # フォーマット確認（崩れていたら npm run fo
 
 ### 7. PR を出す
 
-`develop` 宛てに PR を作成します。本文には以下を書きます:
+PR の宛先・レビュー・マージは [開発ガイドの開発フロー](DEVELOPMENT.md#開発フロー) に従います。手動開発では人間または Claude がレビューします。本文には以下を書きます:
 
 - 変更概要と対応 Issue（`Closes #64` 等）
 - テスト結果（全件グリーンであること）
 - UI 変更がある場合はスクリーンショット
 
-マージはレビュー（人間または Claude）を経てから行います。
-
 ## 守るべき規約
 
 ### コーディング規約
 
-- タブ幅4（タブインデント）・セミコロンなし・シングルクォート
-- 手で覚える必要はなく、`npm run format`（Prettier）が自動で整えます
+[開発ガイドのコーディング規約](DEVELOPMENT.md#コーディング規約) を参照してください。
 
 ### テスト規約
 
-- **テストが失敗したとき、実装に合わせてテストを書き換えて通さない**。テストは仕様であり、直すのは実装側
-- `.skip` / `.only` をコミットに残さない
-- テストコードで `any` を使わない
-- `Date.now()` や実タイマーに依存しない。タイマー系は `jest.useFakeTimers()` を使う
-- 実ネットワーク・実 Supabase に接続するテストを書かない（モックする）
-- React 19 では同期 `act` / `renderHook` はタイマー系テストで失敗する。必ず `await act(async () => ...)` を使う（参照実装: `src/games/kimagure-ox/__tests__/`）
+[開発ガイドの TDD 運用](DEVELOPMENT.md#tdd-運用2026-07-15-導入) を参照してください（禁止事項・React 19 の注意点を含む）。
 
 ### セキュリティ
 
-- 秘密情報（`.env` 系ファイル・API 秘密鍵・署名証明書）を絶対にコミットしない
-- 閲覧・共有してよいのは `.env.example`（ダミー値）のみ
+[開発ガイドのセキュリティ](DEVELOPMENT.md#セキュリティ) を参照してください。
 
 ## よく使うコマンド
 
-| コマンド                          | 用途                                         |
-| --------------------------------- | -------------------------------------------- |
-| `npm start`                       | Expo 開発サーバー起動                        |
-| `npm test`                        | 全テスト実行                                 |
-| `npx jest src/games/<id>/`        | 特定ゲームのテストだけ実行                   |
-| `npx jest <path> --watch`         | watch モード（TDD 中はこれ）                 |
-| `npx jest --coverage`             | カバレッジ計測（目安: Lines 80% 以上を維持） |
-| `npm run typecheck`               | TypeScript 型チェック                        |
-| `npm run lint`                    | ESLint                                       |
-| `npm run format` / `format:check` | Prettier 整形 / 確認                         |
+[開発ガイドのよく使うコマンド](DEVELOPMENT.md#よく使うコマンド) を参照してください。
 
 ## 新しいゲームを追加する場合
 
-[ADDING-A-GAME.md](ADDING-A-GAME.md) を参照してください（AI 利用の有無に関わらず同じ手順です）。
+[開発ガイドの新しいゲームの追加方法](DEVELOPMENT.md#新しいゲームの追加方法) を参照してください（AI 利用の有無に関わらず同じ手順です）。

@@ -30,10 +30,10 @@ jest.mock('expo-router', () => {
 			React.createElement(React.Fragment, null, children),
 	}
 })
-jest.mock('@/components/animated-icon', () => {
+jest.mock('@/components/splash-overlay', () => {
 	// eslint-disable-next-line @typescript-eslint/no-require-imports
 	const { Text } = require('react-native')
-	return { AnimatedSplashOverlay: () => <Text>animated-splash</Text> }
+	return { SplashOverlay: () => <Text>animated-splash</Text> }
 })
 jest.mock('@/lib/settings-store', () => ({
 	settingsStore: { hydrate: jest.fn() },

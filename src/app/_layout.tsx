@@ -3,7 +3,7 @@ import * as SplashScreen from 'expo-splash-screen'
 import { useEffect } from 'react'
 import { useColorScheme } from 'react-native'
 
-import { AnimatedSplashOverlay } from '@/components/animated-icon'
+import { SplashOverlay } from '@/components/splash-overlay'
 import { initAds } from '@/lib/ads'
 import { playersStore } from '@/lib/players-store'
 import { initPremium } from '@/lib/premium'
@@ -47,7 +47,7 @@ export default function RootLayout() {
 
 	return (
 		<ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-			<AnimatedSplashOverlay />
+			<SplashOverlay />
 			<Stack screenOptions={{ headerShown: false }}>
 				<Stack.Screen name="index" />
 				<Stack.Screen
