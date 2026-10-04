@@ -40,7 +40,7 @@ export function LuckyCutIn({ playerName, onDone }: Props) {
 const styles = StyleSheet.create({
 	backdrop: {
 		...StyleSheet.absoluteFill,
-		backgroundColor: 'rgba(10,8,24,0.94)',
+		backgroundColor: RP.revealBackdrop,
 		alignItems: 'center',
 		justifyContent: 'center',
 		padding: spacing.lg,

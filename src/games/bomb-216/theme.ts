@@ -1,5 +1,8 @@
 // BOMB!! 2/16 ローカルカラー（警告パネル×赤グロッシーボタンの世界観）
 export const BOMB = {
+	backgroundShade: 'rgba(10,8,20,0.45)',
+	fenceLight: '#59616C',
+	fenceDark: '#343A43',
 	bg: '#12101F',
 	accent: '#FF6B6B',
 	accentDeep: '#C0392B',

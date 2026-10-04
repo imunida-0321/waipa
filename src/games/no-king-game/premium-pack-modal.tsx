@@ -9,6 +9,7 @@ import { packUnlockStore, usePackUnlocked } from '@/lib/pack-unlock-store'
 import { getTopicsByPack, topicsStore } from '@/lib/topics-store'
 import { colors, radii, spacing, typography } from '@/theme/tokens'
 import { KING_PREMIUM_PACK } from './engine'
+import { NKG } from './theme'
 
 type Props = {
 	visible: boolean
@@ -116,7 +117,7 @@ export function PremiumPackModal({ visible, onClose }: Props) {
 const styles = StyleSheet.create({
 	backdrop: {
 		flex: 1,
-		backgroundColor: 'rgba(0,0,0,0.6)',
+		backgroundColor: NKG.modalBackdrop,
 		alignItems: 'center',
 		justifyContent: 'center',
 		padding: spacing.lg,

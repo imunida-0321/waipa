@@ -3,6 +3,7 @@ import type { HandType } from './dice'
 
 // チンチロのゲームカラー。丼は金縁×濃紫、サイコロはクリーム系（ダークネイビー背景に映える）
 export const CHIN = {
+	rulesBackdrop: 'rgba(10,8,24,0.92)',
 	bg: colors.background,
 	bowlRim: '#B8860B',
 	bowlInner: '#241F3D',

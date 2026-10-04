@@ -67,7 +67,7 @@ export function CalibrationScreen({ levelDb, onConfirm }: Props) {
 
 const styles = StyleSheet.create({
 	container: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 20, padding: 24 },
-	title: { color: '#FFFFFF', fontSize: 20, fontWeight: '700' },
+	title: { color: SL.text, fontSize: 20, fontWeight: '700' },
 	sub: { color: SL.sub, fontSize: 14, textAlign: 'center' },
 	progressTrack: {
 		width: '80%',
@@ -92,5 +92,5 @@ const styles = StyleSheet.create({
 		borderRadius: 999,
 		backgroundColor: SL.green,
 	},
-	mainButtonLabel: { color: '#0B2818', fontSize: 16, fontWeight: '800' },
+	mainButtonLabel: { color: SL.buttonText, fontSize: 16, fontWeight: '800' },
 })

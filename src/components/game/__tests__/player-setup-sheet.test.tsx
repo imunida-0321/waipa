@@ -142,6 +142,59 @@ it('×を押すと router.back が呼ばれる', async () => {
 })
 
 describe('人数のゲーム別範囲クランプ', () => {
+	it.each([
+		{ initialCount: 2, minPlayers: 3, maxPlayers: 8, expectedCount: 3 },
+		{ initialCount: 10, minPlayers: 2, maxPlayers: 8, expectedCount: 8 },
+	])(
+		'初回補正後は名前やコールバックの変更で再補正しない（$initialCount 人）',
+		async ({ initialCount, minPlayers, maxPlayers, expectedCount }) => {
+			await playersStore.setCount(initialCount)
+			const setCount = jest.spyOn(playersStore, 'setCount')
+			try {
+				const { rerender } = await render(
+					<PlayerSetupSheet
+						onProceed={jest.fn()}
+						minPlayers={minPlayers}
+						maxPlayers={maxPlayers}
+					/>,
+				)
+				// 初回補正はちょうど1回（#136 で重複していたマウント時 effect を統合）
+				expect(setCount.mock.calls).toEqual([[expectedCount]])
+				await act(async () => {
+					await playersStore.setName(0, '変更後')
+				})
+				await rerender(
+					<PlayerSetupSheet
+						onProceed={jest.fn()}
+						minPlayers={minPlayers}
+						maxPlayers={maxPlayers}
+					/>,
+				)
+				expect(setCount).toHaveBeenCalledTimes(1)
+			} finally {
+				setCount.mockRestore()
+			}
+		},
+	)
+
+	it('範囲内では書き込まず、人数範囲の props 変更では新しい境界へ1回ずつ補正する', async () => {
+		const setCount = jest.spyOn(playersStore, 'setCount')
+		try {
+			const { rerender } = await render(
+				<PlayerSetupSheet onProceed={jest.fn()} minPlayers={2} maxPlayers={8} />,
+			)
+			await rerender(<PlayerSetupSheet onProceed={jest.fn()} minPlayers={3} maxPlayers={6} />)
+			expect(setCount).not.toHaveBeenCalled()
+			await rerender(<PlayerSetupSheet onProceed={jest.fn()} minPlayers={5} maxPlayers={6} />)
+			expect(setCount.mock.calls).toEqual([[5]])
+			await rerender(<PlayerSetupSheet onProceed={jest.fn()} minPlayers={2} maxPlayers={3} />)
+			expect(setCount.mock.calls).toEqual([[5], [3]])
+			expect(playersStore.getState().count).toBe(3)
+		} finally {
+			setCount.mockRestore()
+		}
+	})
+
 	it('保存済み人数が maxPlayers を超えていたらマウント時に切り詰めて案内を出す', async () => {
 		await playersStore.setCount(10)
 		const { getAllByPlaceholderText, getByText } = await render(

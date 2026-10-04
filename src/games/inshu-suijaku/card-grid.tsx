@@ -222,7 +222,7 @@ const styles = StyleSheet.create({
 	jokerFace: { borderWidth: 2, borderColor: NS.rose },
 	jokerTint: {
 		...StyleSheet.absoluteFill,
-		backgroundColor: 'rgba(80, 20, 90, 0.45)',
+		backgroundColor: NS.jokerCardOverlay,
 		justifyContent: 'flex-end',
 		alignItems: 'center',
 		paddingBottom: spacing.xs,

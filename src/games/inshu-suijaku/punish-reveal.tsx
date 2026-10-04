@@ -74,7 +74,7 @@ export function PunishReveal({ punish, playerName, playerIndex, onDone }: Props)
 								source={require('@/assets/images/inshu-suijaku/punish-glass.png')}
 								style={styles.glassIcon}
 								contentFit="contain"
-								tintColor="#FFFFFF"
+								tintColor={NS.punishIconTint}
 							/>
 							<Text style={styles.punishText}>{punish.text}</Text>
 						</View>
@@ -109,13 +109,13 @@ export function PunishReveal({ punish, playerName, playerIndex, onDone }: Props)
 const styles = StyleSheet.create({
 	backdrop: {
 		...StyleSheet.absoluteFill,
-		backgroundColor: 'rgba(10,8,24,0.94)',
+		backgroundColor: NS.revealBackdrop,
 		alignItems: 'stretch',
 		justifyContent: 'center',
 		padding: spacing.lg,
 		gap: spacing.lg,
 	},
-	jokerBackdrop: { backgroundColor: 'rgba(26,6,32,0.96)' },
+	jokerBackdrop: { backgroundColor: NS.jokerBackdrop },
 	badge: {
 		...typography.caption,
 		color: NS.rose,

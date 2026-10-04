@@ -14,6 +14,7 @@ import { haptics } from '@/lib/haptics'
 import { playSound } from '@/lib/sound'
 import { colors, radii, spacing, typography } from '@/theme/tokens'
 import { EVENT_META, type EventId } from './events'
+import { KOX } from './theme'
 
 export const CUTIN_DURATION_MS = 1400
 
@@ -61,7 +62,7 @@ export function EventCutin({ event, onDone }: Props) {
 const styles = StyleSheet.create({
 	backdrop: {
 		...StyleSheet.absoluteFill,
-		backgroundColor: 'rgba(10,8,24,0.85)',
+		backgroundColor: KOX.eventBackdrop,
 		alignItems: 'center',
 		justifyContent: 'center',
 		zIndex: 10,

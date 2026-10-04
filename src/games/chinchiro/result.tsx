@@ -46,11 +46,13 @@ export function ChinchiroResult({ hands, playerNames, onRetry, onHome, rng = Mat
 	// react-hooks/set-state-in-effect には抵触しない。
 	const [suddenDeathLosers, setSuddenDeathLosers] = useState<number[] | null>(null)
 	const drum = useDrumroll()
+	const { start } = drum
 	const drumStarted = useRef(false)
+	const initialSafeCount = useRef(safeCount)
 
 	// 順めくり: interval コールバック内で drumroll 開始まで直接進める（fake timers 対応の定石）
 	useEffect(() => {
-		const { start } = drum
+		const safeCount = initialSafeCount.current
 		let count = 0
 		const id = setInterval(() => {
 			count += 1
@@ -71,9 +73,7 @@ export function ChinchiroResult({ hands, playerNames, onRetry, onHome, rng = Mat
 			}
 		}
 		return () => clearInterval(id)
-		// マウント時1回だけ実行（drum.start は useCallback で安定）
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [])
+	}, [start])
 
 	const losersRevealed = drum.phase === 'revealed'
 	const singleLoserCase = initialLosers.length <= 1

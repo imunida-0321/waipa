@@ -49,8 +49,7 @@ export function FiveSecResult({ records, playerNames, onRetry, onHome }: Props) 
 			}
 		}, REVEAL_INTERVAL_MS)
 		return () => clearInterval(id)
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [safeCount])
+	}, [safeCount, drumStart])
 
 	const losersRevealed = drum.phase === 'revealed'
 

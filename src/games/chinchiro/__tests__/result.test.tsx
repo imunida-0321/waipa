@@ -1,4 +1,5 @@
 import { act, fireEvent, render } from '@testing-library/react-native'
+import { playSound } from '@/lib/sound'
 import type { Hand } from '../dice'
 import { ChinchiroResult, REVEAL_INTERVAL_MS } from '../result'
 
@@ -32,6 +33,7 @@ const DRUMROLL_MS = 2000
 
 beforeEach(() => {
 	jest.useFakeTimers()
+	jest.clearAllMocks()
 })
 afterEach(() => {
 	jest.useRealTimers()
@@ -188,5 +190,99 @@ describe('ガラス面', () => {
 		)
 
 		expect(getAllByTestId('glass-surface-pseudo')).toHaveLength(2)
+	})
+})
+
+describe('順めくり effect の実行タイミング', () => {
+	it('同じ人数の結果・名前・コールバックが変わってもタイマーを延長せず、効果音は各1回だけ', async () => {
+		const { rerender, getByText } = await render(
+			<ChinchiroResult
+				hands={[hand(106, 'me', 6), hand(105, 'me', 5), hand(10, 'nome')]}
+				playerNames={['A', 'B', 'C']}
+				onRetry={jest.fn()}
+				onHome={jest.fn()}
+			/>,
+		)
+		await act(async () => jest.advanceTimersByTime(REVEAL_INTERVAL_MS / 2))
+		await rerender(
+			<ChinchiroResult
+				hands={[hand(1000, 'pinzoro'), hand(800, 'shigoro'), hand(0, 'hifumi')]}
+				playerNames={['更新A', '更新B', '更新C']}
+				onRetry={jest.fn()}
+				onHome={jest.fn()}
+			/>,
+		)
+		await act(async () => jest.advanceTimersByTime(REVEAL_INTERVAL_MS / 2))
+		expect(getByText('更新A')).toBeTruthy()
+		expect(playSound).not.toHaveBeenCalled()
+		await act(async () => jest.advanceTimersByTime(REVEAL_INTERVAL_MS))
+		expect(getByText('更新B')).toBeTruthy()
+		expect(jest.mocked(playSound).mock.calls).toEqual([['drumroll']])
+		await rerender(
+			<ChinchiroResult
+				hands={[hand(1000, 'pinzoro'), hand(800, 'shigoro'), hand(0, 'hifumi')]}
+				playerNames={['更新A', '更新B', '更新C']}
+				onRetry={jest.fn()}
+				onHome={jest.fn()}
+			/>,
+		)
+		await act(async () => jest.advanceTimersByTime(DRUMROLL_MS + REVEAL_INTERVAL_MS * 3))
+		expect(getByText('更新C')).toBeTruthy()
+		expect(jest.mocked(playSound).mock.calls).toEqual([['drumroll'], ['reveal']])
+	})
+
+	it('全員同率では初回に1回だけドラムロールを開始し、再レンダーで重複しない', async () => {
+		const props = {
+			hands: [hand(10, 'nome'), hand(10, 'nome')],
+			playerNames: ['A', 'B'],
+			onRetry: jest.fn(),
+			onHome: jest.fn(),
+		}
+		const { rerender } = await render(<ChinchiroResult {...props} />)
+		expect(jest.mocked(playSound).mock.calls).toEqual([['drumroll']])
+		await rerender(<ChinchiroResult {...props} hands={[...props.hands]} onHome={jest.fn()} />)
+		await act(async () => jest.advanceTimersByTime(DRUMROLL_MS * 2))
+		expect(jest.mocked(playSound).mock.calls).toEqual([['drumroll'], ['reveal']])
+	})
+
+	it('safeCount が変わると初回人数のタイミングを維持する', async () => {
+		const { rerender } = await render(
+			<ChinchiroResult
+				hands={[hand(106, 'me', 6), hand(105, 'me', 5), hand(10, 'nome')]}
+				playerNames={['A', 'B', 'C']}
+				onRetry={jest.fn()}
+				onHome={jest.fn()}
+			/>,
+		)
+		await act(async () => jest.advanceTimersByTime(REVEAL_INTERVAL_MS / 2))
+		await rerender(
+			<ChinchiroResult
+				hands={[hand(106, 'me', 6), hand(10, 'nome'), hand(10, 'nome')]}
+				playerNames={['A', 'B', 'C']}
+				onRetry={jest.fn()}
+				onHome={jest.fn()}
+			/>,
+		)
+		await act(async () => jest.advanceTimersByTime(REVEAL_INTERVAL_MS * 1.5 - 1))
+		expect(playSound).not.toHaveBeenCalled()
+		await act(async () => jest.advanceTimersByTime(1))
+		expect(jest.mocked(playSound).mock.calls).toEqual([['drumroll']])
+		await act(async () => jest.advanceTimersByTime(DRUMROLL_MS + REVEAL_INTERVAL_MS * 3))
+		expect(jest.mocked(playSound).mock.calls).toEqual([['drumroll'], ['reveal']])
+	})
+
+	it('順めくり途中にアンマウントすると後続のドラムロールを開始しない', async () => {
+		const { unmount } = await render(
+			<ChinchiroResult
+				hands={[hand(106, 'me', 6), hand(105, 'me', 5), hand(10, 'nome')]}
+				playerNames={['A', 'B', 'C']}
+				onRetry={jest.fn()}
+				onHome={jest.fn()}
+			/>,
+		)
+		await act(async () => jest.advanceTimersByTime(REVEAL_INTERVAL_MS))
+		await unmount()
+		await act(async () => jest.advanceTimersByTime(REVEAL_INTERVAL_MS * 3 + DRUMROLL_MS))
+		expect(playSound).not.toHaveBeenCalled()
 	})
 })
