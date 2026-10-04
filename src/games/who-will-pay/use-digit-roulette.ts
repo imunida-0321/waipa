@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Easing, useSharedValue, withTiming } from 'react-native-reanimated'
 import { haptics } from '@/lib/haptics'
+import { defaultRng } from '@/lib/random'
 import { playSound } from '@/lib/sound'
 import { assignSlot, amountToSlots, needsSpin, pickPlayerIndex, type DigitSlot } from './payment'
 import { nextAngleForSegment, wheelRepeats } from './spin'
@@ -33,7 +34,7 @@ export function useDigitRoulette(amount: number, playerCount: number) {
 		if (isSpinning || allDone || currentIndex === null) return
 
 		const targetIndex = currentIndex
-		const playerIndex = pickPlayerIndex(playerCount, Math.random)
+		const playerIndex = pickPlayerIndex(playerCount, defaultRng)
 
 		setIsSpinning(true)
 		playSound('spin')
@@ -48,7 +49,7 @@ export function useDigitRoulette(amount: number, playerCount: number) {
 		// から1つをランダムに選び、その中心で止める。描画と同じ wheelRepeats を参照。
 		const repeats = wheelRepeats(playerCount)
 		const total = playerCount * repeats
-		const segment = playerIndex + playerCount * Math.floor(Math.random() * repeats)
+		const segment = playerIndex + playerCount * Math.floor(defaultRng() * repeats)
 		// 累積値に足すのではなく、現在角を基準に絶対目標角を作る（複数スピンでもズレない）
 		rotation.value = withTiming(nextAngleForSegment(rotation.value, segment, total), {
 			duration: SPIN_DURATION,

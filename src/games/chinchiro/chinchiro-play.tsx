@@ -4,6 +4,7 @@ import { ConfettiBurst } from '@/components/game/confetti-burst'
 import { DrumrollReveal } from '@/components/game/drumroll-reveal'
 import { SecondaryButton } from '@/components/ui/secondary-button'
 import { haptics } from '@/lib/haptics'
+import { defaultRng, type Rng } from '@/lib/random'
 import { playSound } from '@/lib/sound'
 import { playerColor } from '@/theme/player-colors'
 import { colors, radii, spacing, typography } from '@/theme/tokens'
@@ -18,12 +19,12 @@ export const ROLL_DURATION_MS = 1200
 type Props = {
 	playerNames: string[]
 	onFinish: (hands: Hand[]) => void
-	rng?: () => number
+	rng?: Rng
 }
 
 // 1ラウンド全体を管理する。3D シーンは常設で、画面下の丸ボタンを押すたびに現在プレイヤーが振る。
 // 役確定/3投終了で settled になり、次の人が同じ丸ボタンを押すとそのまま次の投擲が始まる。
-export function ChinchiroPlay({ playerNames, onFinish, rng = Math.random }: Props) {
+export function ChinchiroPlay({ playerNames, onFinish, rng = defaultRng }: Props) {
 	const [state, dispatch] = useReducer(reduce, playerNames.length, initialState)
 	const timer = useRef<ReturnType<typeof setTimeout> | null>(null)
 	const playedRollId = useRef(0)

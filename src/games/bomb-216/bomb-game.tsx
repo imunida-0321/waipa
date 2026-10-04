@@ -9,6 +9,7 @@ import Animated, {
 } from 'react-native-reanimated'
 import { ResultOverlay } from '@/components/game/result-overlay'
 import { haptics } from '@/lib/haptics'
+import { pickRandom } from '@/lib/random'
 import { playSound } from '@/lib/sound'
 import { colors, spacing, typography } from '@/theme/tokens'
 import { createBoard, hiddenCount, revealTile, type Board } from './board'
@@ -47,7 +48,7 @@ export function BombGame() {
 		if (outcome === 'safe') {
 			haptics.tap()
 			playSound('tap')
-			setMessage(SAFE_REACTIONS[Math.floor(Math.random() * SAFE_REACTIONS.length)])
+			setMessage(pickRandom(SAFE_REACTIONS)!)
 			return
 		}
 		// 爆発: シェイク＋強ハプティクス＋爆発音 → 少し見せてからリザルト

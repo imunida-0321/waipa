@@ -7,6 +7,7 @@ import { LottieEffect } from '@/components/game/lottie-effect'
 import { useDrumroll } from '@/components/game/use-drumroll'
 import { GlassSurface } from '@/components/ui/glass-surface'
 import { haptics } from '@/lib/haptics'
+import { defaultRng } from '@/lib/random'
 import { getDisplayNames, usePlayers } from '@/lib/players-store'
 import { playSound } from '@/lib/sound'
 import { useTrialRoundConsumer } from '@/lib/trial-store'
@@ -23,7 +24,7 @@ export function BurstChickenGame() {
 	const players = usePlayers()
 	const names = getDisplayNames(players)
 	const [state, dispatch] = useReducer(reduce, players.count, (count) =>
-		createInitialState(count, Math.random),
+		createInitialState(count, defaultRng),
 	)
 	useTrialRoundConsumer('burst-chicken', state.phase === 'exploded' || state.phase === 'settled')
 
@@ -62,7 +63,7 @@ export function BurstChickenGame() {
 
 	const retry = () => {
 		drum.reset()
-		dispatch({ type: 'restart', rng: Math.random })
+		dispatch({ type: 'restart', rng: defaultRng })
 	}
 
 	if (state.phase === 'exploded') {

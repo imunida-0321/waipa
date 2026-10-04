@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { createStore, useStore } from './create-store'
+import { defaultRng, pickRandom, type Rng } from './random'
 import { fetchRows } from './supabase-rest'
 
 const CACHE_KEY = 'waipa.topics.v1'
@@ -98,8 +99,11 @@ export function getTopicsByPack(pack: string): Topic[] {
 }
 
 // ゲームから使うランダムピッカー。使用済み ID を除外して重複出題を防ぐ
-export function pickTopic(pack: string, excludeIds: string[] = []): Topic | undefined {
+export function pickTopic(
+	pack: string,
+	excludeIds: string[] = [],
+	rng: Rng = defaultRng,
+): Topic | undefined {
 	const pool = getTopicsByPack(pack).filter((t) => !excludeIds.includes(t.id))
-	if (pool.length === 0) return undefined
-	return pool[Math.floor(Math.random() * pool.length)]
+	return pickRandom(pool, rng)
 }

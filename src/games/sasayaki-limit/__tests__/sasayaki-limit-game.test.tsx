@@ -3,6 +3,7 @@ import { useTopics, type Topic } from '@/lib/topics-store'
 import { CALIBRATION_MS, MEASURE_MS, METER_INTERVAL_MS } from '../engine'
 import { SasayakiLimitGame } from '../sasayaki-limit-game'
 import * as whisperTopics from '../topics'
+import { defaultRng } from '@/lib/random'
 
 jest.mock('react-native-reanimated', () => {
 	// eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -249,7 +250,7 @@ describe('権限・録音・出題 effect の実行回数', () => {
 		await act(async () => jest.advanceTimersByTime(CALIBRATION_MS))
 		await act(async () => fireEvent.press(utils.getByText('スタート')))
 		expect(pick).toHaveBeenCalledTimes(1)
-		expect(pick).toHaveBeenNthCalledWith(1, initialTopics, [], Math.random)
+		expect(pick).toHaveBeenNthCalledWith(1, initialTopics, [], defaultRng)
 		expect(utils.getByText('「最初のお題」')).toBeTruthy()
 		jest.mocked(useTopics).mockReturnValue({ topics: nextTopics, fetchedAt: null })
 		mockMic = { ...mockMic, levelDb: -40 }
@@ -275,7 +276,7 @@ describe('権限・録音・出題 effect の実行回数', () => {
 				call,
 				nextTopics,
 				['initial', ...nextTopics.slice(0, call - 2).map(({ id }) => id)],
-				Math.random,
+				defaultRng,
 			)
 		}
 		expect(utils.getByText('「次のお題5」')).toBeTruthy()

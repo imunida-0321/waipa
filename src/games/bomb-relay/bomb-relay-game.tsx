@@ -13,6 +13,7 @@ import { LottieEffect } from '@/components/game/lottie-effect'
 import { GlassSurface } from '@/components/ui/glass-surface'
 import { GradientButton } from '@/components/ui/gradient-button'
 import { haptics } from '@/lib/haptics'
+import { defaultRng } from '@/lib/random'
 import { playSound } from '@/lib/sound'
 import { useTopics, type Topic } from '@/lib/topics-store'
 import { colors, radii, spacing, typography } from '@/theme/tokens'
@@ -27,7 +28,7 @@ type Phase = 'ready' | 'ticking' | 'exploded'
 export function BombRelayGame() {
 	const { topics } = useTopics()
 	const [phase, setPhase] = useState<Phase>('ready')
-	const [topic, setTopic] = useState<Topic>(() => pickTalkTopic(topics, [], Math.random))
+	const [topic, setTopic] = useState<Topic>(() => pickTalkTopic(topics, [], defaultRng))
 	// 初回レンダー時点の topic はすでに確定しているので、ref 初期値でそのまま使用済み登録できる
 	const usedIdsRef = useRef<string[]>([topic.id])
 	const fuseRef = useRef(0)
@@ -69,12 +70,12 @@ export function BombRelayGame() {
 	const pulseStyle = useAnimatedStyle(() => ({ transform: [{ scale: pulse.value }] }))
 
 	const start = () => {
-		fuseRef.current = pickFuseMs(Math.random)
+		fuseRef.current = pickFuseMs(defaultRng)
 		setPhase('ticking')
 	}
 
 	const retry = () => {
-		const next = pickTalkTopic(topics, usedIdsRef.current, Math.random)
+		const next = pickTalkTopic(topics, usedIdsRef.current, defaultRng)
 		usedIdsRef.current = [...usedIdsRef.current, next.id]
 		setTopic(next)
 		setPhase('ready')

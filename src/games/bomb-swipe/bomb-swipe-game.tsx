@@ -7,6 +7,7 @@ import { LottieEffect } from '@/components/game/lottie-effect'
 import { useDrumroll } from '@/components/game/use-drumroll'
 import { GlassSurface } from '@/components/ui/glass-surface'
 import { haptics } from '@/lib/haptics'
+import { defaultRng } from '@/lib/random'
 import { getDisplayNames, usePlayers } from '@/lib/players-store'
 import { playSound } from '@/lib/sound'
 import { useTrialRoundConsumer } from '@/lib/trial-store'
@@ -23,7 +24,7 @@ export function BombSwipeGame() {
 	const players = usePlayers()
 	const names = getDisplayNames(players)
 	const [state, dispatch] = useReducer(reduce, players.count, (count) =>
-		createInitialState(count, Math.random),
+		createInitialState(count, defaultRng),
 	)
 	useTrialRoundConsumer('bomb-swipe', state.phase === 'result')
 	// スワイプ中の緊張演出用。ゲージ内部と重複して持つが、親は演出にだけ使う
@@ -69,7 +70,7 @@ export function BombSwipeGame() {
 
 	const retry = () => {
 		drum.reset()
-		dispatch({ type: 'restart', rng: Math.random })
+		dispatch({ type: 'restart', rng: defaultRng })
 	}
 
 	const result = state.results[state.turnIndex]

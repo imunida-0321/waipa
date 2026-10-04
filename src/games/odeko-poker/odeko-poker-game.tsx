@@ -3,6 +3,7 @@ import { useReducer } from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import { GradientButton } from '@/components/ui/gradient-button'
 import { getDisplayNames, usePlayers } from '@/lib/players-store'
+import { defaultRng } from '@/lib/random'
 import { useTrialRoundConsumer } from '@/lib/trial-store'
 import { playerColor } from '@/theme/player-colors'
 import { spacing, typography } from '@/theme/tokens'
@@ -28,7 +29,7 @@ export function OdekoPokerGame() {
 					</Text>
 					<GradientButton
 						title="カードを配る"
-						onPress={() => dispatch({ type: 'start', rng: Math.random })}
+						onPress={() => dispatch({ type: 'start', rng: defaultRng })}
 					/>
 				</View>
 			)}

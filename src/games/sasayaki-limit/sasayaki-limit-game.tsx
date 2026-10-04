@@ -1,4 +1,5 @@
 import { getDisplayNames, usePlayers } from '@/lib/players-store'
+import { defaultRng } from '@/lib/random'
 import { useTrialRoundConsumer } from '@/lib/trial-store'
 import { useTopics, type Topic } from '@/lib/topics-store'
 import { useEffect, useReducer, useRef, useState } from 'react'
@@ -37,7 +38,7 @@ export function SasayakiLimitGame() {
 
 	const [stage, setStage] = useState<Stage>('permission')
 	const [range, setRange] = useState<VoiceRange | null>(null)
-	const [state, dispatch] = useReducer(reduce, players.count, (n) => initialState(n, Math.random))
+	const [state, dispatch] = useReducer(reduce, players.count, (n) => initialState(n, defaultRng))
 	const [liveLevel, setLiveLevel] = useState(0)
 	const [topic, setTopic] = useState<Topic | null>(null)
 	const usedIdsRef = useRef<string[]>([])
@@ -75,7 +76,7 @@ export function SasayakiLimitGame() {
 	// speech に入るたびにお題を引く
 	useEffect(() => {
 		if (stage !== 'playing' || state.phase !== 'speech') return
-		const next = pickWhisperTopic(topicsRef.current, usedIdsRef.current, Math.random)
+		const next = pickWhisperTopic(topicsRef.current, usedIdsRef.current, defaultRng)
 		usedIdsRef.current = [...usedIdsRef.current, next.id]
 		setTopic(next)
 	}, [stage, state.phase, state.turnPos, state.round])
@@ -145,7 +146,7 @@ export function SasayakiLimitGame() {
 				names={names}
 				successCounts={state.successCounts}
 				losers={state.losers}
-				onRetry={() => dispatch({ type: 'retry', rng: Math.random })}
+				onRetry={() => dispatch({ type: 'retry', rng: defaultRng })}
 			/>
 		)
 	}
@@ -163,7 +164,7 @@ export function SasayakiLimitGame() {
 				<Text style={styles.guardText}>次のラウンドはゾーンが狭くなるよ！</Text>
 				<Pressable
 					style={styles.mainButton}
-					onPress={() => dispatch({ type: 'nextRound', rng: Math.random })}
+					onPress={() => dispatch({ type: 'nextRound', rng: defaultRng })}
 				>
 					<Text style={styles.mainButtonLabel}>ラウンド {state.round + 1} へ</Text>
 				</Pressable>
@@ -221,7 +222,7 @@ export function SasayakiLimitGame() {
 					<Text style={styles.judgement}>{JUDGEMENT_LABELS[state.lastJudgement]}</Text>
 					<Pressable
 						style={styles.mainButton}
-						onPress={() => dispatch({ type: 'next', rng: Math.random })}
+						onPress={() => dispatch({ type: 'next', rng: defaultRng })}
 					>
 						<Text style={styles.mainButtonLabel}>つぎの人へ</Text>
 					</Pressable>

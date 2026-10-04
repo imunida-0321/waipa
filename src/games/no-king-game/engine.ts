@@ -1,6 +1,7 @@
+import type { Rng } from '@/lib/random'
 import type { Topic } from '@/lib/topics-store'
 
-export type Rng = () => number
+export type { Rng } from '@/lib/random'
 
 export const MIN_COUNT = 3
 export const MAX_COUNT = 12

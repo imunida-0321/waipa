@@ -1,3 +1,5 @@
+import { defaultRng, type Rng } from '@/lib/random'
+
 export const TILE_COUNT = 16
 
 export type TileState = 'hidden' | 'safe' | 'solo' | 'all'
@@ -10,8 +12,8 @@ export type Board = {
 }
 
 // 爆弾2個（1人負け solo ＋ 全員負け all）を必ず別マスへ配置する。
-// rng は [0,1) を返す関数（テストで注入可、既定 Math.random）
-export function createBoard(rng: () => number = Math.random): Board {
+// rng は [0,1) を返す関数（テストで注入可、既定 defaultRng）
+export function createBoard(rng: Rng = defaultRng): Board {
 	const soloIndex = Math.floor(rng() * TILE_COUNT)
 	let allIndex = Math.floor(rng() * (TILE_COUNT - 1))
 	if (allIndex >= soloIndex) allIndex += 1
