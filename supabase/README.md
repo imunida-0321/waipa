@@ -11,7 +11,7 @@
 4. `0004_create_word_pairs.sql` — word_pairs テーブル＋RLS ポリシー作成
 5. `0005_seed_word_pairs.sql` — ワードウルフのお題ペア投入（80件）
 6. `0006_seed_whisper_topics.sql` — ささやきリミットのセリフお題投入（30件・2026-07-13 適用済み）
-7. `0007_king_premium_free.sql` — リワード広告で解放する king_premium を is_premium=false に変更（未適用）
+7. `0007_king_premium_free.sql` — リワード広告で解放する king_premium を is_premium=false に変更（2026-10-04 適用済み）
 
 適用後の確認（anon キーで無料お題だけ読めること）:
 
