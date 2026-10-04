@@ -1,6 +1,7 @@
 import { router } from 'expo-router'
 import { useEffect, useReducer, useState } from 'react'
 import { Pressable, StyleSheet, Text, View } from 'react-native'
+import { mulberry32 } from '@/components/dice-3d/math'
 import { GradientButton } from '@/components/ui/gradient-button'
 import { IsoDie } from '@/games/chinchiro/iso-die'
 import { haptics } from '@/lib/haptics'
@@ -18,18 +19,6 @@ import { ResultScreen } from './result-screen'
 import { RevealOverlay } from './reveal-overlay'
 import { DD } from './theme'
 import { useShake } from './use-shake'
-
-// rollId をシードにした決定的疑似乱数（dice-roll-3d.tsx の mulberry32 と同等実装）
-function mulberry32(seed: number): () => number {
-	let s = seed >>> 0
-	return () => {
-		s = (s + 0x6d2b79f5) >>> 0
-		let t = s
-		t = Math.imul(t ^ (t >>> 15), t | 1)
-		t ^= t + Math.imul(t ^ (t >>> 7), t | 61)
-		return ((t ^ (t >>> 14)) >>> 0) / 4294967296
-	}
-}
 
 // rollId シードの決定的ダミー出目（転がり演出用）。実出目は長押し確認と公開時のみ表示する
 function dummyDice(rollId: number): [number, number] {

@@ -1,6 +1,6 @@
 import { Quaternion, Vector3 } from 'three'
 
-// チンチロ3D演出の姿勢・散布計算（GL 非依存の純関数）。
+// サイコロ3D演出の姿勢・散布計算（GL 非依存の純関数）。
 // 座標系: y=0 が床、+Y が真上、+Z がカメラ手前方向。
 
 export type DieFace = 1 | 2 | 3 | 4 | 5 | 6
@@ -158,4 +158,68 @@ export function tumbleQuaternion(
 	a.normalize()
 	const remainder = new Quaternion().setFromAxisAngle(a, (1 - easedT) * totalAngle)
 	return toQuat(fromQuat(final).multiply(remainder))
+}
+
+const PIP_RADIUS = DIE_SIZE * 0.08
+const PIP_ONE_RADIUS = DIE_SIZE * 0.16
+const PIP_SPREAD = DIE_SIZE * 0.26
+const PIP_LIFT = 0.002
+const PIP_RIM_SCALE = 1.28
+
+// rollId をシードにした決定的疑似乱数。同じ投なら再レンダーでも散らばりが変わらない
+export function mulberry32(seed: number): () => number {
+	let s = seed >>> 0
+	return () => {
+		s = (s + 0x6d2b79f5) >>> 0
+		let t = s
+		t = Math.imul(t ^ (t >>> 15), t | 1)
+		t ^= t + Math.imul(t ^ (t >>> 7), t | 61)
+		return ((t ^ (t >>> 14)) >>> 0) / 4294967296
+	}
+}
+
+export type PipSpec = {
+	face: DieFace
+	key: string
+	position: Vec3
+	rimPosition: Vec3
+	quaternion: Quat
+	red: boolean
+	radius: number
+	rimRadius: number
+}
+
+// 6面ぶんのピップ（円板）の配置を事前計算。circleGeometry は +Z 向きなので面法線へ回す。
+// 各ピップは「面色を暗くしたリム円（下）＋本来のピップ色（上）」の二重円で疑似インセットにする
+export function buildPips(): PipSpec[] {
+	const forward = new Vector3(0, 0, 1)
+	const pips: PipSpec[] = []
+	for (const value of [1, 2, 3, 4, 5, 6] as DieFace[]) {
+		const normal = new Vector3(...FACE_NORMALS[value])
+		const quaternion = new Quaternion().setFromUnitVectors(forward, normal)
+		const radius = value === 1 ? PIP_ONE_RADIUS : PIP_RADIUS
+		PIP_OFFSETS[value].forEach(([ox, oy], i) => {
+			const position = new Vector3(
+				ox * PIP_SPREAD,
+				oy * PIP_SPREAD,
+				DIE_HALF + PIP_LIFT * 2,
+			).applyQuaternion(quaternion)
+			const rimPosition = new Vector3(
+				ox * PIP_SPREAD,
+				oy * PIP_SPREAD,
+				DIE_HALF + PIP_LIFT,
+			).applyQuaternion(quaternion)
+			pips.push({
+				face: value,
+				key: `${value}-${i}`,
+				position: [position.x, position.y, position.z],
+				rimPosition: [rimPosition.x, rimPosition.y, rimPosition.z],
+				quaternion: toQuat(quaternion),
+				red: value === 1 || value === 4,
+				radius,
+				rimRadius: radius * PIP_RIM_SCALE,
+			})
+		})
+	}
+	return pips
 }
