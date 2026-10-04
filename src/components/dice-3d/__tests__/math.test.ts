@@ -1,17 +1,21 @@
 import { Quaternion, Vector3 } from 'three'
 import {
 	DIE_HALF,
+	DIE_SIZE,
 	FACE_NORMALS,
 	MIN_DICE_DISTANCE,
 	PIP_OFFSETS,
 	RING_RADIUS,
+	buildPips,
+	mulberry32,
 	faceUpQuaternion,
 	finalPose,
 	shonbenPose,
 	tumbleProgress,
 	tumbleQuaternion,
 	type DieFace,
-} from '../dice-3d-math'
+	type PipSpec,
+} from '../math'
 
 // テスト用の決定的シード付き疑似乱数（LCG）
 function lcg(seed: number): () => number {
@@ -159,5 +163,100 @@ describe('tumbleQuaternion', () => {
 describe('PIP_OFFSETS', () => {
 	it.each(FACES)('出目 %d のピップ数が一致する', (v) => {
 		expect(PIP_OFFSETS[v]).toHaveLength(v)
+	})
+})
+
+describe('mulberry32', () => {
+	it.each([0, 1, 137, -1, 0xffffffff])('同じシード %d は同じ数列を返す', (seed) => {
+		const first = mulberry32(seed)
+		const second = mulberry32(seed)
+		expect(Array.from({ length: 100 }, () => first())).toEqual(
+			Array.from({ length: 100 }, () => second()),
+		)
+	})
+
+	it.each([0, 1, 137, -1, 0xffffffff])('シード %d の出力は [0, 1) に収まる', (seed) => {
+		const rng = mulberry32(seed)
+		for (let i = 0; i < 1000; i++) {
+			const value = rng()
+			expect(Number.isFinite(value)).toBe(true)
+			expect(value).toBeGreaterThanOrEqual(0)
+			expect(value).toBeLessThan(1)
+		}
+	})
+
+	it('異なるシードでは異なる数列を返す（定数を返す実装を防ぐ）', () => {
+		const first = mulberry32(1)
+		const second = mulberry32(2)
+		expect(Array.from({ length: 20 }, () => first())).not.toEqual(
+			Array.from({ length: 20 }, () => second()),
+		)
+	})
+})
+
+// 段階②の契約: buildPips(): PipSpec[]
+// PipSpec = { face: DieFace, key: string, position: Vec3, rimPosition: Vec3,
+//             quaternion: Quat, red: boolean, radius: number, rimRadius: number }
+// three の描画オブジェクトではなく、既存 Pose と同じ数値タプルで受け渡す。
+describe('buildPips', () => {
+	it('6面で合計21個のピップを返し、key は重複しない', () => {
+		const pips: PipSpec[] = buildPips()
+		expect(pips).toHaveLength(21)
+		expect(new Set(pips.map((pip) => pip.key)).size).toBe(21)
+	})
+
+	it.each(FACES)('面 %d のピップ数・色・サイズが既存の表示仕様と一致する', (face) => {
+		const allPips: PipSpec[] = buildPips()
+		const pips = allPips.filter((pip) => pip.face === face)
+		expect(pips).toHaveLength(face)
+		for (const pip of pips) {
+			expect(pip.red).toBe(face === 1 || face === 4)
+			expect(pip.radius).toBeCloseTo(DIE_SIZE * (face === 1 ? 0.16 : 0.08), 8)
+			expect(pip.rimRadius).toBeCloseTo(pip.radius * 1.28, 8)
+		}
+	})
+
+	it.each(FACES)('面 %d の座標は面内に収まり、ピップとリムは面の外側で重なる', (face) => {
+		const allPips: PipSpec[] = buildPips()
+		const pips = allPips.filter((pip) => pip.face === face)
+		expect(pips).toHaveLength(face)
+		const normal = new Vector3(...FACE_NORMALS[face])
+		const localPositions: number[][] = []
+		for (const pip of pips) {
+			expect(Array.isArray(pip.position)).toBe(true)
+			expect(Array.isArray(pip.rimPosition)).toBe(true)
+			expect(Array.isArray(pip.quaternion)).toBe(true)
+			expect(pip.position).toHaveLength(3)
+			expect(pip.rimPosition).toHaveLength(3)
+			expect(pip.quaternion).toHaveLength(4)
+
+			const q = quatOf(pip.quaternion)
+			expect(q.length()).toBeCloseTo(1, 8)
+			// circleGeometry の +Z がその面の外向き法線を向く。
+			expect(new Vector3(0, 0, 1).applyQuaternion(q).distanceTo(normal)).toBeLessThan(1e-6)
+			const position = new Vector3(...pip.position)
+			const rim = new Vector3(...pip.rimPosition)
+			expect(position.dot(normal)).toBeCloseTo(DIE_HALF + 0.004, 8)
+			expect(rim.dot(normal)).toBeCloseTo(DIE_HALF + 0.002, 8)
+
+			const local = position.applyQuaternion(q.clone().invert())
+			const localRim = rim.applyQuaternion(q.clone().invert())
+			expect(local.x).toBeCloseTo(localRim.x, 8)
+			expect(local.y).toBeCloseTo(localRim.y, 8)
+			// 中心だけでなく、リムを含む円全体が面の範囲内。
+			expect(Math.abs(local.x) + pip.rimRadius).toBeLessThanOrEqual(DIE_HALF)
+			expect(Math.abs(local.y) + pip.rimRadius).toBeLessThanOrEqual(DIE_HALF)
+			localPositions.push([local.x, local.y])
+		}
+		// 順序に依存せず、対角・中央列を含む既存の配置を保つ。
+		for (const [ox, oy] of PIP_OFFSETS[face]) {
+			expect(
+				localPositions.filter(
+					([x, y]) =>
+						Math.abs(x - ox * DIE_SIZE * 0.26) < 1e-6 &&
+						Math.abs(y - oy * DIE_SIZE * 0.26) < 1e-6,
+				),
+			).toHaveLength(1)
+		}
 	})
 })

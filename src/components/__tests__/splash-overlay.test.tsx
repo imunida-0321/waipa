@@ -44,7 +44,6 @@ describe('SplashOverlay', () => {
 		const { getByTestId } = await render(<SplashOverlay />)
 
 		expect(getByTestId('splash-image').props.source).toEqual(
-			// eslint-disable-next-line @typescript-eslint/no-require-imports
 			require('@/assets/images/splash-icon.png'),
 		)
 	})
