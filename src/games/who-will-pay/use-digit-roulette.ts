@@ -17,7 +17,7 @@ function nextNeedsSpinIndex(slots: DigitSlot[], afterIndex: number): number | nu
 	return found ? found.index : null
 }
 
-type PendingSpin = { targetIndex: number; playerIndex: number } | null
+type PendingSpin = { targetIndex: number; playerIndex: number; playerCount: number } | null
 
 export function useDigitRoulette(amount: number, playerCount: number) {
 	const [slots, setSlots] = useState(() => amountToSlots(amount))
@@ -37,13 +37,13 @@ export function useDigitRoulette(amount: number, playerCount: number) {
 
 		setIsSpinning(true)
 		playSound('spin')
-		setPending({ targetIndex, playerIndex })
+		setPending({ targetIndex, playerIndex, playerCount })
 	}, [isSpinning, allDone, currentIndex, playerCount])
 
 	useEffect(() => {
 		if (!pending) return
 
-		const { targetIndex, playerIndex } = pending
+		const { targetIndex, playerIndex, playerCount } = pending
 		// 当選プレイヤーが盤上に持つ repeats 個のセグメント（playerIndex, +playerCount, ...）
 		// から1つをランダムに選び、その中心で止める。描画と同じ wheelRepeats を参照。
 		const repeats = wheelRepeats(playerCount)
@@ -68,8 +68,7 @@ export function useDigitRoulette(amount: number, playerCount: number) {
 			setPending(null)
 			timerRef.current = null
 		}, SPIN_DURATION)
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [pending])
+	}, [pending, rotation])
 
 	useEffect(
 		() => () => {

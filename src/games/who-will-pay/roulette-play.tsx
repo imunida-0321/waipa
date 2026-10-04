@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { Pressable, StyleSheet, Text, View } from 'react-native'
 import Animated, {
 	useAnimatedStyle,
@@ -41,10 +41,16 @@ export function RoulettePlay({ amount, playerColors, playerNames, onFinish }: Pr
 		amount,
 		playerColors.length,
 	)
+	const slotsRef = useRef(slots)
+	const onFinishRef = useRef(onFinish)
 
 	useEffect(() => {
-		if (allDone) onFinish(slots)
-		// eslint-disable-next-line react-hooks/exhaustive-deps
+		slotsRef.current = slots
+		onFinishRef.current = onFinish
+	}, [slots, onFinish])
+
+	useEffect(() => {
+		if (allDone) onFinishRef.current(slotsRef.current)
 	}, [allDone])
 
 	return (

@@ -1,4 +1,5 @@
 import { act, fireEvent, render } from '@testing-library/react-native'
+import { haptics } from '@/lib/haptics'
 import { playSound } from '@/lib/sound'
 import { DiscussScreen } from '../discuss-screen'
 
@@ -162,5 +163,87 @@ describe('ガラス面', () => {
 		expect(
 			hasAncestorTestId(getByText('誰かが質問されたら全員乾杯'), 'glass-surface-pseudo'),
 		).toBe(true)
+	})
+})
+
+describe('remaining effect の実行タイミング', () => {
+	beforeEach(() => jest.clearAllMocks())
+
+	it('5秒で半拍を追加し、props 変更や確認表示の再レンダーでは音・バイブを重複せず半拍も延期しない', async () => {
+		const onDone = jest.fn()
+		const { getByText, rerender } = await render(
+			<DiscussScreen {...baseProps} seconds={6} onDone={onDone} />,
+		)
+		expect(jest.mocked(playSound).mock.calls).toEqual([['tick']])
+		expect(haptics.tap).toHaveBeenCalledTimes(1)
+		await act(async () => jest.advanceTimersByTime(999))
+		expect(playSound).toHaveBeenCalledTimes(1) // 6秒では半拍なし
+		await act(async () => jest.advanceTimersByTime(1))
+		expect(getByText('0:05')).toBeTruthy()
+		expect(playSound).toHaveBeenCalledTimes(2)
+		expect(haptics.tap).toHaveBeenCalledTimes(2)
+		await act(async () => jest.advanceTimersByTime(250))
+		await rerender(
+			<DiscussScreen
+				{...baseProps}
+				seconds={99}
+				trigger="更新した乾杯ルール"
+				kanpaiCount={1}
+				onDone={jest.fn()}
+			/>,
+		)
+		await act(async () => fireEvent.press(getByText('投票へすすむ')))
+		expect(getByText('0:05')).toBeTruthy() // seconds の変更ではリセットしない
+		expect(playSound).toHaveBeenCalledTimes(2)
+		expect(haptics.tap).toHaveBeenCalledTimes(3) // tick 2回＋確認ボタン自体の tap
+		await act(async () => jest.advanceTimersByTime(249))
+		expect(playSound).toHaveBeenCalledTimes(2)
+		await act(async () => jest.advanceTimersByTime(1))
+		expect(jest.mocked(playSound).mock.calls).toEqual([['tick'], ['tick'], ['tick']])
+		expect(haptics.tap).toHaveBeenCalledTimes(3) // 半拍は音だけ
+		await act(async () => jest.advanceTimersByTime(500))
+		expect(getByText('0:04')).toBeTruthy()
+		expect(playSound).toHaveBeenCalledTimes(4)
+		expect(haptics.tap).toHaveBeenCalledTimes(4)
+		expect(onDone).not.toHaveBeenCalled()
+	})
+
+	it('満了時は最新の onDone を1回呼び、完了後の props 変更では再通知しない', async () => {
+		const initialDone = jest.fn()
+		const latestDone = jest.fn()
+		const afterDone = jest.fn()
+		const { rerender } = await render(
+			<DiscussScreen {...baseProps} seconds={1} onDone={initialDone} />,
+		)
+		await act(async () => jest.advanceTimersByTime(500))
+		await rerender(<DiscussScreen {...baseProps} seconds={1} onDone={latestDone} />)
+		expect(initialDone).not.toHaveBeenCalled()
+		expect(latestDone).not.toHaveBeenCalled()
+		await act(async () => jest.advanceTimersByTime(499))
+		expect(latestDone).not.toHaveBeenCalled()
+		await act(async () => jest.advanceTimersByTime(1))
+		expect(initialDone).not.toHaveBeenCalled()
+		expect(latestDone).toHaveBeenCalledTimes(1)
+		expect(haptics.heavy).toHaveBeenCalledTimes(1)
+		await rerender(<DiscussScreen {...baseProps} seconds={20} onDone={afterDone} />)
+		await act(async () => jest.advanceTimersByTime(20_000))
+		expect(latestDone).toHaveBeenCalledTimes(1)
+		expect(afterDone).not.toHaveBeenCalled()
+		expect(haptics.heavy).toHaveBeenCalledTimes(1)
+		expect(jest.mocked(playSound).mock.calls).toEqual([['tick'], ['tick']])
+	})
+
+	it('半拍待ちでアンマウントすると半拍音・カウントダウン・完了通知を取り消す', async () => {
+		const onDone = jest.fn()
+		const { unmount } = await render(
+			<DiscussScreen {...baseProps} seconds={5} onDone={onDone} />,
+		)
+		await act(async () => jest.advanceTimersByTime(499))
+		await unmount()
+		await act(async () => jest.advanceTimersByTime(10_000))
+		expect(jest.mocked(playSound).mock.calls).toEqual([['tick']])
+		expect(haptics.tap).toHaveBeenCalledTimes(1)
+		expect(haptics.heavy).not.toHaveBeenCalled()
+		expect(onDone).not.toHaveBeenCalled()
 	})
 })
