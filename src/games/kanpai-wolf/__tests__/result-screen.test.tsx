@@ -71,6 +71,8 @@ describe('ガラス面', () => {
 			/>,
 		)
 
-		expect(hasAncestorTestId(getByText('市民のお題: ラーメン'), 'glass-surface-pseudo')).toBe(true)
+		expect(hasAncestorTestId(getByText('市民のお題: ラーメン'), 'glass-surface-pseudo')).toBe(
+			true,
+		)
 	})
 })

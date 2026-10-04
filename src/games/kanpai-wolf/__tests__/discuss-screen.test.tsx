@@ -159,8 +159,8 @@ describe('ガラス面', () => {
 			<DiscussScreen seconds={180} onDone={jest.fn()} {...baseProps} />,
 		)
 
-		expect(hasAncestorTestId(getByText('誰かが質問されたら全員乾杯'), 'glass-surface-pseudo')).toBe(
-			true,
-		)
+		expect(
+			hasAncestorTestId(getByText('誰かが質問されたら全員乾杯'), 'glass-surface-pseudo'),
+		).toBe(true)
 	})
 })

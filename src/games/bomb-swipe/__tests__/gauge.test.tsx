@@ -11,7 +11,7 @@ jest.mock('expo-linear-gradient', () => {
 // 内部で act() を await する非同期関数。await せず複数回連続で呼ぶと act() 呼び出しが
 // 重複し、以降のテストの render() が空ツリーを返す状態異常が発生するため、
 // 1 回ずつ必ず await する（brief の一括 act(async () => {...}) 版は本環境では動作しない）
-async function layout(gauge: any) {
+async function layout(gauge: Parameters<typeof fireEvent>[0]) {
 	await fireEvent(gauge, 'layout', {
 		nativeEvent: { layout: { x: 0, y: 0, width: 300, height: 400 } },
 	})

@@ -14,10 +14,10 @@ WaiPa の UI に Liquid Glass（ガラスモーフィズム）表現を導入す
 - ネオンブロブ背景 `AppBackground` の新設と `_layout.tsx` への設置
 - `glass` テーマトークンの追加
 - 共通 UI・主要画面への適用:
-  - `src/components/ui/card.tsx` の土台差し替え（settings / gallery に自動波及）
-  - `pill-button.tsx` / `secondary-button.tsx` の背景ガラス化
-  - ホーム（`home-header` / `game-card` / `hero-banner` の枠）
-  - モーダル・シート・オーバーレイ7種: 遊び方（`how-to-play-modal`）/ リザルト（`result-overlay`）/ プレミアムロック（`premium-lock-modal`）/ プレイヤー設定（`player-setup-sheet`）/ トライアルロック（`trial-lock-overlay`）/ upsell（`premium-upsell-card`）/ paywall
+    - `src/components/ui/card.tsx` の土台差し替え（settings / gallery に自動波及）
+    - `pill-button.tsx` / `secondary-button.tsx` の背景ガラス化
+    - ホーム（`home-header` / `game-card` / `hero-banner` の枠）
+    - モーダル・シート・オーバーレイ7種: 遊び方（`how-to-play-modal`）/ リザルト（`result-overlay`）/ プレミアムロック（`premium-lock-modal`）/ プレイヤー設定（`player-setup-sheet`）/ トライアルロック（`trial-lock-overlay`）/ upsell（`premium-upsell-card`）/ paywall
 
 ### フェーズ1でやらないこと
 
@@ -71,10 +71,10 @@ GlassSurface({ children, style, variant? })
 
 ```ts
 export const glass = {
-	fallbackFill: 'rgba(33, 29, 58, 0.72)',      // surface #211D3A の半透明版
+	fallbackFill: 'rgba(33, 29, 58, 0.72)', // surface #211D3A の半透明版
 	borderHighlight: 'rgba(255, 255, 255, 0.14)', // ハイライト風の枠線
 	blurIntensity: 40,
-	tint: 'rgba(123, 92, 250, 0.10)',             // GlassView / blur に載せる紫味
+	tint: 'rgba(123, 92, 250, 0.10)', // GlassView / blur に載せる紫味
 } as const
 ```
 

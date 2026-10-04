@@ -56,9 +56,7 @@ describe('PillButton', () => {
 	})
 
 	it('ガラス面を土台にする', async () => {
-		const { getByTestId } = await render(
-			<PillButton title="プレミアム" onPress={() => {}} />,
-		)
+		const { getByTestId } = await render(<PillButton title="プレミアム" onPress={() => {}} />)
 		expect(getByTestId('glass-surface-pseudo')).toBeTruthy()
 	})
 })

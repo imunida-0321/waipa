@@ -75,7 +75,9 @@ it('キャッチは小さめフォント＋2行分の固定高さで段ずれを
 })
 
 it('サムネとキャッチをガラス面のカード面で包む', async () => {
-	const { getByTestId, getByText } = await render(<GameCard game={baseGame} onPress={jest.fn()} />)
+	const { getByTestId, getByText } = await render(
+		<GameCard game={baseGame} onPress={jest.fn()} />,
+	)
 	const surface = getByTestId('game-card-surface')
 	const glassFace = within(surface).getByTestId('glass-surface-pseudo')
 	const style = StyleSheet.flatten(glassFace.props.style)

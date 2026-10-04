@@ -21,10 +21,12 @@
 ### Task 1: `formatPlayerCount` 純関数
 
 **Files:**
+
 - Create: `src/lib/format-players.ts`
 - Test: `src/lib/__tests__/format-players.test.ts`
 
 **Interfaces:**
+
 - Consumes: なし
 - Produces: `formatPlayerCount(min: number, max: number): string` — `min === max` なら `'2人'`、それ以外 `'2〜8人'`（区切りは全角波ダッシュ `〜` U+301C。既存モック・UI 文言と同じ文字）
 
@@ -85,10 +87,12 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 ### Task 2: `PlayerCountBadge` コンポーネント
 
 **Files:**
+
 - Create: `src/components/home/player-count-badge.tsx`
 - Test: `src/components/home/__tests__/player-count-badge.test.tsx`
 
 **Interfaces:**
+
 - Consumes: Task 1 の `formatPlayerCount(min, max)`
 - Produces: `PlayerCountBadge({ game }: { game: GameMeta })` — サムネ左上に絶対配置される人数ピル。`testID="player-count-badge"`
 
@@ -187,10 +191,12 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 ### Task 3: `GameCard` 刷新（バッジ・tagline 廃止・フォールバック刷新）
 
 **Files:**
+
 - Modify: `src/components/home/game-card.tsx`
 - Test: `src/components/home/__tests__/game-card.test.tsx`（既存テストの仕様変更部分を更新）
 
 **Interfaces:**
+
 - Consumes: Task 2 の `PlayerCountBadge`
 - Produces: `GameCard({ game, onPress })` — props・`accessibilityLabel={game.title}`・`testID` 群（`card-thumb-image` / `premium-lock-mask` / `icon-crown` / `player-count-badge`）は維持。カード幅は親任せ（`width: '100%'`）に変わる（Task 4 の2カラム化の前提）
 
@@ -384,10 +390,12 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 ### Task 4: `GameGrid` 千鳥2カラム化
 
 **Files:**
+
 - Modify: `src/components/home/game-grid.tsx`
 - Test: `src/components/home/__tests__/game-grid.test.tsx`（列分割・オフセットのテストを追加、tagline 依存を削除）
 
 **Interfaces:**
+
 - Consumes: Task 3 の `GameCard`（`width: '100%'` 前提）
 - Produces: `GameGrid()` — `testID="grid-left-column"` / `testID="grid-right-column"` の2カラム。偶数 index → 左列、奇数 index → 右列。右列に `paddingTop: '18.5%'`（半タイル分。親幅 48% ÷ 1.3 ÷ 2 ≒ 18.46%）
 
@@ -523,9 +531,11 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 ### Task 5: 全体検証と PR 作成
 
 **Files:**
+
 - なし（検証のみ）
 
 **Interfaces:**
+
 - Consumes: Task 1〜4 の全成果物
 - Produces: develop 向け PR
 

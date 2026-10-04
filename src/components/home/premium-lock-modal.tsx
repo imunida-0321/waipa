@@ -77,7 +77,9 @@ export function PremiumLockModal({ visible, gameId, gameTitle, onClose }: Props)
 								</View>
 							</>
 						) : null}
-						{used ? <Text style={styles.trialUsed}>お試しプレイは利用済みです</Text> : null}
+						{used ? (
+							<Text style={styles.trialUsed}>お試しプレイは利用済みです</Text>
+						) : null}
 						<View style={styles.buttonWrap}>
 							<GradientButton
 								title="プレミアムにアップグレード"

@@ -44,10 +44,12 @@ Expected: `feat/liquid-glass-ui`
 ### Task 1: glass テーマトークン
 
 **Files:**
+
 - Modify: `src/theme/tokens.ts`（末尾に `glass` を追加）
 - Test: `src/theme/__tests__/glass-tokens.test.ts`（新規）
 
 **Interfaces:**
+
 - Produces: `export const glass = { fallbackFill: string, borderHighlight: string, blurIntensity: number, tint: string }`（以降の全タスクが `@/theme/tokens` から import する）
 
 - [ ] **Step 1: 失敗するテストを書く**
@@ -109,6 +111,7 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 ### Task 2: GlassSurface コンポーネント（expo-blur 導入・モック含む）
 
 **Files:**
+
 - Create: `src/components/ui/glass-surface.tsx`
 - Create: `__mocks__/expo-glass-effect.tsx`
 - Create: `__mocks__/expo-blur.tsx`
@@ -116,11 +119,12 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 - Test: `src/components/ui/__tests__/glass-surface.test.tsx`（新規）
 
 **Interfaces:**
+
 - Consumes: `glass`, `radii`（`@/theme/tokens`）
 - Produces:
-  - `export function GlassSurface(props: PropsWithChildren<{ style?: StyleProp<ViewStyle>; variant?: 'card' | 'overlay' }>): JSX.Element` — variant 省略時は `'card'`
-  - `export function resolveGlassMode(variant: 'card' | 'overlay', env?: { liquidGlass: boolean; os: typeof Platform.OS }): 'native' | 'blur' | 'pseudo'`
-  - 描画ルートの testID: `glass-surface-native` / `glass-surface-blur` / `glass-surface-pseudo`（テストはこれで分岐を検証する）
+    - `export function GlassSurface(props: PropsWithChildren<{ style?: StyleProp<ViewStyle>; variant?: 'card' | 'overlay' }>): JSX.Element` — variant 省略時は `'card'`
+    - `export function resolveGlassMode(variant: 'card' | 'overlay', env?: { liquidGlass: boolean; os: typeof Platform.OS }): 'native' | 'blur' | 'pseudo'`
+    - 描画ルートの testID: `glass-surface-native` / `glass-surface-blur` / `glass-surface-pseudo`（テストはこれで分岐を検証する）
 
 - [ ] **Step 1: expo-blur を導入する**
 
@@ -163,7 +167,13 @@ type Props = ViewProps & {
 }
 
 // View が知らない props を渡すと警告になるため、blur 固有 props は落とす
-export function BlurView({ children, tint: _tint, intensity: _intensity, experimentalBlurMethod: _m, ...props }: Props) {
+export function BlurView({
+	children,
+	tint: _tint,
+	intensity: _intensity,
+	experimentalBlurMethod: _m,
+	...props
+}: Props) {
 	return <View {...props}>{children}</View>
 }
 ```
@@ -350,6 +360,7 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 ### Task 3: AppBackground（ネオンブロブ背景）と主要画面への設置
 
 **Files:**
+
 - Create: `src/components/ui/app-background.tsx`
 - Modify: `src/app/index.tsx`
 - Modify: `src/app/settings.tsx`
@@ -359,6 +370,7 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 - Test: `src/components/ui/__tests__/app-background.test.tsx`（新規）
 
 **Interfaces:**
+
 - Consumes: `colors`（`@/theme/tokens`）
 - Produces: `export function AppBackground(): JSX.Element` — `position: absolute` 全面・`pointerEvents="none"`・testID `app-background`。各画面のルート View（`backgroundColor: colors.background` を持つ）の最初の子として置く
 
@@ -470,14 +482,14 @@ import { AppBackground } from '@/components/ui/app-background'
 ```
 
 ```tsx
-	return (
-		<View style={styles.screen}>
-			<AppBackground />
-			<ScrollView contentContainerStyle={styles.content}>
+return (
+	<View style={styles.screen}>
+		<AppBackground />
+		<ScrollView contentContainerStyle={styles.content}>
 			{/* …既存の中身は変更なし… */}
-			</ScrollView>
-		</View>
-	)
+		</ScrollView>
+	</View>
+)
 ```
 
 ScrollView から `style={styles.screen}` を外す（`screen` スタイル自体は View 側で使うので残す）。
@@ -487,14 +499,14 @@ ScrollView から `style={styles.screen}` を外す（`screen` スタイル自�
 `src/app/paywall.tsx` — 同じ構造変更。ルートの `<ScrollView style={styles.screen} …>` を:
 
 ```tsx
-	return (
-		<View style={styles.screen}>
-			<AppBackground />
-			<ScrollView contentContainerStyle={styles.content}>
+return (
+	<View style={styles.screen}>
+		<AppBackground />
+		<ScrollView contentContainerStyle={styles.content}>
 			{/* …既存の中身は変更なし… */}
-			</ScrollView>
-		</View>
-	)
+		</ScrollView>
+	</View>
+)
 ```
 
 import の `react-native` 行に `View` を追加（paywall は既に `View` を import 済みなら不要）し、`AppBackground` を追加。
@@ -528,10 +540,12 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 ### Task 4: Card を GlassSurface 土台に差し替え
 
 **Files:**
+
 - Modify: `src/components/ui/card.tsx`
 - Test: `src/components/ui/__tests__/card.test.tsx`（新規）
 
 **Interfaces:**
+
 - Consumes: `GlassSurface`（Task 2）
 - Produces: `Card` の外部 API は不変（`PropsWithChildren<{ style?: … }>`）。`style` の型は `ViewStyle` → `StyleProp<ViewStyle>` に広がる（後方互換）
 
@@ -606,11 +620,13 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 ### Task 5: PillButton / SecondaryButton のガラス化
 
 **Files:**
+
 - Modify: `src/components/ui/pill-button.tsx`
 - Modify: `src/components/ui/secondary-button.tsx`
 - Test: `src/components/ui/__tests__/buttons.test.tsx`（追記）
 
 **Interfaces:**
+
 - Consumes: `GlassSurface`（Task 2）
 - Produces: 両ボタンの外部 API（props）は不変。Pressable がタップ・押下表現を持ち、視覚面は内側の GlassSurface が持つ構造になる
 
@@ -621,12 +637,10 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 `src/components/ui/__tests__/buttons.test.tsx` の `describe('PillButton', …)` 内に追記:
 
 ```tsx
-	it('ガラス面を土台にする', async () => {
-		const { getByTestId } = await render(
-			<PillButton title="プレミアム" onPress={() => {}} />,
-		)
-		expect(getByTestId('glass-surface-pseudo')).toBeTruthy()
-	})
+it('ガラス面を土台にする', async () => {
+	const { getByTestId } = await render(<PillButton title="プレミアム" onPress={() => {}} />)
+	expect(getByTestId('glass-surface-pseudo')).toBeTruthy()
+})
 ```
 
 同ファイル末尾に SecondaryButton の describe を新設（import に `SecondaryButton` を追加）:
@@ -767,10 +781,12 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 ### Task 6: GameCard のプレミアムロックバッジをガラス化
 
 **Files:**
+
 - Modify: `src/components/home/game-card.tsx`
 - Test: `src/components/home/__tests__/` の game-card 既存テスト（追記）
 
 **Interfaces:**
+
 - Consumes: `GlassSurface`（Task 2）
 - Produces: 外部 API 不変。サムネイル（画像・グラデ面）はガラス化しない
 
@@ -779,11 +795,11 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 game-card の既存テストファイル（`src/components/home/__tests__/` 配下）に、ロック表示のテストと同じモック・props 構成で追記:
 
 ```tsx
-	it('ロックバッジはガラス面で描画される', async () => {
-		// 既存の「プレミアム未解放でロックマスクが出る」テストと同じ premium ゲームの props を使う
-		const { getByTestId } = await render(<GameCard game={premiumGame} onPress={() => {}} />)
-		expect(getByTestId('glass-surface-pseudo')).toBeTruthy()
-	})
+it('ロックバッジはガラス面で描画される', async () => {
+	// 既存の「プレミアム未解放でロックマスクが出る」テストと同じ premium ゲームの props を使う
+	const { getByTestId } = await render(<GameCard game={premiumGame} onPress={() => {}} />)
+	expect(getByTestId('glass-surface-pseudo')).toBeTruthy()
+})
 ```
 
 （`premiumGame` は既存テストで使っている premium: true のフィクスチャ名に合わせる）
@@ -804,19 +820,21 @@ import { GlassSurface } from '@/components/ui/glass-surface'
 ロックバッジの `<View style={styles.lockBadge}>…</View>` を差し替え:
 
 ```tsx
-					{locked && (
-						<View testID="premium-lock-mask" style={styles.lockMask}>
-							<GlassSurface style={styles.lockBadge}>
-								<MaterialCommunityIcons
-									name="crown"
-									testID="icon-crown"
-									size={13}
-									color={colors.premiumGold}
-								/>
-								<Text style={styles.lockBadgeText}>プレミアム</Text>
-							</GlassSurface>
-						</View>
-					)}
+{
+	locked && (
+		<View testID="premium-lock-mask" style={styles.lockMask}>
+			<GlassSurface style={styles.lockBadge}>
+				<MaterialCommunityIcons
+					name="crown"
+					testID="icon-crown"
+					size={13}
+					color={colors.premiumGold}
+				/>
+				<Text style={styles.lockBadgeText}>プレミアム</Text>
+			</GlassSurface>
+		</View>
+	)
+}
 ```
 
 `styles.lockBadge` から `backgroundColor` を外し、金枠は残す（GlassSurface の白枠より style 配列で勝つ）:
@@ -853,12 +871,14 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 ### Task 7: モーダル群のガラス化（overlay variant）
 
 **Files:**
+
 - Modify: `src/components/game/how-to-play-modal.tsx`
 - Modify: `src/components/home/premium-lock-modal.tsx`
 - Modify: `src/components/game/trial-lock-overlay.tsx`
 - Test: 各コンポーネントの既存テストファイルに追記
 
 **Interfaces:**
+
 - Consumes: `GlassSurface`（variant `overlay` → Jest では testID `glass-surface-blur` になる）
 - Produces: 各モーダルの外部 API 不変。バックドロップ（暗幕）は blur 1枚ルールのため既存の rgba のまま
 
@@ -871,32 +891,32 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 how-to-play-modal:
 
 ```tsx
-	it('パネルはガラス面（overlay）で描画される', async () => {
-		const { getByTestId } = await render(
-			<HowToPlayModal visible title="テスト" pages={['1ページ']} onClose={() => {}} />,
-		)
-		expect(getByTestId('glass-surface-blur')).toBeTruthy()
-	})
+it('パネルはガラス面（overlay）で描画される', async () => {
+	const { getByTestId } = await render(
+		<HowToPlayModal visible title="テスト" pages={['1ページ']} onClose={() => {}} />,
+	)
+	expect(getByTestId('glass-surface-blur')).toBeTruthy()
+})
 ```
 
 premium-lock-modal（既存テストの gma / trial-store モックをそのまま利用）:
 
 ```tsx
-	it('シートはガラス面（overlay）で描画される', async () => {
-		const { getByTestId } = await render(
-			<PremiumLockModal visible gameId="chinchiro" gameTitle="チンチロ" onClose={() => {}} />,
-		)
-		expect(getByTestId('glass-surface-blur')).toBeTruthy()
-	})
+it('シートはガラス面（overlay）で描画される', async () => {
+	const { getByTestId } = await render(
+		<PremiumLockModal visible gameId="chinchiro" gameTitle="チンチロ" onClose={() => {}} />,
+	)
+	expect(getByTestId('glass-surface-blur')).toBeTruthy()
+})
 ```
 
 trial-lock-overlay（既存テストの「表示される」ケースと同じストアモックを利用）:
 
 ```tsx
-	it('パネルはガラス面（overlay）で描画される', async () => {
-		const { getByTestId } = await render(<TrialLockOverlay gameId="burst-chicken" />)
-		expect(getByTestId('glass-surface-blur')).toBeTruthy()
-	})
+it('パネルはガラス面（overlay）で描画される', async () => {
+	const { getByTestId } = await render(<TrialLockOverlay gameId="burst-chicken" />)
+	expect(getByTestId('glass-surface-blur')).toBeTruthy()
+})
 ```
 
 - [ ] **Step 2: 失敗を確認する**
@@ -913,11 +933,11 @@ import { GlassSurface } from '@/components/ui/glass-surface'
 ```
 
 ```tsx
-			<View style={styles.backdrop}>
-				<GlassSurface variant="overlay" style={styles.card}>
-					{/* …中身は変更なし… */}
-				</GlassSurface>
-			</View>
+<View style={styles.backdrop}>
+	<GlassSurface variant="overlay" style={styles.card}>
+		{/* …中身は変更なし… */}
+	</GlassSurface>
+</View>
 ```
 
 `styles.card` を以下に変更:
@@ -935,13 +955,13 @@ import { GlassSurface } from '@/components/ui/glass-surface'
 import 追加後、シートの内側 Pressable を「タップ遮断のみ」にし、視覚は GlassSurface に移す:
 
 ```tsx
-			<Pressable style={styles.backdrop} onPress={onClose}>
-				<Pressable style={styles.sheetWrap} onPress={() => {}}>
-					<GlassSurface variant="overlay" style={styles.sheet}>
-						{/* …王冠アイコン以下、中身は変更なし… */}
-					</GlassSurface>
-				</Pressable>
-			</Pressable>
+<Pressable style={styles.backdrop} onPress={onClose}>
+	<Pressable style={styles.sheetWrap} onPress={() => {}}>
+		<GlassSurface variant="overlay" style={styles.sheet}>
+			{/* …王冠アイコン以下、中身は変更なし… */}
+		</GlassSurface>
+	</Pressable>
+</Pressable>
 ```
 
 styles の変更:
@@ -963,11 +983,11 @@ styles の変更:
 import 追加と JSX 差し替え:
 
 ```tsx
-		<View testID="trial-lock-overlay" style={styles.overlay}>
-			<GlassSurface variant="overlay" style={styles.panel}>
-				{/* …中身は変更なし… */}
-			</GlassSurface>
-		</View>
+<View testID="trial-lock-overlay" style={styles.overlay}>
+	<GlassSurface variant="overlay" style={styles.panel}>
+		{/* …中身は変更なし… */}
+	</GlassSurface>
+</View>
 ```
 
 `styles.panel` を以下に変更:
@@ -1001,12 +1021,14 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 ### Task 8: 常設パネル群のガラス化（player-setup-sheet / premium-upsell-card / paywall）
 
 **Files:**
+
 - Modify: `src/components/game/player-setup-sheet.tsx`
 - Modify: `src/components/settings/premium-upsell-card.tsx`
 - Modify: `src/app/paywall.tsx`
 - Test: 各既存テストファイルに追記
 
 **Interfaces:**
+
 - Consumes: `GlassSurface`（variant `card`＝既定。リスト内の常設パネルなので blur 1枚ルールにより疑似ガラス側）
 - Produces: 各コンポーネントの外部 API 不変
 
@@ -1015,29 +1037,29 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 premium-upsell-card の既存テストに追記:
 
 ```tsx
-	it('ガラス面を土台にする', async () => {
-		const { getByTestId } = await render(<PremiumUpsellCard onUpgradePress={() => {}} />)
-		expect(getByTestId('glass-surface-pseudo')).toBeTruthy()
-	})
+it('ガラス面を土台にする', async () => {
+	const { getByTestId } = await render(<PremiumUpsellCard onUpgradePress={() => {}} />)
+	expect(getByTestId('glass-surface-pseudo')).toBeTruthy()
+})
 ```
 
 player-setup-sheet の既存テストに追記。**まず既存テストファイルを読み、レンダーに使っている props とストアモックをそのまま流用する**（本体の render 引数だけ既存の表示テストからコピーする）:
 
 ```tsx
-	it('プレイヤーカードはガラス面で描画される', async () => {
-		// render の引数は既存の「プレイヤーカードが表示される」系テストと同一にする
-		const { getAllByTestId } = await render(/* 既存テストと同じ <PlayerSetupSheet …/> */)
-		expect(getAllByTestId('glass-surface-pseudo').length).toBeGreaterThan(0)
-	})
+it('プレイヤーカードはガラス面で描画される', async () => {
+	// render の引数は既存の「プレイヤーカードが表示される」系テストと同一にする
+	const { getAllByTestId } = await render(/* 既存テストと同じ <PlayerSetupSheet …/> */)
+	expect(getAllByTestId('glass-surface-pseudo').length).toBeGreaterThan(0)
+})
 ```
 
 paywall の既存テストに追記:
 
 ```tsx
-	it('特典行・プランカードはガラス面で描画される', async () => {
-		const { getAllByTestId } = await render(<PaywallScreen />)
-		expect(getAllByTestId('glass-surface-pseudo').length).toBeGreaterThan(0)
-	})
+it('特典行・プランカードはガラス面で描画される', async () => {
+	const { getAllByTestId } = await render(<PaywallScreen />)
+	expect(getAllByTestId('glass-surface-pseudo').length).toBeGreaterThan(0)
+})
 ```
 
 - [ ] **Step 2: 失敗を確認する**
@@ -1065,24 +1087,26 @@ import 追加。3箇所を差し替える。
 プレイヤーカード（`key` は GlassSurface に付ける）:
 
 ```tsx
-						<GlassSurface
-							key={`${i}-${players.count}`}
-							style={[styles.card, showError && empty && styles.cardError]}
-						>
-							{/* …colorBar / cardBody / removeBtn は変更なし… */}
-						</GlassSurface>
+<GlassSurface
+	key={`${i}-${players.count}`}
+	style={[styles.card, showError && empty && styles.cardError]}
+>
+	{/* …colorBar / cardBody / removeBtn は変更なし… */}
+</GlassSurface>
 ```
 
 範囲調整バナー:
 
 ```tsx
-			{rangeAdjusted && (
-				<GlassSurface style={[styles.banner, styles.bannerNotice]}>
-					<Text style={styles.bannerText}>
-						このゲームは{rangeLabel}用のため人数を調整しました
-					</Text>
-				</GlassSurface>
-			)}
+{
+	rangeAdjusted && (
+		<GlassSurface style={[styles.banner, styles.bannerNotice]}>
+			<Text style={styles.bannerText}>
+				このゲームは{rangeLabel}用のため人数を調整しました
+			</Text>
+		</GlassSurface>
+	)
+}
 ```
 
 履歴ボックス: `<View style={styles.historyBox}>` → `<GlassSurface style={styles.historyBox}>`。
@@ -1113,22 +1137,24 @@ import 追加。4種のパネルを差し替える。
 特典行:
 
 ```tsx
-				{BENEFITS.map((benefit) => (
-					<GlassSurface key={benefit.title} style={styles.benefitRow}>
-						{/* …中身は変更なし… */}
-					</GlassSurface>
-				))}
+{
+	BENEFITS.map((benefit) => (
+		<GlassSurface key={benefit.title} style={styles.benefitRow}>
+			{/* …中身は変更なし… */}
+		</GlassSurface>
+	))
+}
 ```
 
 プランカード（PlanOption 内。Pressable はタップ担当、視覚は GlassSurface）:
 
 ```tsx
-		<Pressable accessibilityRole="button" onPress={onPress} style={styles.planWrap}>
-			<GlassSurface style={[styles.plan, selected && styles.selectedPlan]}>
-				<Text style={styles.planLabel}>{hasPackages ? label : `${label} ${price}`}</Text>
-				{hasPackages && <Text style={styles.planPrice}>{price}</Text>}
-			</GlassSurface>
-		</Pressable>
+<Pressable accessibilityRole="button" onPress={onPress} style={styles.planWrap}>
+	<GlassSurface style={[styles.plan, selected && styles.selectedPlan]}>
+		<Text style={styles.planLabel}>{hasPackages ? label : `${label} ${price}`}</Text>
+		{hasPackages && <Text style={styles.planPrice}>{price}</Text>}
+	</GlassSurface>
+</Pressable>
 ```
 
 「約39%お得」バッジ: `<View style={styles.badge}>` → `<GlassSurface style={styles.badge}>`
@@ -1206,6 +1232,7 @@ Expected: エラー 0
 Run: `LANG=UTF-8 bunx expo run:ios`（メモリ「iOS dev build 手順」参照。Expo Go 不可）
 
 確認項目:
+
 - ホーム: ブロブ背景が見える / ピルボタン・ロックバッジがガラス
 - 設定・gallery: カードがガラスでスクロール時に背景が透ける
 - paywall: 特典行・プランカードがガラス、選択時の金枠が出る

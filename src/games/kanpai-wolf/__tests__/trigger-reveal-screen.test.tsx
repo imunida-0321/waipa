@@ -42,8 +42,8 @@ describe('ガラス面', () => {
 			<TriggerRevealScreen triggerText="誰かが質問されたら全員乾杯" onDone={jest.fn()} />,
 		)
 
-		expect(hasAncestorTestId(getByText('誰かが質問されたら全員乾杯'), 'glass-surface-pseudo')).toBe(
-			true,
-		)
+		expect(
+			hasAncestorTestId(getByText('誰かが質問されたら全員乾杯'), 'glass-surface-pseudo'),
+		).toBe(true)
 	})
 })

@@ -107,8 +107,9 @@ it('ネイティブガラスでも選択中サイズの枠線が見える', asyn
 			isLiquidGlassAvailable: () => true,
 		}
 	})
-	// eslint-disable-next-line @typescript-eslint/no-require-imports
-	const { SizeSelect: NativeSizeSelect } = require('../size-select') as typeof import('../size-select')
+	const { SizeSelect: NativeSizeSelect } =
+		// eslint-disable-next-line @typescript-eslint/no-require-imports
+		require('../size-select') as typeof import('../size-select')
 	const { getAllByTestId } = await render(<NativeSizeSelect onStart={jest.fn()} />)
 	const active = getAllByTestId('glass-surface-native')
 		.map((node) => StyleSheet.flatten(node.props.style))

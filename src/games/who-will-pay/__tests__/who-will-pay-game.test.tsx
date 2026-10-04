@@ -1,5 +1,7 @@
 import { act, fireEvent, render, waitFor } from '@testing-library/react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import type { Ref } from 'react'
+import type { View as RNView, ViewProps } from 'react-native'
 import { playersStore } from '@/lib/players-store'
 import { WhoWillPayGame } from '../who-will-pay-game'
 
@@ -28,7 +30,7 @@ jest.mock('expo-linear-gradient', () => {
 	const React = require('react')
 	// eslint-disable-next-line @typescript-eslint/no-require-imports
 	const { View } = require('react-native')
-	const LinearGradient = React.forwardRef((props: any, ref: any) =>
+	const LinearGradient = React.forwardRef((props: ViewProps, ref: Ref<RNView>) =>
 		React.createElement(View, { ...props, ref }, props.children),
 	)
 	LinearGradient.displayName = 'LinearGradient'

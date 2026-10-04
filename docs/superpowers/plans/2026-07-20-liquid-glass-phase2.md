@@ -32,42 +32,42 @@
 
 **overlay（外殻パネル6箇所）:**
 
-| ファイル | スタイル | 内容 |
-|---|---|---|
-| chinchiro/rules-modal.tsx | sheet | Modal シート本体（テスト新規） |
-| no-king-game/premium-pack-modal.tsx | sheet | Modal シート本体 |
-| kimagure-ox/event-cutin.tsx | L74 のパネル | イベントカットイン |
-| daut-dice/reveal-overlay.tsx | penalty | オーバーレイ内ペナルティ表示 |
-| inshu-suijaku/punish-reveal.tsx | card | オーバーレイ内リビールカード |
-| reaction-pairs/punish-reveal.tsx | card | オーバーレイ内リビールカード |
+| ファイル                            | スタイル     | 内容                           |
+| ----------------------------------- | ------------ | ------------------------------ |
+| chinchiro/rules-modal.tsx           | sheet        | Modal シート本体（テスト新規） |
+| no-king-game/premium-pack-modal.tsx | sheet        | Modal シート本体               |
+| kimagure-ox/event-cutin.tsx         | L74 のパネル | イベントカットイン             |
+| daut-dice/reveal-overlay.tsx        | penalty      | オーバーレイ内ペナルティ表示   |
+| inshu-suijaku/punish-reveal.tsx     | card         | オーバーレイ内リビールカード   |
+| reaction-pairs/punish-reveal.tsx    | card         | オーバーレイ内リビールカード   |
 
 **card（既定・27箇所）:**
 
-| ファイル | スタイル |
-|---|---|
-| bomb-relay/bomb-relay-game.tsx | topicCard |
-| bomb-swipe/bomb-swipe-game.tsx | turnRow |
-| bomb-swipe/round-result.tsx | row |
-| burst-chicken/burst-chicken-game.tsx | turnRow |
-| burst-chicken/round-result.tsx | rankingCard |
-| chinchiro/result.tsx | card |
-| daut-dice/respond-screen.tsx | card |
-| daut-dice/result-screen.tsx | row（テスト新規） |
-| five-sec-stop/result.tsx | card |
+| ファイル                                   | スタイル                                                                                 |
+| ------------------------------------------ | ---------------------------------------------------------------------------------------- |
+| bomb-relay/bomb-relay-game.tsx             | topicCard                                                                                |
+| bomb-swipe/bomb-swipe-game.tsx             | turnRow                                                                                  |
+| bomb-swipe/round-result.tsx                | row                                                                                      |
+| burst-chicken/burst-chicken-game.tsx       | turnRow                                                                                  |
+| burst-chicken/round-result.tsx             | rankingCard                                                                              |
+| chinchiro/result.tsx                       | card                                                                                     |
+| daut-dice/respond-screen.tsx               | card                                                                                     |
+| daut-dice/result-screen.tsx                | row（テスト新規）                                                                        |
+| five-sec-stop/result.tsx                   | card                                                                                     |
 | inshu-suijaku/custom-punishments-sheet.tsx | setChip / toggleRow / tabs / tabActive / itemRow / segment / segmentBtnActive / inputBox |
-| inshu-suijaku/result-screen.tsx | row |
-| inshu-suijaku/size-select.tsx | customRow / option |
-| kanpai-wolf/discuss-screen.tsx | triggerCard |
-| kanpai-wolf/result-screen.tsx | card |
-| kanpai-wolf/setup-screen.tsx | chip |
-| kanpai-wolf/trigger-reveal-screen.tsx | card |
-| no-king-game/count-select.tsx | packRow |
-| no-king-game/topic-reveal.tsx | topicCard |
-| odeko-poker/result-screen.tsx | row |
-| reaction-pairs/player-roulette.tsx | row |
-| reaction-pairs/reaction-pairs-game.tsx | header |
-| reaction-pairs/result-screen.tsx | row |
-| who-will-pay/result.tsx | summary（テスト新規） |
+| inshu-suijaku/result-screen.tsx            | row                                                                                      |
+| inshu-suijaku/size-select.tsx              | customRow / option                                                                       |
+| kanpai-wolf/discuss-screen.tsx             | triggerCard                                                                              |
+| kanpai-wolf/result-screen.tsx              | card                                                                                     |
+| kanpai-wolf/setup-screen.tsx               | chip                                                                                     |
+| kanpai-wolf/trigger-reveal-screen.tsx      | card                                                                                     |
+| no-king-game/count-select.tsx              | packRow                                                                                  |
+| no-king-game/topic-reveal.tsx              | topicCard                                                                                |
+| odeko-poker/result-screen.tsx              | row                                                                                      |
+| reaction-pairs/player-roulette.tsx         | row                                                                                      |
+| reaction-pairs/reaction-pairs-game.tsx     | header                                                                                   |
+| reaction-pairs/result-screen.tsx           | row                                                                                      |
+| who-will-pay/result.tsx                    | summary（テスト新規）                                                                    |
 
 **ホーム（#44 カード面・ユーザー承認済み）:**
 
