@@ -5,7 +5,6 @@ import { haptics } from '@/lib/haptics'
 import { playSound } from '@/lib/sound'
 import GalleryScreen from '../gallery'
 
-jest.mock('@/global.css', () => ({}))
 jest.mock('expo-router', () => {
 	// eslint-disable-next-line @typescript-eslint/no-require-imports
 	const { Text } = require('react-native')

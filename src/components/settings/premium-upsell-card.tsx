@@ -23,7 +23,7 @@ export function PremiumUpsellCard({ onUpgradePress }: Props) {
 				/>
 				<Image
 					style={styles.mascot}
-					source={require('@/assets/images/expo-logo.png')}
+					source={require('@/assets/images/splash-icon.png')}
 					contentFit="contain"
 				/>
 			</View>

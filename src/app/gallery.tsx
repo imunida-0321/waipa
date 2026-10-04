@@ -1,6 +1,6 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons'
 import { Redirect, router } from 'expo-router'
-import { ScrollView, StyleSheet, View } from 'react-native'
+import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import { AppBackground } from '@/components/ui/app-background'
 import { Card } from '@/components/ui/card'
 import { ChevronRow } from '@/components/ui/chevron-row'
@@ -12,8 +12,7 @@ import { haptics } from '@/lib/haptics'
 import { settingsStore, useSettings } from '@/lib/settings-store'
 import { playSound } from '@/lib/sound'
 import { useTopics } from '@/lib/topics-store'
-import { colors, spacing } from '@/theme/tokens'
-import { ThemedText } from '@/components/themed-text'
+import { colors, spacing, typography } from '@/theme/tokens'
 
 // デザインシステム確認用ギャラリー。本番ビルドではアクセス不可
 export default function GalleryScreen() {
@@ -48,7 +47,7 @@ export default function GalleryScreen() {
 
 				<SectionHeader title="カード" />
 				<Card>
-					<ThemedText>サーフェス #211D3A / 枠線 #332E52 / 角丸 24</ThemedText>
+					<Text style={styles.body}>サーフェス #211D3A / 枠線 #332E52 / 角丸 24</Text>
 				</Card>
 
 				<SectionHeader title="設定行" />
@@ -85,12 +84,12 @@ export default function GalleryScreen() {
 
 				<SectionHeader title="お題データ" />
 				<Card>
-					<ThemedText>
+					<Text style={styles.body}>
 						読み込み済み: {topics.topics.length}件
 						{topics.fetchedAt
 							? `（${new Date(topics.fetchedAt).toLocaleTimeString()} 取得）`
 							: '（キャッシュなし）'}
-					</ThemedText>
+					</Text>
 				</Card>
 			</ScrollView>
 		</View>
@@ -101,4 +100,5 @@ const styles = StyleSheet.create({
 	screen: { flex: 1, backgroundColor: colors.background },
 	content: { padding: spacing.md, paddingBottom: spacing.xl },
 	gap: { height: spacing.sm },
+	body: { ...typography.body, color: colors.text },
 })
