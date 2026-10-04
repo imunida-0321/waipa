@@ -19,6 +19,7 @@ const sample = [
 function mockFetchOk(data: unknown) {
 	globalThis.fetch = jest.fn().mockResolvedValue({
 		ok: true,
+		status: 200,
 		json: async () => data,
 	}) as unknown as typeof fetch
 }
@@ -106,5 +107,17 @@ describe('refreshPremiumPack', () => {
 		const ok = await topicsStore.refreshPremiumPack('king_premium')
 		expect(ok).toBe(false)
 		expect(topicsStore.getState()).toEqual(before)
+	})
+
+	it('200 で空配列を取得したら false を返し state のお題を変更しない', async () => {
+		mockFetchOk(sample)
+		await topicsStore.refresh()
+		const before = [...topicsStore.getState().topics]
+		mockFetchOk([])
+
+		const ok = await topicsStore.refreshPremiumPack('king_premium')
+
+		expect(topicsStore.getState().topics).toEqual(before)
+		expect(ok).toBe(false)
 	})
 })

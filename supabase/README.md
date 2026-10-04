@@ -11,6 +11,7 @@
 4. `0004_create_word_pairs.sql` — word_pairs テーブル＋RLS ポリシー作成
 5. `0005_seed_word_pairs.sql` — ワードウルフのお題ペア投入（80件）
 6. `0006_seed_whisper_topics.sql` — ささやきリミットのセリフお題投入（30件・2026-07-13 適用済み）
+7. `0007_king_premium_free.sql` — リワード広告で解放する king_premium を is_premium=false に変更（未適用）
 
 適用後の確認（anon キーで無料お題だけ読めること）:
 
@@ -35,7 +36,7 @@ curl "https://ltkkzucuzngtavpreixq.supabase.co/rest/v1/word_pairs?select=id,pack
 | `pointing`         | 指差しヒートアップ                       | false      |
 | `batsu`            | リアクション神経衰弱（罰お題）           | false      |
 | `whisper`          | ささやきリミット（セリフお題）           | false      |
-| `king_premium`     | 王様ゲーム限定パック（恋愛系）           | true       |
+| `king_premium`     | 王様ゲーム限定パック（恋愛系）           | false      |
 | `pointing_premium` | 指差し限定パック（恋愛系）               | true       |
 
 - お題本文の `{B}` はアプリ側で「実行役以外のランダムな参加者番号」に置換する
