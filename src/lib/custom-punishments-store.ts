@@ -1,5 +1,4 @@
-import AsyncStorage from '@react-native-async-storage/async-storage'
-import { useSyncExternalStore } from 'react'
+import { createPersistedStore, useStore } from './create-store'
 
 const STORAGE_KEY = 'waipa.inshu-suijaku.custom-punishments'
 
@@ -29,16 +28,12 @@ function defaultState(): CustomPunishmentsState {
 	}
 }
 
-let state: CustomPunishmentsState = defaultState()
-const listeners = new Set<() => void>()
-
-function emit() {
-	listeners.forEach((fn) => fn())
-}
-
-async function persist() {
-	await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(state))
-}
+const store = createPersistedStore<CustomPunishmentsState>({
+	key: STORAGE_KEY,
+	initial: defaultState,
+	parse: (raw) =>
+		normalizeState({ ...defaultState(), ...(raw as Partial<CustomPunishmentsState>) }),
+})
 
 function normalizeText(text: string, maxLength: number): string {
 	return text.trim().slice(0, maxLength)
@@ -52,7 +47,10 @@ function normalizeState(next: CustomPunishmentsState): CustomPunishmentsState {
 	return { ...next, sets, activeSetId }
 }
 
-function updateActiveSet(fn: (set: CustomSet) => CustomSet): CustomPunishmentsState {
+function updateActiveSet(
+	state: CustomPunishmentsState,
+	fn: (set: CustomSet) => CustomSet,
+): CustomPunishmentsState {
 	const active = getActiveSet(state)
 	return {
 		...state,
@@ -62,35 +60,21 @@ function updateActiveSet(fn: (set: CustomSet) => CustomSet): CustomPunishmentsSt
 }
 
 export const customPunishmentsStore = {
-	getState(): CustomPunishmentsState {
-		return state
-	},
-	subscribe(fn: () => void): () => void {
-		listeners.add(fn)
-		return () => listeners.delete(fn)
-	},
-	async hydrate() {
-		try {
-			const raw = await AsyncStorage.getItem(STORAGE_KEY)
-			state = raw ? normalizeState({ ...defaultState(), ...JSON.parse(raw) }) : defaultState()
-		} catch {
-			// 読み取り失敗・破損データはメモリ上だけデフォルトへ戻す
-			state = defaultState()
-		}
-		emit()
-	},
+	getState: store.getState,
+	subscribe: store.subscribe,
+	hydrate: store.hydrate,
 	async setEnabled(on: boolean) {
-		state = { ...state, enabled: on }
-		emit()
-		await persist()
+		store.setState((state) => ({ ...state, enabled: on }))
+		await store.persist()
 	},
 	async selectSet(setId: string) {
+		const state = store.getState()
 		if (!state.sets.some((set) => set.id === setId)) return
-		state = { ...state, activeSetId: setId }
-		emit()
-		await persist()
+		store.setState({ ...state, activeSetId: setId })
+		await store.persist()
 	},
 	async addSet(name: string) {
+		const state = store.getState()
 		if (state.sets.length >= MAX_SETS) return
 		const id = `set${state.nextId}`
 		const trimmed = normalizeText(name, MAX_SET_NAME_LENGTH)
@@ -99,67 +83,66 @@ export const customPunishmentsStore = {
 			name: trimmed || `セット${state.sets.length + 1}`,
 			items: [],
 		}
-		state = {
+		store.setState({
 			...state,
 			activeSetId: id,
 			sets: [...state.sets, set],
 			nextId: state.nextId + 1,
-		}
-		emit()
-		await persist()
+		})
+		await store.persist()
 	},
 	async removeSet(setId: string) {
+		const state = store.getState()
 		if (state.sets.length <= 1) return
 		const sets = state.sets.filter((set) => set.id !== setId)
 		if (sets.length === state.sets.length) return
-		state = {
+		store.setState({
 			...state,
 			sets,
 			activeSetId: state.activeSetId === setId ? sets[0].id : state.activeSetId,
-		}
-		emit()
-		await persist()
+		})
+		await store.persist()
 	},
 	async addItem(type: CustomPunishment['type'], text: string) {
+		const state = store.getState()
 		const trimmed = normalizeText(text, MAX_TEXT_LENGTH)
 		if (!trimmed) return
 		const active = getActiveSet(state)
 		const max = type === 'normal' ? MAX_NORMAL_ITEMS : MAX_SPECIAL_ITEMS
 		if (countByType(active, type) >= max) return
 		const item: CustomPunishment = { id: `c${state.nextId}`, text: trimmed, type }
-		state = updateActiveSet((set) => ({ ...set, items: [...set.items, item] }))
-		state = { ...state, nextId: state.nextId + 1 }
-		emit()
-		await persist()
+		store.setState({
+			...updateActiveSet(state, (set) => ({ ...set, items: [...set.items, item] })),
+			nextId: state.nextId + 1,
+		})
+		await store.persist()
 	},
 	async updateItem(itemId: string, text: string) {
 		const trimmed = normalizeText(text, MAX_TEXT_LENGTH)
 		if (!trimmed) return
-		state = updateActiveSet((set) => ({
-			...set,
-			items: set.items.map((item) =>
-				item.id === itemId ? { ...item, text: trimmed } : item,
-			),
-		}))
-		emit()
-		await persist()
+		store.setState((state) =>
+			updateActiveSet(state, (set) => ({
+				...set,
+				items: set.items.map((item) =>
+					item.id === itemId ? { ...item, text: trimmed } : item,
+				),
+			})),
+		)
+		await store.persist()
 	},
 	async removeItem(itemId: string) {
-		state = updateActiveSet((set) => ({
-			...set,
-			items: set.items.filter((item) => item.id !== itemId),
-		}))
-		emit()
-		await persist()
+		store.setState((state) =>
+			updateActiveSet(state, (set) => ({
+				...set,
+				items: set.items.filter((item) => item.id !== itemId),
+			})),
+		)
+		await store.persist()
 	},
 }
 
 export function useCustomPunishments(): CustomPunishmentsState {
-	return useSyncExternalStore(
-		customPunishmentsStore.subscribe,
-		customPunishmentsStore.getState,
-		customPunishmentsStore.getState,
-	)
+	return useStore(customPunishmentsStore)
 }
 
 export function getActiveSet(s: CustomPunishmentsState): CustomSet {

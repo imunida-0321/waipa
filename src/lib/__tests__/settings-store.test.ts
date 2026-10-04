@@ -22,6 +22,17 @@ describe('settingsStore', () => {
 		expect(await AsyncStorage.getItem('waipa.settings')).toContain('"soundEnabled":false')
 	})
 
+	it('保存失敗でも setSoundEnabled は resolve し、メモリの状態は更新される', async () => {
+		jest.mocked(AsyncStorage.setItem).mockRejectedValueOnce(new Error('write error'))
+
+		await expect(settingsStore.setSoundEnabled(false)).resolves.toBeUndefined()
+		expect(settingsStore.getState().soundEnabled).toBe(false)
+		expect(AsyncStorage.setItem).toHaveBeenCalledWith(
+			'waipa.settings',
+			JSON.stringify({ soundEnabled: false, hapticsEnabled: true }),
+		)
+	})
+
 	it('hydrate が保存済み設定を復元する', async () => {
 		await AsyncStorage.setItem(
 			'waipa.settings',

@@ -1,15 +1,8 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { useSyncExternalStore } from 'react'
+import { createStore, useStore } from './create-store'
+import { fetchRows } from './supabase-rest'
 
 const CACHE_KEY = 'waipa.word_pairs.v1'
-
-function getSupabaseUrl() {
-	return process.env.EXPO_PUBLIC_SUPABASE_URL ?? ''
-}
-
-function getAnonKey() {
-	return process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY ?? ''
-}
 
 export type WordPairRow = {
 	id: string
@@ -23,29 +16,33 @@ type WordPairsState = {
 	fetchedAt: number | null
 }
 
-let state: WordPairsState = { pairs: [], fetchedAt: null }
-const listeners = new Set<() => void>()
+const store = createStore<WordPairsState>({ pairs: [], fetchedAt: null })
 
-function emit() {
-	listeners.forEach((fn) => fn())
+function isWordPairRow(value: unknown): value is WordPairRow {
+	return (
+		typeof value === 'object' &&
+		value !== null &&
+		'id' in value &&
+		typeof value.id === 'string' &&
+		'pack' in value &&
+		typeof value.pack === 'string' &&
+		'word_a' in value &&
+		typeof value.word_a === 'string' &&
+		'word_b' in value &&
+		typeof value.word_b === 'string'
+	)
 }
 
 export const wordPairsStore = {
-	getState(): WordPairsState {
-		return state
-	},
-	subscribe(fn: () => void): () => void {
-		listeners.add(fn)
-		return () => listeners.delete(fn)
-	},
+	getState: store.getState,
+	subscribe: store.subscribe,
 	// キャッシュ→メモリ復元（起動直後・オフライン時の土台）
 	async hydrate() {
 		try {
 			const raw = await AsyncStorage.getItem(CACHE_KEY)
 			if (raw) {
 				const cached = JSON.parse(raw) as WordPairsState
-				state = { pairs: cached.pairs ?? [], fetchedAt: cached.fetchedAt ?? null }
-				emit()
+				store.setState({ pairs: cached.pairs ?? [], fetchedAt: cached.fetchedAt ?? null })
 			}
 		} catch {
 			// 壊れたキャッシュは無視（次の refresh で上書きされる）
@@ -54,22 +51,14 @@ export const wordPairsStore = {
 	// ネットワーク取得。失敗しても throw せず false（キャッシュ温存）
 	async refresh(): Promise<boolean> {
 		try {
-			const anonKey = getAnonKey()
-			const supabaseUrl = getSupabaseUrl()
-			const res = await fetch(
-				`${supabaseUrl}/rest/v1/word_pairs?select=id,pack,word_a,word_b&is_premium=eq.false&limit=1000`,
-				{
-					headers: {
-						apikey: anonKey,
-						Authorization: `Bearer ${anonKey}`,
-					},
-				},
+			const pairs = await fetchRows(
+				'word_pairs',
+				{ select: 'id,pack,word_a,word_b', is_premium: 'eq.false', limit: '1000' },
+				isWordPairRow,
 			)
-			if (!res.ok) return false
-			const pairs = (await res.json()) as WordPairRow[]
-			state = { pairs, fetchedAt: Date.now() }
-			emit()
-			await AsyncStorage.setItem(CACHE_KEY, JSON.stringify(state))
+			if (pairs === null) return false
+			store.setState({ pairs, fetchedAt: Date.now() })
+			await AsyncStorage.setItem(CACHE_KEY, JSON.stringify(store.getState()))
 			return true
 		} catch {
 			return false
@@ -77,18 +66,14 @@ export const wordPairsStore = {
 	},
 	// テスト用: モジュール状態を初期化
 	_resetForTest() {
-		state = { pairs: [], fetchedAt: null }
+		store.setState({ pairs: [], fetchedAt: null })
 	},
 }
 
 export function useWordPairs(): WordPairsState {
-	return useSyncExternalStore(
-		wordPairsStore.subscribe,
-		wordPairsStore.getState,
-		wordPairsStore.getState,
-	)
+	return useStore(wordPairsStore)
 }
 
 export function getPairsByPack(pack: string): WordPairRow[] {
-	return state.pairs.filter((p) => p.pack === pack)
+	return store.getState().pairs.filter((p) => p.pack === pack)
 }

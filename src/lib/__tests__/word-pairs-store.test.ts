@@ -32,6 +32,26 @@ beforeEach(async () => {
 })
 
 describe('wordPairsStore', () => {
+	it('refresh は必須フィールドの欠落・型違いの行を捨て、正しい行だけを保存する', async () => {
+		mockFetchOk([
+			sample[0],
+			{ pack: 'food', word_a: 'ラーメン', word_b: 'うどん' },
+			{ id: 'missing-pack', word_a: 'ラーメン', word_b: 'うどん' },
+			{ id: 'missing-a', pack: 'food', word_b: 'うどん' },
+			{ id: 'missing-b', pack: 'food', word_a: 'ラーメン' },
+			{ id: 123, pack: 'food', word_a: 'ラーメン', word_b: 'うどん' },
+			{ id: 'wrong-pack', pack: 123, word_a: 'ラーメン', word_b: 'うどん' },
+			{ id: 'wrong-a', pack: 'food', word_a: 123, word_b: 'うどん' },
+			{ id: 'wrong-b', pack: 'food', word_a: 'ラーメン', word_b: 123 },
+			null,
+			sample[1],
+		])
+
+		await expect(wordPairsStore.refresh()).resolves.toBe(true)
+
+		expect(wordPairsStore.getState().pairs).toEqual([sample[0], sample[1]])
+	})
+
 	it('refresh 成功でメモリとキャッシュが更新される', async () => {
 		mockFetchOk(sample)
 		const ok = await wordPairsStore.refresh()
