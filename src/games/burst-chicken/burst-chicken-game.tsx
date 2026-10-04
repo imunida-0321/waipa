@@ -44,10 +44,11 @@ export function BurstChickenGame() {
 	}
 
 	const drum = useDrumroll()
+	const { start } = drum
 
 	// バースト: 爆発音＋強バイブ。精算: ドラムロール開始
 	// 注意: drum は useDrumroll() が毎レンダー新規オブジェクトを返すため、
-	// 依存配列には drum 自体ではなく安定した drum.start（useCallback）を渡す
+	// 依存配列には drum 自体ではなく安定した start（useCallback）を渡す
 	// （drum を渡すと phase 変化のたびに再実行され、ドラムロールが延々リスタートしてしまう）
 	useEffect(() => {
 		if (state.phase === 'exploded') {
@@ -55,10 +56,9 @@ export function BurstChickenGame() {
 			haptics.heavy()
 		}
 		if (state.phase === 'settled') {
-			drum.start()
+			start()
 		}
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [state.phase, drum.start])
+	}, [state.phase, start])
 
 	const retry = () => {
 		drum.reset()

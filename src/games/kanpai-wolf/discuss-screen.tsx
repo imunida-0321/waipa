@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Animated, Pressable, StyleSheet, Text, View } from 'react-native'
 import { GradientButton } from '@/components/ui/gradient-button'
 import { GlassSurface } from '@/components/ui/glass-surface'
@@ -29,18 +29,23 @@ export function DiscussScreen({
 	const [remaining, setRemaining] = useState(seconds)
 	const [confirming, setConfirming] = useState(false)
 	const doneRef = useRef(false)
+	const onDoneRef = useRef(onDone)
 	const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
 	const halfRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 	const scale = useMemo(() => new Animated.Value(1), [])
 
-	const finish = () => {
+	useEffect(() => {
+		onDoneRef.current = onDone
+	}, [onDone])
+
+	const finish = useCallback(() => {
 		if (doneRef.current) return
 		doneRef.current = true
 		if (intervalRef.current) clearInterval(intervalRef.current)
 		if (halfRef.current) clearTimeout(halfRef.current)
 		haptics.heavy()
-		onDone()
-	}
+		onDoneRef.current()
+	}, [])
 
 	const kanpai = () => {
 		playSound('cheers') // 素材未登録の間は無音スキップ（#75）
@@ -74,8 +79,7 @@ export function DiscussScreen({
 			}
 		}
 		// remaining のカウントダウンごとに評価する
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [remaining])
+	}, [remaining, finish])
 
 	const mm = Math.floor(Math.max(remaining, 0) / 60)
 	const ss = String(Math.max(remaining, 0) % 60).padStart(2, '0')

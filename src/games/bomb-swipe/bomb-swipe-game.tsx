@@ -34,20 +34,20 @@ export function BombSwipeGame() {
 	const lastHeartbeatBucket = useRef(0)
 
 	const drum = useDrumroll()
+	const { start } = drum
 
 	// 爆発: 音＋強バイブ。心音はスコア更新側で鳴らす（heartbeat 未収録の間は無音スキップ）
 	// 注意: drum は useDrumroll() が毎レンダー新規オブジェクトを返すため、
-	// 依存配列には drum 自体ではなく安定した drum.start（useCallback）を渡す
+	// 依存配列には drum 自体ではなく安定した start（useCallback）を渡す
 	useEffect(() => {
 		if (state.phase === 'exploded') {
 			playSound('explosion')
 			haptics.heavy()
 		}
 		if (state.phase === 'result') {
-			drum.start()
+			start()
 		}
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [state.phase, drum.start])
+	}, [state.phase, start])
 
 	const onScoreChange = (score: number) => {
 		setLiveScore(score)

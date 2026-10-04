@@ -1,5 +1,6 @@
 import { act, fireEvent, render } from '@testing-library/react-native'
 import { haptics } from '@/lib/haptics'
+import { playSound } from '@/lib/sound'
 import { BurstChickenGame } from '../burst-chicken-game'
 
 jest.mock('@/lib/sound', () => ({ playSound: jest.fn(), registerSound: jest.fn() }))
@@ -199,5 +200,55 @@ describe('ガラス面', () => {
 		const { getByText } = await render(<BurstChickenGame />)
 
 		expect(hasAncestorTestId(getByText(/あかさんの番/), 'glass-surface-pseudo')).toBe(true)
+	})
+})
+
+describe('phase effect の実行回数', () => {
+	it('バーストごとに爆発音・強バイブは1回で、再レンダーでは繰り返さない', async () => {
+		jest.mocked(Math.random).mockReturnValue(0) // 上限21、22では add 自体のバイブは tap
+		const { getByLabelText, getByText, rerender } = await render(<BurstChickenGame />)
+		const explosions = () =>
+			jest.mocked(playSound).mock.calls.filter(([sound]) => sound === 'explosion')
+		for (let round = 1; round <= 2; round++) {
+			for (let i = 0; i < 7; i++) await press(getByLabelText('+3'))
+			await rerender(<BurstChickenGame />)
+			expect(explosions()).toHaveLength(round - 1)
+			expect(haptics.heavy).toHaveBeenCalledTimes(round - 1)
+			await press(getByLabelText('+1'))
+			expect(explosions()).toHaveLength(round)
+			expect(haptics.heavy).toHaveBeenCalledTimes(round)
+			await rerender(<BurstChickenGame />)
+			await act(async () => jest.advanceTimersByTime(4000))
+			expect(explosions()).toHaveLength(round)
+			expect(haptics.heavy).toHaveBeenCalledTimes(round)
+			expect(playSound).not.toHaveBeenCalledWith('drumroll')
+			expect(playSound).not.toHaveBeenCalledWith('reveal')
+			if (round === 1) await press(getByText('もう一回'))
+		}
+	})
+
+	it('精算のドラムロールと発表は各1回で、途中・発表後の再レンダーでは再開しない', async () => {
+		const { getByLabelText, getByText, queryByText, rerender } = await render(
+			<BurstChickenGame />,
+		)
+		for (let i = 0; i < 5; i++) await press(getByLabelText('+3'))
+		expect(playSound).not.toHaveBeenCalledWith('drumroll')
+		expect(haptics.heavy).not.toHaveBeenCalled()
+		await press(getByText(/ストップ宣言/))
+		const resultSounds = () =>
+			jest.mocked(playSound).mock.calls.filter(([sound]) => sound !== 'tick')
+		expect(resultSounds()).toEqual([['drumroll']])
+		expect(haptics.heavy).toHaveBeenCalledTimes(1) // ストップ宣言
+		await act(async () => jest.advanceTimersByTime(1000))
+		await rerender(<BurstChickenGame />)
+		await act(async () => jest.advanceTimersByTime(999))
+		expect(queryByText(/の負け/)).toBeNull()
+		expect(resultSounds()).toEqual([['drumroll']])
+		await act(async () => jest.advanceTimersByTime(1))
+		expect(getByText(/の負け/)).toBeTruthy()
+		await rerender(<BurstChickenGame />)
+		await act(async () => jest.advanceTimersByTime(4000))
+		expect(resultSounds()).toEqual([['drumroll'], ['reveal']])
+		expect(haptics.heavy).toHaveBeenCalledTimes(2) // ストップ宣言＋発表
 	})
 })

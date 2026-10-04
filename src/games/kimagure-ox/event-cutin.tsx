@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { Dimensions, StyleSheet, Text, View } from 'react-native'
 import Animated, {
 	Easing,
@@ -26,6 +26,8 @@ type Props = {
 // 全画面カットイン。オーバーレイが下の盤面へのタップを遮る
 export function EventCutin({ event, onDone }: Props) {
 	const scale = useSharedValue(0.3)
+	// 演出完了には初回の callback を使い、props の変更では再開しない
+	const initialOnDoneRef = useRef(onDone)
 
 	useEffect(() => {
 		playSound('event')
@@ -34,11 +36,9 @@ export function EventCutin({ event, onDone }: Props) {
 			withTiming(1.15, { duration: 250, easing: Easing.out(Easing.cubic) }),
 			withTiming(1, { duration: 150 }),
 		)
-		const timer = setTimeout(onDone, CUTIN_DURATION_MS)
+		const timer = setTimeout(initialOnDoneRef.current, CUTIN_DURATION_MS)
 		return () => clearTimeout(timer)
-		// マウント時に一度だけ発火させる（onDone の identity 変化で再発火させない）
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [])
+	}, [scale])
 
 	const animatedStyle = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }))
 	const meta = EVENT_META[event]

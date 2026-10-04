@@ -1,4 +1,6 @@
 import { act, fireEvent, render } from '@testing-library/react-native'
+import { haptics } from '@/lib/haptics'
+import { playSound } from '@/lib/sound'
 import { BombSwipeGame } from '../bomb-swipe-game'
 
 jest.mock('@/lib/sound', () => ({ playSound: jest.fn(), registerSound: jest.fn() }))
@@ -194,5 +196,53 @@ describe('ガラス面', () => {
 		const { getByText } = await render(<BombSwipeGame />)
 
 		expect(hasAncestorTestId(getByText(/あかさんの番/), 'glass-surface-pseudo')).toBe(true)
+	})
+})
+
+describe('phase effect の実行回数', () => {
+	it('爆発した手番ごとに音・強バイブは1回で、同じ phase の再レンダーでは増えない', async () => {
+		const { getByText, getByTestId, rerender } = await render(<BombSwipeGame />)
+		expect(playSound).not.toHaveBeenCalled()
+		expect(haptics.heavy).not.toHaveBeenCalled()
+		for (let turn = 1; turn <= 2; turn++) {
+			await press(getByText(/スワイプ開始/))
+			await rerender(<BombSwipeGame />)
+			expect(jest.mocked(playSound).mock.calls).toHaveLength(turn - 1)
+			await press(getByTestId('mock-release-60'))
+			expect(playSound).toHaveBeenNthCalledWith(turn, 'explosion')
+			expect(haptics.heavy).toHaveBeenCalledTimes(turn)
+			await rerender(<BombSwipeGame />)
+			await act(async () => jest.advanceTimersByTime(3000))
+			expect(playSound).toHaveBeenCalledTimes(turn)
+			expect(haptics.heavy).toHaveBeenCalledTimes(turn)
+			if (turn === 1) await press(getByText(/次へ/))
+		}
+	})
+
+	it('結果に入るたびに1回だけドラムロールを開始し、再レンダーでも2秒後の発表を延長しない', async () => {
+		const { getByText, getByTestId, queryByText, rerender } = await render(<BombSwipeGame />)
+		for (let round = 1; round <= 2; round++) {
+			for (let turn = 0; turn < 2; turn++) {
+				await press(getByText(/スワイプ開始/))
+				await press(getByTestId('mock-release-50'))
+				expect(playSound).toHaveBeenCalledTimes((round - 1) * 2)
+				await press(getByText(/次へ/))
+			}
+			expect(playSound).toHaveBeenCalledTimes(round * 2 - 1)
+			expect(playSound).toHaveBeenLastCalledWith('drumroll')
+			await act(async () => jest.advanceTimersByTime(1000))
+			await rerender(<BombSwipeGame />)
+			await act(async () => jest.advanceTimersByTime(999))
+			expect(queryByText(/の負け/)).toBeNull()
+			expect(haptics.heavy).toHaveBeenCalledTimes(round - 1)
+			await act(async () => jest.advanceTimersByTime(1))
+			expect(getByText(/の負け/)).toBeTruthy()
+			await rerender(<BombSwipeGame />)
+			await act(async () => jest.advanceTimersByTime(4000))
+			expect(playSound).toHaveBeenCalledTimes(round * 2)
+			expect(playSound).toHaveBeenLastCalledWith('reveal')
+			expect(haptics.heavy).toHaveBeenCalledTimes(round)
+			if (round === 1) await press(getByText('もう一回'))
+		}
 	})
 })

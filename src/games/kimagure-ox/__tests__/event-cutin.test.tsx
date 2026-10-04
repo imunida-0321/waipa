@@ -1,4 +1,5 @@
 import { act, render } from '@testing-library/react-native'
+import { withSequence, withTiming } from 'react-native-reanimated'
 import { playSound } from '@/lib/sound'
 import { haptics } from '@/lib/haptics'
 import { CUTIN_DURATION_MS, EventCutin } from '../event-cutin'
@@ -10,10 +11,12 @@ jest.mock('@/lib/haptics', () => ({
 jest.mock('react-native-reanimated', () => {
 	// eslint-disable-next-line @typescript-eslint/no-require-imports
 	const { View, Text } = require('react-native')
+	// eslint-disable-next-line @typescript-eslint/no-require-imports
+	const { useRef } = require('react') as typeof import('react')
 	return {
 		__esModule: true,
 		default: { View, Text },
-		useSharedValue: jest.fn((initial: number) => ({ value: initial })),
+		useSharedValue: (initial: number) => useRef({ value: initial }).current,
 		useAnimatedStyle: jest.fn(() => ({})),
 		withTiming: jest.fn((toValue: number) => toValue),
 		withSequence: jest.fn((toValue: number) => toValue),
@@ -72,4 +75,31 @@ describe('ガラス面', () => {
 
 		expect(hasAncestorTestId(getByText('マスシャッフル'), 'glass-surface-blur')).toBe(true)
 	})
+})
+
+it('event・onDone が変わっても演出を再開せず、初回の onDone をマウントから1400ms後に1回呼ぶ', async () => {
+	const initialDone = jest.fn()
+	const latestDone = jest.fn()
+	const { rerender, getByText } = await render(<EventCutin event="double" onDone={initialDone} />)
+	await act(async () => jest.advanceTimersByTime(400))
+	await rerender(<EventCutin event="shuffle" onDone={latestDone} />)
+	expect(getByText('マスシャッフル')).toBeTruthy()
+	expect(jest.mocked(playSound).mock.calls).toEqual([['event']])
+	expect(haptics.heavy).toHaveBeenCalledTimes(1)
+	expect(withSequence).toHaveBeenCalledTimes(1)
+	expect(withTiming).toHaveBeenCalledTimes(2)
+	await act(async () => jest.advanceTimersByTime(CUTIN_DURATION_MS - 401))
+	expect(initialDone).not.toHaveBeenCalled()
+	expect(latestDone).not.toHaveBeenCalled()
+	await act(async () => jest.advanceTimersByTime(1))
+	expect(initialDone).toHaveBeenCalledTimes(1)
+	expect(latestDone).not.toHaveBeenCalled()
+	await rerender(<EventCutin event="shuffle" onDone={latestDone} />)
+	await act(async () => jest.advanceTimersByTime(CUTIN_DURATION_MS * 2))
+	expect(initialDone).toHaveBeenCalledTimes(1)
+	expect(latestDone).not.toHaveBeenCalled()
+	expect(jest.mocked(playSound).mock.calls).toEqual([['event']])
+	expect(haptics.heavy).toHaveBeenCalledTimes(1)
+	expect(withSequence).toHaveBeenCalledTimes(1)
+	expect(withTiming).toHaveBeenCalledTimes(2)
 })
