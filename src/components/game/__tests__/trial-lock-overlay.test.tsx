@@ -50,9 +50,7 @@ it('お試しを消費し切った非プレミアムユーザーにはロック�
 it('未消費・非トライアル・プレミアムでは表示しない', async () => {
 	const { trialStore } = requireTrialStore()
 	trialStore._resetForTest()
-	const { queryByTestId, rerender } = await render(
-		<TrialLockOverlay gameId="burst-chicken" />,
-	)
+	const { queryByTestId, rerender } = await render(<TrialLockOverlay gameId="burst-chicken" />)
 	expect(queryByTestId('trial-lock-overlay')).toBeNull()
 
 	await trialStore.startTrial('burst-chicken')

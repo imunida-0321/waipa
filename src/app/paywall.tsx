@@ -148,7 +148,9 @@ export default function PaywallScreen() {
 						<View style={styles.plans}>
 							<PlanOption
 								label="月額"
-								price={monthlyPackage?.product.priceString ?? FALLBACK_PRICES.monthly}
+								price={
+									monthlyPackage?.product.priceString ?? FALLBACK_PRICES.monthly
+								}
 								selected={selectedPlan === 'monthly'}
 								hasPackages={packages !== null}
 								onPress={() => setSelectedPlan('monthly')}
@@ -202,11 +204,7 @@ function PlanOption({
 	onPress: () => void
 }) {
 	return (
-		<Pressable
-			accessibilityRole="button"
-			onPress={onPress}
-			style={styles.planWrap}
-		>
+		<Pressable accessibilityRole="button" onPress={onPress} style={styles.planWrap}>
 			<GlassSurface style={[styles.plan, selected && styles.selectedPlan]}>
 				<Text style={styles.planLabel}>{hasPackages ? label : `${label} ${price}`}</Text>
 				{hasPackages && <Text style={styles.planPrice}>{price}</Text>}

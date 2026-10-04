@@ -175,7 +175,9 @@ export function CustomPunishmentsSheet({ visible, onClose }: Props) {
 										}}
 										onLongPress={() => confirmRemoveSet(set.id)}
 									>
-										<GlassSurface style={[styles.setChip, active && styles.setChipActive]}>
+										<GlassSurface
+											style={[styles.setChip, active && styles.setChipActive]}
+										>
 											<Text style={styles.setChipText}>{set.name}</Text>
 										</GlassSurface>
 									</Pressable>

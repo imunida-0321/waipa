@@ -41,7 +41,10 @@ export function ResultScreen({ names, scores, onRetry, onHome }: Props) {
 				{rows.map((row) => {
 					const isLast = !allTied && row.score === minScore
 					return (
-						<GlassSurface key={row.index} style={[styles.row, isLast && styles.lastRow]}>
+						<GlassSurface
+							key={row.index}
+							style={[styles.row, isLast && styles.lastRow]}
+						>
 							<Text style={styles.rank}>{row.rank}位</Text>
 							<View
 								style={[

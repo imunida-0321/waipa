@@ -147,9 +147,7 @@ it('king_premium 解放中はアンマウントで再ロックされる', async 
 
 it('プレミアム解放中で限定お題が未取得ならマウント時に限定パックを取得する', async () => {
 	mockedPremium.mockReturnValue(true)
-	const refreshPremiumPack = jest
-		.spyOn(topicsStore, 'refreshPremiumPack')
-		.mockResolvedValue(true)
+	const refreshPremiumPack = jest.spyOn(topicsStore, 'refreshPremiumPack').mockResolvedValue(true)
 
 	await render(<NoKingGame />)
 

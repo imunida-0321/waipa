@@ -243,10 +243,7 @@ it('イントロで閉じたときはインタースティシャルを呼ばな�
 it('イントロ表示中は beforeRemove リスナーを登録せずインタースティシャルを呼ばない', async () => {
 	await render(<GameScreen meta={baseMeta} />)
 
-	expect(mockNavigationAddListener).not.toHaveBeenCalledWith(
-		'beforeRemove',
-		expect.any(Function),
-	)
+	expect(mockNavigationAddListener).not.toHaveBeenCalledWith('beforeRemove', expect.any(Function))
 	expect(mockBeforeRemoveHandler).toBeUndefined()
 	expect(maybeShowGameExitInterstitialMock).not.toHaveBeenCalled()
 })
@@ -257,10 +254,7 @@ it('play ステージの beforeRemove でインタースティシャルを1回�
 		fireEvent.press(getByText('ゲームスタート'))
 	})
 	await waitFor(() => {
-		expect(mockNavigationAddListener).toHaveBeenCalledWith(
-			'beforeRemove',
-			expect.any(Function),
-		)
+		expect(mockNavigationAddListener).toHaveBeenCalledWith('beforeRemove', expect.any(Function))
 	})
 
 	await act(async () => {

@@ -65,7 +65,11 @@ export default function GalleryScreen() {
 						value={settings.hapticsEnabled}
 						onValueChange={(v) => settingsStore.setHapticsEnabled(v)}
 					/>
-					<ChevronRow icon="star" label="レビューを書く" onPress={() => haptics.heavy()} />
+					<ChevronRow
+						icon="star"
+						label="レビューを書く"
+						onPress={() => haptics.heavy()}
+					/>
 				</Card>
 
 				<SectionHeader title="ゲームフレーム" />

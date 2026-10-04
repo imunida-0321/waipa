@@ -55,9 +55,17 @@ export default function SettingsScreen() {
 				</Card>
 				<SectionHeader title="その他" />
 				<Card>
-					<ChevronRow icon="restore" label="購入を復元する" onPress={handleRestorePremium} />
+					<ChevronRow
+						icon="restore"
+						label="購入を復元する"
+						onPress={handleRestorePremium}
+					/>
 					<ChevronRow icon="star" label="レビューを書く" onPress={() => writeReview()} />
-					<ChevronRow icon="email-outline" label="要望・問い合わせ" onPress={() => contactSupport()} />
+					<ChevronRow
+						icon="email-outline"
+						label="要望・問い合わせ"
+						onPress={() => contactSupport()}
+					/>
 				</Card>
 			</ScrollView>
 		</View>

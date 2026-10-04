@@ -106,7 +106,9 @@ function RankCard({
 	const playerColorValue = playerColor(entry.playerIndex).value
 
 	return (
-		<GlassSurface style={[styles.card, isTop && styles.topCard, entry.isLoser && styles.loserCard]}>
+		<GlassSurface
+			style={[styles.card, isTop && styles.topCard, entry.isLoser && styles.loserCard]}
+		>
 			<Text style={styles.rank}>{rank}位</Text>
 			<View style={[styles.colorDot, { backgroundColor: playerColorValue }]} />
 			<Text style={styles.name}>{name}</Text>
