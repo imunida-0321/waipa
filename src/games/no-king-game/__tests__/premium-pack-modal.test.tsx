@@ -106,6 +106,40 @@ describe('PremiumPackModal', () => {
 		expect(getByText('再試行')).toBeTruthy()
 	})
 
+	it('視聴完了後に200でお題が0件だったら解放せず再試行を表示する', async () => {
+		const { topicsStore: actualTopicsStore } =
+			jest.requireActual<typeof import('@/lib/topics-store')>('@/lib/topics-store')
+		actualTopicsStore._resetForTest()
+		const originalFetch = globalThis.fetch
+		globalThis.fetch = jest.fn().mockResolvedValue({
+			ok: true,
+			status: 200,
+			json: async () => [],
+		}) as unknown as typeof fetch
+		// 空レスポンスの成否判定は実際のストアに任せる。
+		refreshPremiumPackMock.mockImplementation(actualTopicsStore.refreshPremiumPack)
+		getTopicsByPackMock.mockReturnValue([])
+		mockedHook.mockReturnValue(hookState({ isEarnedReward: true }))
+
+		try {
+			const { getByText, queryByText } = await render(
+				<PremiumPackModal visible onClose={() => {}} />,
+			)
+
+			expect(refreshPremiumPackMock).toHaveBeenCalledWith('king_premium')
+			expect(globalThis.fetch).toHaveBeenCalled()
+			await waitFor(() => {
+				expect(isPackUnlocked('king_premium')).toBe(false)
+				expect(getByText('お題の取得に失敗しました')).toBeTruthy()
+				expect(getByText('再試行')).toBeTruthy()
+				expect(queryByText(/解放中/)).toBeNull()
+			})
+		} finally {
+			globalThis.fetch = originalFetch
+			actualTopicsStore._resetForTest()
+		}
+	})
+
 	it('再試行でプレミアムお題の取得に成功したら動画を再視聴せず解放する', async () => {
 		getTopicsByPackMock.mockReturnValue([])
 		refreshPremiumPackMock.mockResolvedValue(false)

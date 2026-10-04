@@ -91,6 +91,7 @@ export const topicsStore = {
 			)
 			if (!res.ok) return false
 			const fetched = (await res.json()) as Topic[]
+			if (fetched.length === 0) return false
 			const known = new Set(state.topics.map((t) => t.id))
 			state = {
 				...state,
