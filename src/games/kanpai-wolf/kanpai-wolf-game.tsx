@@ -1,5 +1,6 @@
 import { useCallback, useReducer } from 'react'
 import { getDisplayNames, usePlayers } from '@/lib/players-store'
+import { defaultRng } from '@/lib/random'
 import { useTrialRoundConsumer } from '@/lib/trial-store'
 import { getPairsByPack, useWordPairs } from '@/lib/word-pairs-store'
 import { DealPass } from './deal-pass'
@@ -25,7 +26,7 @@ export function KanpaiWolfGame() {
 
 	const pickPair = useCallback(
 		(pack: string, usedIds: readonly string[]) =>
-			choosePair(getPairsByPack(pack), pack, usedIds, Math.random),
+			choosePair(getPairsByPack(pack), pack, usedIds, defaultRng),
 		[],
 	)
 
@@ -34,8 +35,8 @@ export function KanpaiWolfGame() {
 			type: 'start',
 			config,
 			pair: pickPair(config.pack, state.usedPairIds),
-			trigger: chooseTrigger(state.usedTriggerIds, Math.random),
-			rng: Math.random,
+			trigger: chooseTrigger(state.usedTriggerIds, defaultRng),
+			rng: defaultRng,
 		})
 
 	switch (state.phase) {
@@ -134,8 +135,8 @@ export function KanpaiWolfGame() {
 						dispatch({
 							type: 'retry',
 							pair: pickPair(state.pack, state.usedPairIds),
-							trigger: chooseTrigger(state.usedTriggerIds, Math.random),
-							rng: Math.random,
+							trigger: chooseTrigger(state.usedTriggerIds, defaultRng),
+							rng: defaultRng,
 						})
 					}
 				/>

@@ -1,6 +1,7 @@
+import type { Rng } from '@/lib/random'
 import { NORMAL_PUNISHMENTS, SPECIAL_PUNISHMENTS, type Punishment } from './punishments'
 
-export type Rng = () => number
+export type { Rng } from '@/lib/random'
 
 export type BoardSize = 'small' | 'medium' | 'large'
 

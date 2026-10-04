@@ -1,4 +1,6 @@
-export type Rng = () => number
+import type { Rng } from '@/lib/random'
+
+export type { Rng } from '@/lib/random'
 
 export type CardKind = 'pair' | 'joker' | 'lucky'
 export type CardState = 'hidden' | 'revealed' | 'removed'

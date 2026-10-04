@@ -102,6 +102,31 @@ describe('topicsStore', () => {
 		expect(picked?.id).toBe('b')
 		expect(pickTopic('king', ['a', 'b'])).toBeUndefined()
 	})
+
+	describe('pickTopic の rng 注入', () => {
+		afterEach(() => {
+			jest.restoreAllMocks()
+		})
+
+		it.each([
+			{ value: 0, expectedId: 'b', position: '先頭' },
+			{ value: 0.999, expectedId: 'd', position: '末尾' },
+		])(
+			'rng が $value を返すと excludeIds 適用後のプールの $position を選ぶ',
+			async ({ value, expectedId }) => {
+				mockFetchOk([
+					...sample,
+					{ id: 'd', pack: 'king', text: 'お題D' },
+					{ id: 'e', pack: 'king', text: 'お題E' },
+				])
+				await topicsStore.refresh()
+				// 第3引数を無視する実装が偶然パスしないよう、逆の端を選ぶ値に固定する
+				jest.spyOn(Math, 'random').mockReturnValue(value === 0 ? 0.999 : 0)
+
+				expect(pickTopic('king', ['a', 'e'], () => value)?.id).toBe(expectedId)
+			},
+		)
+	})
 })
 
 describe('refreshPremiumPack', () => {

@@ -1,5 +1,6 @@
-/** [0, 1) を返す（Math.random 互換）。1 ちょうどを返す実装は不可 */
-export type Rng = () => number
+import type { Rng } from '@/lib/random'
+
+export type { Rng } from '@/lib/random'
 
 export const MIE = 21
 export const INITIAL_LIVES = 3

@@ -7,12 +7,13 @@ import {
 	useCustomPunishments,
 } from '@/lib/custom-punishments-store'
 import { haptics } from '@/lib/haptics'
+import { defaultRng } from '@/lib/random'
 import { getDisplayNames, usePlayers } from '@/lib/players-store'
 import { useTrialRoundConsumer } from '@/lib/trial-store'
 import { playerColor } from '@/theme/player-colors'
 import { spacing, typography } from '@/theme/tokens'
 import { CardGrid, MATCH_ANIM_MS } from './card-grid'
-import { BOARD_CONFIG, remainingPairs, type Rng } from './engine'
+import { BOARD_CONFIG, remainingPairs } from './engine'
 import { initialState, isMismatchShown, reduce } from './reducer'
 import { PunishReveal } from './punish-reveal'
 import { ResultScreen } from './result-screen'
@@ -20,8 +21,6 @@ import { SizeSelect } from './size-select'
 
 export const MISMATCH_MS = 1500
 export const JOKER_ANIM_MS = 600
-
-const rng: Rng = () => Math.random()
 
 export function InshuSuijakuGame() {
 	const players = usePlayers()
@@ -62,7 +61,12 @@ export function InshuSuijakuGame() {
 		return (
 			<SizeSelect
 				onStart={(size) =>
-					dispatch({ type: 'start', size, rng, custom: getActivePool(customState) })
+					dispatch({
+						type: 'start',
+						size,
+						rng: defaultRng,
+						custom: getActivePool(customState),
+					})
 				}
 			/>
 		)
@@ -73,7 +77,9 @@ export function InshuSuijakuGame() {
 			<ResultScreen
 				names={names}
 				scores={state.scores}
-				onRetry={() => dispatch({ type: 'retry', rng, custom: getActivePool(customState) })}
+				onRetry={() =>
+					dispatch({ type: 'retry', rng: defaultRng, custom: getActivePool(customState) })
+				}
 				onHome={() => router.replace('/')}
 			/>
 		)

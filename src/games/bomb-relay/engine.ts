@@ -1,4 +1,6 @@
-export type Rng = () => number
+import type { Rng } from '@/lib/random'
+
+export type { Rng } from '@/lib/random'
 
 export const FUSE_MIN_MS = 10000
 export const FUSE_MAX_MS = 45000

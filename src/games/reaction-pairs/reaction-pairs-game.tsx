@@ -3,6 +3,7 @@ import { useEffect, useReducer } from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import { GlassSurface } from '@/components/ui/glass-surface'
 import { getDisplayNames, usePlayers } from '@/lib/players-store'
+import { defaultRng } from '@/lib/random'
 import { useTopics } from '@/lib/topics-store'
 import { playerColor } from '@/theme/player-colors'
 import { colors, radii, spacing, typography } from '@/theme/tokens'
@@ -21,7 +22,7 @@ export function ReactionPairsGame() {
 	const names = getDisplayNames(players)
 	const topics = useTopics()
 	const [state, dispatch] = useReducer(reduce, players.count, (count) =>
-		initialState(count, Math.random),
+		initialState(count, defaultRng),
 	)
 
 	const mismatch = isMismatchShown(state)
@@ -48,7 +49,7 @@ export function ReactionPairsGame() {
 			<CardGrid
 				cards={state.cards}
 				disabled={state.phase !== 'play' || state.flippedIds.length === 2 || luckyShown}
-				onFlip={(cardId) => dispatch({ type: 'flip', cardId, rng: Math.random })}
+				onFlip={(cardId) => dispatch({ type: 'flip', cardId, rng: defaultRng })}
 			/>
 
 			{luckyShown && state.passHolder !== null && (
@@ -67,7 +68,7 @@ export function ReactionPairsGame() {
 					onDone={() =>
 						dispatch({
 							type: 'rouletteDone',
-							topic: pickBatsuTopic(topics.topics, state.usedTopicIds, Math.random),
+							topic: pickBatsuTopic(topics.topics, state.usedTopicIds, defaultRng),
 						})
 					}
 				/>
@@ -88,7 +89,7 @@ export function ReactionPairsGame() {
 					scores={state.scores}
 					punishCounts={state.punishCounts}
 					loserIndex={state.loserIndex}
-					onRetry={() => dispatch({ type: 'retry', rng: Math.random })}
+					onRetry={() => dispatch({ type: 'retry', rng: defaultRng })}
 					onHome={() => router.replace('/')}
 				/>
 			)}

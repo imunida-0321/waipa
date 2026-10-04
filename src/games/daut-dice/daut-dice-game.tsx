@@ -5,13 +5,14 @@ import { mulberry32 } from '@/components/dice-3d/math'
 import { GradientButton } from '@/components/ui/gradient-button'
 import { IsoDie } from '@/games/chinchiro/iso-die'
 import { haptics } from '@/lib/haptics'
+import { defaultRng } from '@/lib/random'
 import { playSound } from '@/lib/sound'
 import { getDisplayNames, usePlayers } from '@/lib/players-store'
 import { useTrialRoundConsumer } from '@/lib/trial-store'
 import { colors, radii, spacing, typography } from '@/theme/tokens'
 import { DeclareList } from './declare-list'
 import { DiceRoll3D, ROLL_ANIM_MS } from './dice-roll-3d'
-import { declarationLabel, type Rng } from './engine'
+import { declarationLabel } from './engine'
 import { LivesBar } from './lives-bar'
 import { initialState, reduce } from './reducer'
 import { RespondScreen } from './respond-screen'
@@ -28,8 +29,6 @@ function dummyDice(rollId: number): [number, number] {
 	return [a, b]
 }
 
-const rng: Rng = () => Math.random()
-
 export function DautDiceGame() {
 	const players = usePlayers()
 	const names = getDisplayNames(players)
@@ -39,7 +38,7 @@ export function DautDiceGame() {
 	// haptics はボタン経由なら GradientButton 内蔵の tap に任せる（シェイク時のみ明示発火）
 	const doRoll = () => {
 		playSound('diceRoll1')
-		dispatch({ type: 'roll', rng })
+		dispatch({ type: 'roll', rng: defaultRng })
 	}
 	useShake(state.phase === 'roll', () => {
 		haptics.tap()

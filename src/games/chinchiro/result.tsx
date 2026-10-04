@@ -5,6 +5,7 @@ import { GlassSurface } from '@/components/ui/glass-surface'
 import { GradientButton } from '@/components/ui/gradient-button'
 import { SecondaryButton } from '@/components/ui/secondary-button'
 import { playSound } from '@/lib/sound'
+import { defaultRng, type Rng } from '@/lib/random'
 import { haptics } from '@/lib/haptics'
 import { playerColor } from '@/theme/player-colors'
 import { colors, radii, spacing, typography } from '@/theme/tokens'
@@ -29,13 +30,13 @@ type Props = {
 	playerNames: string[]
 	onRetry: () => void
 	onHome: () => void
-	rng?: () => number
+	rng?: Rng
 }
 
 type Stage = 'ranking' | 'sudden-death' | 'final'
 
 // ランキング発表（順めくり→最下位ドラムロール）→ 同率複数ならサドンデス → 敗者確定
-export function ChinchiroResult({ hands, playerNames, onRetry, onHome, rng = Math.random }: Props) {
+export function ChinchiroResult({ hands, playerNames, onRetry, onHome, rng = defaultRng }: Props) {
 	const ranked = rankPlayers(hands)
 	const initialLosers = ranked.filter((r) => r.isLoser).map((r) => r.playerIndex)
 	const safeCount = ranked.length - initialLosers.length
@@ -140,7 +141,7 @@ function SuddenDeath({
 }: {
 	contenders: number[]
 	playerNames: string[]
-	rng: () => number
+	rng: Rng
 	onSettled: (losers: number[]) => void
 }) {
 	const [round, setRound] = useState<number[]>(contenders)

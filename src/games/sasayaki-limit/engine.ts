@@ -1,6 +1,8 @@
+import type { Rng } from '@/lib/random'
+
 // ささやきリミット: ゾーン計算・判定・集計の純関数群（dBFS: -160..0）
 
-export type Rng = () => number
+export type { Rng } from '@/lib/random'
 
 export const ROUNDS = 3
 export const MEASURE_MS = 3000

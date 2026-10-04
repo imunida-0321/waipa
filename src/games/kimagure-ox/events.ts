@@ -1,7 +1,8 @@
+import type { Rng } from '@/lib/random'
 import type { Board, Mark } from './engine'
 
 export type EventId = 'shuffle' | 'block' | 'vanish' | 'double'
-export type Rng = () => number // [0, 1)。テストでは固定値を注入する
+export type { Rng } from '@/lib/random'
 
 export const EVENT_META: Record<EventId, { name: string; emoji: string }> = {
 	shuffle: { name: 'マスシャッフル', emoji: '🔀' },

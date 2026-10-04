@@ -4,24 +4,19 @@ import { router } from 'expo-router'
 import { ResultOverlay } from '@/components/game/result-overlay'
 import { GradientButton } from '@/components/ui/gradient-button'
 import { haptics } from '@/lib/haptics'
+import { defaultRng } from '@/lib/random'
 import { colors, spacing, typography } from '@/theme/tokens'
 import type { Mark } from './engine'
 import { BoardView } from './board'
 import { EventCutin } from './event-cutin'
-import type { Rng } from './events'
 import { initialState, reduce } from './reducer'
 import { KOX } from './theme'
-
-// Math.random を参照ではなく呼び出し時に評価する。`const rng = Math.random` だと
-// モジュール読み込み時点の関数参照を固定してしまい、テストの jest.spyOn(Math, 'random')
-// による差し替えが効かなくなる（呼び出しの都度 Math.random を引くことで回避する）
-const rng: Rng = () => Math.random()
 
 const markText = (m: Mark) => (m === 'o' ? '◯' : '×')
 const markColor = (m: Mark) => (m === 'o' ? KOX.o : KOX.x)
 
 export function KimagureOxGame() {
-	const [state, dispatch] = useReducer(reduce, rng, initialState)
+	const [state, dispatch] = useReducer(reduce, defaultRng, initialState)
 
 	useEffect(() => {
 		if (state.phase === 'finished') haptics.success()
@@ -55,20 +50,20 @@ export function KimagureOxGame() {
 				disabled={state.phase !== 'playing'}
 				onCellPress={(index) => {
 					haptics.tap()
-					dispatch({ type: 'tap', index, rng })
+					dispatch({ type: 'tap', index, rng: defaultRng })
 				}}
 			/>
 
 			{state.phase === 'cutin' && state.pendingEvent && (
 				<EventCutin
 					event={state.pendingEvent}
-					onDone={() => dispatch({ type: 'cutinDone', rng })}
+					onDone={() => dispatch({ type: 'cutinDone', rng: defaultRng })}
 				/>
 			)}
 
 			<ResultOverlay
 				visible={state.phase === 'finished'}
-				onRetry={() => dispatch({ type: 'retry', rng })}
+				onRetry={() => dispatch({ type: 'retry', rng: defaultRng })}
 				onHome={() => router.replace('/')}
 			>
 				<View style={styles.resultContent}>

@@ -1,4 +1,6 @@
-export type Rng = () => number
+import type { Rng } from '@/lib/random'
+
+export type { Rng } from '@/lib/random'
 
 export const LIMIT_MIN = 21
 export const LIMIT_MAX = 30

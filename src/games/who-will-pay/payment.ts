@@ -1,3 +1,5 @@
+import type { Rng } from '@/lib/random'
+
 export type DigitSlot = {
 	index: number
 	char: string
@@ -6,7 +8,7 @@ export type DigitSlot = {
 	playerIndex: number | null
 }
 
-export type Rng = () => number
+export type { Rng } from '@/lib/random'
 
 // 合計金額を左（上位桁）から位取り付きスロットに分解する
 export function amountToSlots(amount: number): DigitSlot[] {

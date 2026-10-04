@@ -1,14 +1,12 @@
 import { useCallback, useEffect, useLayoutEffect, useReducer } from 'react'
 import { packUnlockStore, usePackUnlocked } from '@/lib/pack-unlock-store'
+import { defaultRng } from '@/lib/random'
 import { getTopicsByPack, topicsStore, useTopics } from '@/lib/topics-store'
 import { CountSelect } from './count-select'
 import { DealPass } from './deal-pass'
-import { KING_PREMIUM_PACK, type Rng } from './engine'
+import { KING_PREMIUM_PACK } from './engine'
 import { initialState, reduce } from './reducer'
 import { TopicReveal } from './topic-reveal'
-
-// 呼び出しの都度 Math.random を引く（テストの spyOn を効かせるため。kimagure-ox と同じ理由）
-const rng: Rng = () => Math.random()
 
 export function NoKingGame() {
 	const [state, dispatch] = useReducer(reduce, undefined, initialState)
@@ -34,7 +32,7 @@ export function NoKingGame() {
 			<CountSelect
 				count={state.playerCount}
 				onChangeCount={(count) => dispatch({ type: 'setCount', count })}
-				onDeal={() => dispatch({ type: 'deal', rng })}
+				onDeal={() => dispatch({ type: 'deal', rng: defaultRng })}
 			/>
 		)
 	}
@@ -46,7 +44,9 @@ export function NoKingGame() {
 				dealIndex={state.dealIndex}
 				playerCount={state.playerCount}
 				number={state.numbers[state.dealIndex]}
-				onConfirm={() => dispatch({ type: 'confirmNumber', topics: kingTopics, rng })}
+				onConfirm={() =>
+					dispatch({ type: 'confirmNumber', topics: kingTopics, rng: defaultRng })
+				}
 			/>
 		)
 	}
@@ -58,9 +58,9 @@ export function NoKingGame() {
 			topicText={state.topicText}
 			executorNumber={state.executorNumber}
 			skipsLeft={state.skipsLeft}
-			onSkip={() => dispatch({ type: 'skip', topics: kingTopics, rng })}
+			onSkip={() => dispatch({ type: 'skip', topics: kingTopics, rng: defaultRng })}
 			onRevealDone={onRevealDone}
-			onNextRound={() => dispatch({ type: 'nextRound', rng })}
+			onNextRound={() => dispatch({ type: 'nextRound', rng: defaultRng })}
 		/>
 	)
 }
