@@ -1,5 +1,4 @@
-import AsyncStorage from '@react-native-async-storage/async-storage'
-import { useSyncExternalStore } from 'react'
+import { createPersistedStore, useStore } from './create-store'
 
 const STORAGE_KEY = 'waipa.players'
 export const MIN_PLAYERS = 2
@@ -13,92 +12,68 @@ export type PlayersState = {
 
 const DEFAULTS: PlayersState = { count: 4, names: [], history: [] }
 
-let state: PlayersState = { ...DEFAULTS }
-const listeners = new Set<() => void>()
-
-function emit() {
-	listeners.forEach((fn) => fn())
-}
-
-async function persist() {
-	await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(state))
-}
+const store = createPersistedStore<PlayersState>({
+	key: STORAGE_KEY,
+	initial: () => ({ ...DEFAULTS }),
+	parse: (raw) => ({ ...DEFAULTS, ...(raw as Partial<PlayersState>) }),
+})
 
 export const playersStore = {
-	getState(): PlayersState {
-		return state
-	},
-	subscribe(fn: () => void): () => void {
-		listeners.add(fn)
-		return () => listeners.delete(fn)
-	},
-	async hydrate() {
-		try {
-			const raw = await AsyncStorage.getItem(STORAGE_KEY)
-			state = raw ? { ...DEFAULTS, ...JSON.parse(raw) } : { ...DEFAULTS }
-		} catch {
-			// 読み取り失敗・破損データはメモリ上だけデフォルトへ（次回の persist で正常値に上書きされる）
-			state = { ...DEFAULTS }
-		}
-		emit()
-	},
+	getState: store.getState,
+	subscribe: store.subscribe,
+	hydrate: store.hydrate,
 	async setCount(n: number) {
 		const count = Math.min(MAX_PLAYERS, Math.max(MIN_PLAYERS, Math.floor(n)))
-		state = { ...state, count }
-		emit()
-		await persist()
+		store.setState((state) => ({ ...state, count }))
+		await store.persist()
 	},
 	async setName(index: number, name: string) {
+		const state = store.getState()
 		const names = [...state.names]
 		names[index] = name
-		state = { ...state, names }
-		emit()
-		await persist()
+		store.setState({ ...state, names })
+		await store.persist()
 	},
 	async addPlayer() {
+		const state = store.getState()
 		if (state.count >= MAX_PLAYERS) return
-		state = { ...state, count: state.count + 1 }
-		emit()
-		await persist()
+		store.setState({ ...state, count: state.count + 1 })
+		await store.persist()
 	},
 	async removePlayer(index: number) {
+		const state = store.getState()
 		if (state.count <= MIN_PLAYERS) return
 		const names = state.names.slice(0, state.count)
 		names.splice(index, 1)
-		state = { ...state, count: state.count - 1, names }
-		emit()
-		await persist()
+		store.setState({ ...state, count: state.count - 1, names })
+		await store.persist()
 	},
 	async saveToHistory() {
+		const state = store.getState()
 		const set = Array.from({ length: state.count }, (_, i) => state.names[i] ?? '')
 		if (!set.some((n) => n.trim())) return
 		const history = [
 			set,
 			...state.history.filter((h) => JSON.stringify(h) !== JSON.stringify(set)),
 		].slice(0, 5)
-		state = { ...state, history }
-		emit()
-		await persist()
+		store.setState({ ...state, history })
+		await store.persist()
 	},
 	async applyHistory(index: number) {
+		const state = store.getState()
 		const set = state.history[index]
 		if (!set) return
-		state = {
+		store.setState({
 			...state,
 			count: Math.min(MAX_PLAYERS, Math.max(MIN_PLAYERS, set.length)),
 			names: [...set],
-		}
-		emit()
-		await persist()
+		})
+		await store.persist()
 	},
 }
 
 export function usePlayers(): PlayersState {
-	return useSyncExternalStore(
-		playersStore.subscribe,
-		playersStore.getState,
-		playersStore.getState,
-	)
+	return useStore(playersStore)
 }
 
 // 未入力の参加者は「N番」表記にフォールバック

@@ -1,6 +1,6 @@
-import AsyncStorage from '@react-native-async-storage/async-storage'
-import { useEffect, useMemo, useRef, useSyncExternalStore } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import { TRIAL_ROUNDS } from '@/constants/trial'
+import { createPersistedStore, useStore } from './create-store'
 import { isPremiumUnlocked } from './premium'
 
 const STORAGE_KEY = 'waipa.trials.used'
@@ -15,79 +15,52 @@ type TrialState = {
 	active: ActiveTrial | null
 }
 
-let state: TrialState = {
-	usedGameIds: new Set(),
-	active: null,
-}
-const listeners = new Set<() => void>()
+const store = createPersistedStore<TrialState>({
+	key: STORAGE_KEY,
+	initial: () => ({ usedGameIds: new Set(), active: null }),
+	parse: (raw) => ({ usedGameIds: parseUsedGameIds(raw), active: null }),
+	serialize: (state) => [...state.usedGameIds],
+})
 
-function emit() {
-	listeners.forEach((fn) => fn())
-}
-
-async function persistUsed() {
-	await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify([...state.usedGameIds]))
-}
-
-function parseUsedGameIds(raw: string | null): ReadonlySet<string> {
-	if (raw === null) return new Set()
-	const parsed: unknown = JSON.parse(raw)
-	if (!Array.isArray(parsed)) return new Set()
-	return new Set(parsed.filter((value): value is string => typeof value === 'string'))
+function parseUsedGameIds(raw: unknown): ReadonlySet<string> {
+	if (!Array.isArray(raw)) return new Set()
+	return new Set(raw.filter((value): value is string => typeof value === 'string'))
 }
 
 export const trialStore = {
-	getState(): TrialState {
-		return state
-	},
-	subscribe(fn: () => void): () => void {
-		listeners.add(fn)
-		return () => listeners.delete(fn)
-	},
-	async hydrate() {
-		try {
-			state = {
-				usedGameIds: parseUsedGameIds(await AsyncStorage.getItem(STORAGE_KEY)),
-				active: null,
-			}
-		} catch {
-			// 破損データは未使用扱いに戻す。次回 startTrial の永続化で正常な配列に戻る
-			state = { usedGameIds: new Set(), active: null }
-		}
-		emit()
-	},
+	getState: store.getState,
+	subscribe: store.subscribe,
+	hydrate: store.hydrate,
 	async startTrial(gameId: string) {
-		state = {
+		store.setState((state) => ({
 			usedGameIds: new Set(state.usedGameIds).add(gameId),
 			active: { gameId, consumedRounds: 0 },
-		}
-		emit()
-		await persistUsed()
+		}))
+		await store.persist()
 	},
 	consumeRound(gameId: string) {
+		const state = store.getState()
 		if (state.active?.gameId !== gameId) return
-		state = {
+		store.setState({
 			...state,
 			active: {
 				gameId,
 				consumedRounds: state.active.consumedRounds + 1,
 			},
-		}
-		emit()
+		})
 	},
 	endTrial() {
+		const state = store.getState()
 		if (state.active === null) return
-		state = { ...state, active: null }
-		emit()
+		store.setState({ ...state, active: null })
 	},
 	_resetForTest() {
-		state = { usedGameIds: new Set(), active: null }
-		emit()
+		store.setState({ usedGameIds: new Set(), active: null })
 	},
 }
 
 export function isTrialUsed(gameId: string): boolean {
-	return state.usedGameIds.has(gameId)
+	return store.getState().usedGameIds.has(gameId)
 }
 
 export function canOfferTrial(gameId: string): boolean {
@@ -95,15 +68,16 @@ export function canOfferTrial(gameId: string): boolean {
 }
 
 export function isTrialActive(gameId: string): boolean {
-	return state.active?.gameId === gameId
+	return store.getState().active?.gameId === gameId
 }
 
 export function isTrialExhausted(gameId: string): boolean {
+	const state = store.getState()
 	return state.active?.gameId === gameId && state.active.consumedRounds >= TRIAL_ROUNDS
 }
 
 function useTrialState(): TrialState {
-	return useSyncExternalStore(trialStore.subscribe, trialStore.getState, trialStore.getState)
+	return useStore(trialStore)
 }
 
 export function useTrialOffer(gameId: string): { canOffer: boolean; used: boolean } {

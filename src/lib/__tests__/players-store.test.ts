@@ -29,6 +29,17 @@ describe('playersStore', () => {
 		expect(await AsyncStorage.getItem('waipa.players')).toContain('ひろかず')
 	})
 
+	it('保存失敗でも setName は resolve し、メモリの名前は更新される', async () => {
+		jest.mocked(AsyncStorage.setItem).mockRejectedValueOnce(new Error('write error'))
+
+		await expect(playersStore.setName(0, 'ひろかず')).resolves.toBeUndefined()
+		expect(playersStore.getState().names[0]).toBe('ひろかず')
+		expect(AsyncStorage.setItem).toHaveBeenCalledWith(
+			'waipa.players',
+			JSON.stringify(playersStore.getState()),
+		)
+	})
+
 	it('getDisplayNames は未入力を「N番」で埋める', async () => {
 		await playersStore.setCount(3)
 		await playersStore.setName(1, 'たろう')

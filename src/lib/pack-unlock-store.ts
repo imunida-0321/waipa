@@ -1,37 +1,28 @@
 import { useSyncExternalStore } from 'react'
+import { createStore } from './create-store'
 import { isPremiumUnlocked } from './premium'
 
 // リワード視聴によるお題パックのセッション解放（メモリのみ・ゲーム退出で lock）。
 // 永続化しないのは仕様: 「その飲み会のあいだ」だけ解放し、繰り返し視聴を促す（issue #6）
-let unlockedPacks: ReadonlySet<string> = new Set()
-const listeners = new Set<() => void>()
-
-function emit() {
-	listeners.forEach((fn) => fn())
-}
+const store = createStore<ReadonlySet<string>>(new Set())
 
 export const packUnlockStore = {
-	subscribe(fn: () => void): () => void {
-		listeners.add(fn)
-		return () => listeners.delete(fn)
-	},
+	subscribe: store.subscribe,
 	unlock(pack: string) {
-		unlockedPacks = new Set(unlockedPacks).add(pack)
-		emit()
+		store.setState((unlockedPacks) => new Set(unlockedPacks).add(pack))
 	},
 	lock(pack: string) {
-		const next = new Set(unlockedPacks)
+		const next = new Set(store.getState())
 		next.delete(pack)
-		unlockedPacks = next
-		emit()
+		store.setState(next)
 	},
 	_resetForTest() {
-		unlockedPacks = new Set()
+		store.setState(new Set())
 	},
 }
 
 export function isPackUnlocked(pack: string): boolean {
-	return isPremiumUnlocked() || unlockedPacks.has(pack)
+	return isPremiumUnlocked() || store.getState().has(pack)
 }
 
 export function usePackUnlocked(pack: string): boolean {

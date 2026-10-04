@@ -37,6 +37,21 @@ describe('customPunishmentsStore', () => {
 		)
 	})
 
+	it('保存失敗でも addItem は resolve し、メモリのお題は追加される', async () => {
+		jest.mocked(AsyncStorage.setItem).mockRejectedValueOnce(new Error('write error'))
+
+		await expect(
+			customPunishmentsStore.addItem('normal', '幹事のモノマネをして1杯'),
+		).resolves.toBeUndefined()
+		expect(getActiveSet(customPunishmentsStore.getState()).items).toEqual([
+			{ id: 'c2', text: '幹事のモノマネをして1杯', type: 'normal' },
+		])
+		expect(AsyncStorage.setItem).toHaveBeenCalledWith(
+			'waipa.inshu-suijaku.custom-punishments',
+			JSON.stringify(customPunishmentsStore.getState()),
+		)
+	})
+
 	it('addItem は空白のみを無視し、41文字以上を40文字に切り詰める', async () => {
 		await customPunishmentsStore.addItem('normal', '   ')
 		expect(getActiveSet(customPunishmentsStore.getState()).items).toHaveLength(0)

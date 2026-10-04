@@ -34,6 +34,24 @@ beforeEach(async () => {
 })
 
 describe('topicsStore', () => {
+	it('refresh は必須フィールドの欠落・型違いの行を捨て、正しい行だけを保存する', async () => {
+		mockFetchOk([
+			sample[0],
+			{ pack: 'king', text: 'id 欠落' },
+			{ id: 'missing-pack', text: 'pack 欠落' },
+			{ id: 'missing-text', pack: 'king' },
+			{ id: 123, pack: 'king', text: 'id 型違い' },
+			{ id: 'wrong-pack', pack: 123, text: 'pack 型違い' },
+			{ id: 'wrong-text', pack: 'king', text: 123 },
+			null,
+			sample[1],
+		])
+
+		await expect(topicsStore.refresh()).resolves.toBe(true)
+
+		expect(topicsStore.getState().topics).toEqual([sample[0], sample[1]])
+	})
+
 	it('refresh 成功でメモリとキャッシュが更新される', async () => {
 		mockFetchOk(sample)
 		const ok = await topicsStore.refresh()
@@ -87,6 +105,34 @@ describe('topicsStore', () => {
 })
 
 describe('refreshPremiumPack', () => {
+	it('パック名に含まれる & を URL エンコードする', async () => {
+		mockFetchOk([{ id: 'p1', pack: 'a&b', text: 'プレミアムお題' }])
+
+		await topicsStore.refreshPremiumPack('a&b')
+
+		expect(globalThis.fetch).toHaveBeenCalledWith(
+			expect.stringContaining('pack=eq.a%26b'),
+			expect.objectContaining({
+				headers: expect.objectContaining({ apikey: 'test-anon-key' }),
+			}),
+		)
+	})
+
+	it('不正行を捨て、既存のお題に正しい行だけを追加する', async () => {
+		mockFetchOk(sample)
+		await topicsStore.refresh()
+		const premium = { id: 'p1', pack: 'king_premium', text: 'プレミアムお題' }
+		mockFetchOk([
+			{ id: 'missing-text', pack: 'king_premium' },
+			premium,
+			{ id: 'wrong-text', pack: 'king_premium', text: 123 },
+		])
+
+		await expect(topicsStore.refreshPremiumPack('king_premium')).resolves.toBe(true)
+
+		expect(topicsStore.getState().topics).toEqual([...sample, premium])
+	})
+
 	it('取得したお題を重複なくマージする', async () => {
 		mockFetchOk(sample)
 		await topicsStore.refresh()
