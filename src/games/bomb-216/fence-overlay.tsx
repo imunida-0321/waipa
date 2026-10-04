@@ -1,5 +1,6 @@
 import { StyleSheet, View, useWindowDimensions } from 'react-native'
 import Svg, { Line } from 'react-native-svg'
+import { BOMB } from './theme'
 
 const STEP = 46
 
@@ -15,7 +16,7 @@ export function FenceOverlay() {
 				y1={0}
 				x2={x + height}
 				y2={height}
-				stroke="#59616C"
+				stroke={BOMB.fenceLight}
 				strokeWidth={1.8}
 			/>,
 			<Line
@@ -24,7 +25,7 @@ export function FenceOverlay() {
 				y1={0}
 				x2={x}
 				y2={height}
-				stroke="#343A43"
+				stroke={BOMB.fenceDark}
 				strokeWidth={1.8}
 			/>,
 		)

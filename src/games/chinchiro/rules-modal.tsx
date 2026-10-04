@@ -128,7 +128,7 @@ export function RulesModal({ visible, onClose }: Props) {
 const styles = StyleSheet.create({
 	backdrop: {
 		flex: 1,
-		backgroundColor: 'rgba(10,8,24,0.92)',
+		backgroundColor: CHIN.rulesBackdrop,
 		justifyContent: 'center',
 		padding: spacing.lg,
 	},

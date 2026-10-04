@@ -38,7 +38,7 @@ export function PunishReveal({ playerName, playerIndex, topicText, onDone }: Pro
 const styles = StyleSheet.create({
 	backdrop: {
 		...StyleSheet.absoluteFill,
-		backgroundColor: 'rgba(10,8,24,0.94)',
+		backgroundColor: RP.revealBackdrop,
 		alignItems: 'stretch',
 		justifyContent: 'center',
 		padding: spacing.lg,

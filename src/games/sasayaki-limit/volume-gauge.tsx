@@ -64,13 +64,13 @@ const styles = StyleSheet.create({
 		position: 'absolute',
 		left: 0,
 		right: 0,
-		backgroundColor: 'rgba(61, 220, 132, 0.22)',
+		backgroundColor: SL.zoneFill,
 		borderTopWidth: 1,
 		borderBottomWidth: 1,
 		borderColor: SL.green,
 	},
 	zoneGlow: {
-		backgroundColor: 'rgba(61, 220, 132, 0.45)',
+		backgroundColor: SL.zoneGlow,
 		shadowColor: SL.greenGlow,
 		shadowOpacity: 0.9,
 		shadowRadius: 12,
@@ -82,6 +82,6 @@ const styles = StyleSheet.create({
 		left: 0,
 		right: 0,
 		height: 3,
-		backgroundColor: '#FFFFFF',
+		backgroundColor: SL.text,
 	},
 })

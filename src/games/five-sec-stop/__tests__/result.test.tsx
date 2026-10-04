@@ -1,4 +1,5 @@
 import { act, fireEvent, render } from '@testing-library/react-native'
+import { playSound } from '@/lib/sound'
 import { FiveSecResult, REVEAL_INTERVAL_MS } from '../result'
 
 jest.mock('@/lib/sound', () => ({ playSound: jest.fn(), registerSound: jest.fn() }))
@@ -31,6 +32,7 @@ const DRUMROLL_MS = 2000
 
 beforeEach(() => {
 	jest.useFakeTimers()
+	jest.clearAllMocks()
 })
 afterEach(() => {
 	jest.useRealTimers()
@@ -149,5 +151,99 @@ describe('ガラス面', () => {
 		)
 
 		expect(getAllByTestId('glass-surface-pseudo')).toHaveLength(2)
+	})
+})
+
+describe('順めくり effect の実行タイミング', () => {
+	it('同じ人数の結果・名前・コールバックが変わってもタイマーを延長せず、効果音は各1回だけ', async () => {
+		const { rerender, getByText } = await render(
+			<FiveSecResult
+				records={[5000, 5100, 5400]}
+				playerNames={['A', 'B', 'C']}
+				onRetry={jest.fn()}
+				onHome={jest.fn()}
+			/>,
+		)
+		await act(async () => jest.advanceTimersByTime(REVEAL_INTERVAL_MS / 2))
+		await rerender(
+			<FiveSecResult
+				records={[5010, 5200, 5500]}
+				playerNames={['更新A', '更新B', '更新C']}
+				onRetry={jest.fn()}
+				onHome={jest.fn()}
+			/>,
+		)
+		await act(async () => jest.advanceTimersByTime(REVEAL_INTERVAL_MS / 2))
+		expect(getByText('更新A')).toBeTruthy()
+		expect(playSound).not.toHaveBeenCalled()
+		await act(async () => jest.advanceTimersByTime(REVEAL_INTERVAL_MS))
+		expect(getByText('更新B')).toBeTruthy()
+		expect(jest.mocked(playSound).mock.calls).toEqual([['drumroll']])
+		await rerender(
+			<FiveSecResult
+				records={[5010, 5200, 5500]}
+				playerNames={['更新A', '更新B', '更新C']}
+				onRetry={jest.fn()}
+				onHome={jest.fn()}
+			/>,
+		)
+		await act(async () => jest.advanceTimersByTime(DRUMROLL_MS + REVEAL_INTERVAL_MS * 3))
+		expect(getByText('更新C')).toBeTruthy()
+		expect(jest.mocked(playSound).mock.calls).toEqual([['drumroll'], ['reveal']])
+	})
+
+	it('全員同率では初回に1回だけドラムロールを開始し、再レンダーで重複しない', async () => {
+		const props = {
+			records: [5100, 4900],
+			playerNames: ['A', 'B'],
+			onRetry: jest.fn(),
+			onHome: jest.fn(),
+		}
+		const { rerender } = await render(<FiveSecResult {...props} />)
+		expect(jest.mocked(playSound).mock.calls).toEqual([['drumroll']])
+		await rerender(<FiveSecResult {...props} records={[...props.records]} onHome={jest.fn()} />)
+		await act(async () => jest.advanceTimersByTime(DRUMROLL_MS * 2))
+		expect(jest.mocked(playSound).mock.calls).toEqual([['drumroll'], ['reveal']])
+	})
+
+	it('safeCount が変わると旧タイマーを解除して新しい人数で開始する', async () => {
+		const { rerender } = await render(
+			<FiveSecResult
+				records={[5000, 5100, 5400]}
+				playerNames={['A', 'B', 'C']}
+				onRetry={jest.fn()}
+				onHome={jest.fn()}
+			/>,
+		)
+		await act(async () => jest.advanceTimersByTime(REVEAL_INTERVAL_MS / 2))
+		await rerender(
+			<FiveSecResult
+				records={[5000, 5400, 4600]}
+				playerNames={['A', 'B', 'C']}
+				onRetry={jest.fn()}
+				onHome={jest.fn()}
+			/>,
+		)
+		await act(async () => jest.advanceTimersByTime(REVEAL_INTERVAL_MS - 1))
+		expect(playSound).not.toHaveBeenCalled()
+		await act(async () => jest.advanceTimersByTime(1))
+		expect(jest.mocked(playSound).mock.calls).toEqual([['drumroll']])
+		await act(async () => jest.advanceTimersByTime(DRUMROLL_MS + REVEAL_INTERVAL_MS * 3))
+		expect(jest.mocked(playSound).mock.calls).toEqual([['drumroll'], ['reveal']])
+	})
+
+	it('順めくり途中にアンマウントすると後続のドラムロールを開始しない', async () => {
+		const { unmount } = await render(
+			<FiveSecResult
+				records={[5000, 5100, 5400]}
+				playerNames={['A', 'B', 'C']}
+				onRetry={jest.fn()}
+				onHome={jest.fn()}
+			/>,
+		)
+		await act(async () => jest.advanceTimersByTime(REVEAL_INTERVAL_MS))
+		await unmount()
+		await act(async () => jest.advanceTimersByTime(REVEAL_INTERVAL_MS * 3 + DRUMROLL_MS))
+		expect(playSound).not.toHaveBeenCalled()
 	})
 })

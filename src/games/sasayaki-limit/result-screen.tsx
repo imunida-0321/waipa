@@ -36,7 +36,7 @@ export function ResultScreen({ names, successCounts, losers, onRetry }: Props) {
 
 const styles = StyleSheet.create({
 	container: { alignItems: 'center', gap: 12, padding: 24, paddingTop: 48 },
-	heading: { color: '#FFFFFF', fontSize: 24, fontWeight: '800' },
+	heading: { color: SL.text, fontSize: 24, fontWeight: '800' },
 	loserLabel: { color: SL.sub, fontSize: 14, marginTop: 8 },
 	loserName: { color: SL.red, fontSize: 32, fontWeight: '900' },
 	list: { alignSelf: 'stretch', gap: 8, marginTop: 16 },
@@ -51,7 +51,7 @@ const styles = StyleSheet.create({
 		borderColor: SL.trackBorder,
 	},
 	rowLoser: { borderColor: SL.red },
-	name: { color: '#FFFFFF', fontSize: 16, fontWeight: '600' },
+	name: { color: SL.text, fontSize: 16, fontWeight: '600' },
 	count: { color: SL.sub, fontSize: 14 },
 	retryButton: {
 		marginTop: 24,
@@ -60,5 +60,5 @@ const styles = StyleSheet.create({
 		borderRadius: 999,
 		backgroundColor: SL.green,
 	},
-	retryLabel: { color: '#0B2818', fontSize: 16, fontWeight: '800' },
+	retryLabel: { color: SL.buttonText, fontSize: 16, fontWeight: '800' },
 })

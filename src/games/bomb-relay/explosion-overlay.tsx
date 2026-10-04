@@ -54,7 +54,7 @@ export function ExplosionOverlay({ onRetry, onHome }: Props) {
 const styles = StyleSheet.create({
 	backdrop: {
 		...StyleSheet.absoluteFill,
-		backgroundColor: 'rgba(10,8,24,0.94)',
+		backgroundColor: BR.explosionBackdrop,
 		alignItems: 'stretch',
 		justifyContent: 'center',
 		padding: spacing.lg,

@@ -31,7 +31,9 @@ export function SasayakiLimitGame() {
 	const players = usePlayers()
 	const names = getDisplayNames(players)
 	const { topics } = useTopics()
+	const topicsRef = useRef(topics)
 	const mic = useMicLevel()
+	const { requestPermission, start, stop } = mic
 
 	const [stage, setStage] = useState<Stage>('permission')
 	const [range, setRange] = useState<VoiceRange | null>(null)
@@ -46,15 +48,17 @@ export function SasayakiLimitGame() {
 	useEffect(() => {
 		levelDbRef.current = mic.levelDb
 	})
+	useEffect(() => {
+		topicsRef.current = topics
+	}, [topics])
 
 	// マイク権限（初回マウント時にリクエスト。許可済みなら即 resolve される）
 	useEffect(() => {
 		if (stage !== 'permission' || mic.permission === 'denied') return
-		mic.requestPermission().then((granted) => {
+		requestPermission().then((granted) => {
 			if (granted) setStage('calibration')
 		})
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [stage, mic.permission])
+	}, [stage, mic.permission, requestPermission])
 
 	// キャリブレーション・計測中はマイクを回す
 	const shouldRecord =
@@ -62,20 +66,18 @@ export function SasayakiLimitGame() {
 		(stage === 'calibration' || (stage === 'playing' && state.phase === 'measuring'))
 	useEffect(() => {
 		if (!shouldRecord) return
-		mic.start()
+		start()
 		return () => {
-			mic.stop()
+			stop()
 		}
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [shouldRecord])
+	}, [shouldRecord, start, stop])
 
 	// speech に入るたびにお題を引く
 	useEffect(() => {
 		if (stage !== 'playing' || state.phase !== 'speech') return
-		const next = pickWhisperTopic(topics, usedIdsRef.current, Math.random)
+		const next = pickWhisperTopic(topicsRef.current, usedIdsRef.current, Math.random)
 		usedIdsRef.current = [...usedIdsRef.current, next.id]
 		setTopic(next)
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [stage, state.phase, state.turnPos, state.round])
 
 	// 3秒計測: METER_INTERVAL_MS ごとにサンプリングし、終了で measured を dispatch
@@ -232,22 +234,22 @@ export function SasayakiLimitGame() {
 const styles = StyleSheet.create({
 	center: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 16, padding: 24 },
 	playContainer: { flex: 1, alignItems: 'center', paddingTop: 32, gap: 12, padding: 24 },
-	heading: { color: '#FFFFFF', fontSize: 24, fontWeight: '800' },
-	guardTitle: { color: '#FFFFFF', fontSize: 20, fontWeight: '700', textAlign: 'center' },
+	heading: { color: SL.text, fontSize: 24, fontWeight: '800' },
+	guardTitle: { color: SL.text, fontSize: 20, fontWeight: '700', textAlign: 'center' },
 	guardText: { color: SL.sub, fontSize: 14, textAlign: 'center', lineHeight: 22 },
 	roundLabel: { color: SL.sub, fontSize: 14 },
 	playerName: { color: SL.green, fontSize: 24, fontWeight: '800' },
-	topicText: { color: '#FFFFFF', fontSize: 22, fontWeight: '700', textAlign: 'center' },
+	topicText: { color: SL.text, fontSize: 22, fontWeight: '700', textAlign: 'center' },
 	gaugeRow: { flex: 1, justifyContent: 'center' },
-	measuringLabel: { color: '#FFFFFF', fontSize: 18, fontWeight: '700' },
-	judgement: { color: '#FFFFFF', fontSize: 22, fontWeight: '800' },
+	measuringLabel: { color: SL.text, fontSize: 18, fontWeight: '700' },
+	judgement: { color: SL.text, fontSize: 22, fontWeight: '800' },
 	scoreList: { gap: 6, alignItems: 'center' },
-	scoreRow: { color: '#FFFFFF', fontSize: 16 },
+	scoreRow: { color: SL.text, fontSize: 16 },
 	mainButton: {
 		paddingHorizontal: 36,
 		paddingVertical: 14,
 		borderRadius: 999,
 		backgroundColor: SL.green,
 	},
-	mainButtonLabel: { color: '#0B2818', fontSize: 16, fontWeight: '800' },
+	mainButtonLabel: { color: SL.buttonText, fontSize: 16, fontWeight: '800' },
 })

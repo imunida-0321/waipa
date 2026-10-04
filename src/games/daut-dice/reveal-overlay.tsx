@@ -57,7 +57,7 @@ export function RevealOverlay({
 const styles = StyleSheet.create({
 	backdrop: {
 		...StyleSheet.absoluteFill,
-		backgroundColor: 'rgba(10,8,24,0.96)',
+		backgroundColor: DD.revealBackdrop,
 		justifyContent: 'center',
 		padding: spacing.lg,
 		gap: spacing.lg,
