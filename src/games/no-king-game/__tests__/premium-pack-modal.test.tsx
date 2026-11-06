@@ -1,5 +1,6 @@
 import { fireEvent, render, waitFor } from '@testing-library/react-native'
 import { useRewardedAd } from 'react-native-google-mobile-ads'
+import { AD_UNIT_IDS } from '@/constants/ads'
 import { PremiumPackModal } from '@/games/no-king-game/premium-pack-modal'
 import { isPackUnlocked, packUnlockStore } from '@/lib/pack-unlock-store'
 import { getTopicsByPack, topicsStore, type Topic } from '@/lib/topics-store'
@@ -30,15 +31,26 @@ const premiumTopic: Topic = {
 	text: '限定お題',
 }
 
-function hookState(overrides: Partial<ReturnType<typeof useRewardedAd>>) {
+type RewardedState = ReturnType<typeof useRewardedAd>
+
+// v17 のオプション形式（useRewardedAd({ adUnitId, autoLoad })）の戻り値
+function hookState(overrides: Partial<RewardedState>): RewardedState {
 	return {
-		isLoaded: false,
-		isEarnedReward: false,
-		error: undefined,
+		status: 'idle',
+		error: null,
+		autoLoad: false,
+		clicked: false,
+		impression: false,
+		revenue: null,
+		responseInfo: null,
+		reward: null,
+		earnedReward: false,
 		load: jest.fn(),
 		show: jest.fn(),
+		destroy: jest.fn(),
+		retry: jest.fn(),
 		...overrides,
-	} as ReturnType<typeof useRewardedAd>
+	} as RewardedState
 }
 
 beforeEach(() => {
@@ -68,6 +80,11 @@ describe('PremiumPackModal', () => {
 		const { getByText, getByTestId, queryByText } = await render(
 			<PremiumPackModal visible onClose={() => {}} />,
 		)
+		// 非推奨の位置引数形式ではなくオプション形式で呼び、読み込みは表示時に明示的に行う
+		expect(mockedHook).toHaveBeenCalledWith({
+			adUnitId: AD_UNIT_IDS.packUnlockRewarded,
+			autoLoad: false,
+		})
 		expect(state.load).toHaveBeenCalled()
 		await waitFor(() => {
 			expect(refreshPremiumPackMock).toHaveBeenCalledWith('king_premium')
@@ -78,7 +95,7 @@ describe('PremiumPackModal', () => {
 	})
 
 	it('ロード済みならタップで動画を表示する', async () => {
-		const state = hookState({ isLoaded: true })
+		const state = hookState({ status: 'loaded' })
 		mockedHook.mockReturnValue(state)
 		const { getByText } = await render(<PremiumPackModal visible onClose={() => {}} />)
 		fireEvent.press(getByText('動画を見て解放する'))
@@ -87,7 +104,7 @@ describe('PremiumPackModal', () => {
 
 	it('視聴完了時にプレミアムお題を取得済みならパックを解放する', async () => {
 		getTopicsByPackMock.mockReturnValue([premiumTopic])
-		mockedHook.mockReturnValue(hookState({ isEarnedReward: true }))
+		mockedHook.mockReturnValue(hookState({ status: 'closed', earnedReward: true }))
 		await render(<PremiumPackModal visible onClose={() => {}} />)
 		expect(isPackUnlocked('king_premium')).toBe(true)
 		expect(getTopicsByPackMock).toHaveBeenCalledWith('king_premium')
@@ -96,7 +113,7 @@ describe('PremiumPackModal', () => {
 	it('視聴完了時にプレミアムお題の取得へ失敗したら解放せず再試行を表示する', async () => {
 		getTopicsByPackMock.mockReturnValue([])
 		refreshPremiumPackMock.mockResolvedValue(false)
-		mockedHook.mockReturnValue(hookState({ isEarnedReward: true }))
+		mockedHook.mockReturnValue(hookState({ status: 'closed', earnedReward: true }))
 		const { getByText } = await render(<PremiumPackModal visible onClose={() => {}} />)
 
 		await waitFor(() => {
@@ -119,7 +136,7 @@ describe('PremiumPackModal', () => {
 		// 空レスポンスの成否判定は実際のストアに任せる。
 		refreshPremiumPackMock.mockImplementation(actualTopicsStore.refreshPremiumPack)
 		getTopicsByPackMock.mockReturnValue([])
-		mockedHook.mockReturnValue(hookState({ isEarnedReward: true }))
+		mockedHook.mockReturnValue(hookState({ status: 'closed', earnedReward: true }))
 
 		try {
 			const { getByText, queryByText } = await render(
@@ -143,7 +160,7 @@ describe('PremiumPackModal', () => {
 	it('再試行でプレミアムお題の取得に成功したら動画を再視聴せず解放する', async () => {
 		getTopicsByPackMock.mockReturnValue([])
 		refreshPremiumPackMock.mockResolvedValue(false)
-		const state = hookState({ isEarnedReward: true })
+		const state = hookState({ status: 'closed', earnedReward: true })
 		mockedHook.mockReturnValue(state)
 		const { getByText } = await render(<PremiumPackModal visible onClose={() => {}} />)
 

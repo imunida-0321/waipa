@@ -24,15 +24,26 @@ jest.mock('@/lib/premium', () => ({
 const mockedRewardedAd = jest.mocked(useRewardedAd)
 const storageKey = 'waipa.trials.used'
 
-function rewardedState(overrides: Partial<ReturnType<typeof useRewardedAd>>) {
+type RewardedState = ReturnType<typeof useRewardedAd>
+
+// v17 のオプション形式（useRewardedAd({ adUnitId, autoLoad })）の戻り値
+function rewardedState(overrides: Partial<RewardedState>): RewardedState {
 	return {
-		isLoaded: false,
-		isEarnedReward: false,
-		error: undefined,
+		status: 'idle',
+		error: null,
+		autoLoad: false,
+		clicked: false,
+		impression: false,
+		revenue: null,
+		responseInfo: null,
+		reward: null,
+		earnedReward: false,
 		load: jest.fn(),
 		show: jest.fn(),
+		destroy: jest.fn(),
+		retry: jest.fn(),
 		...overrides,
-	} as ReturnType<typeof useRewardedAd>
+	} as RewardedState
 }
 
 type TrialStoreModule = {
@@ -126,7 +137,11 @@ it('お試し可能なら1回きりの説明と動画ボタンを表示し、表
 	)
 
 	expect(AD_UNIT_IDS.trialRewarded).toBe('test-rewarded')
-	expect(mockedRewardedAd).toHaveBeenCalledWith(AD_UNIT_IDS.trialRewarded)
+	// 非推奨の位置引数形式ではなくオプション形式で呼び、読み込みはモーダル表示時に明示的に行う
+	expect(mockedRewardedAd).toHaveBeenCalledWith({
+		adUnitId: AD_UNIT_IDS.trialRewarded,
+		autoLoad: false,
+	})
 	expect(state.load).toHaveBeenCalledTimes(1)
 	expect(getByText('動画を見ると2ラウンドだけお試しできます。お試しは1回だけです。')).toBeTruthy()
 	expect(
@@ -135,7 +150,7 @@ it('お試し可能なら1回きりの説明と動画ボタンを表示し、表
 })
 
 it('リワード動画ロード済みならお試しボタンで動画を表示する', async () => {
-	const state = rewardedState({ isLoaded: true })
+	const state = rewardedState({ status: 'loaded' })
 	mockedRewardedAd.mockReturnValue(state)
 
 	const { getByText } = await render(
@@ -153,7 +168,7 @@ it('リワード動画ロード済みならお試しボタンで動画を表示�
 
 it('リワード獲得後に startTrial して閉じ、対象ゲームへ遷移する', async () => {
 	const onClose = jest.fn()
-	mockedRewardedAd.mockReturnValue(rewardedState({ isLoaded: true, isEarnedReward: true }))
+	mockedRewardedAd.mockReturnValue(rewardedState({ status: 'closed', earnedReward: true }))
 
 	await render(
 		<PremiumLockModal
@@ -194,7 +209,7 @@ it('別のゲームで開き直したとき、再度リワード獲得でお試�
 	const { trialStore } = requireTrialStore()
 	trialStore._resetForTest()
 	const onClose = jest.fn()
-	mockedRewardedAd.mockReturnValue(rewardedState({ isLoaded: true, isEarnedReward: true }))
+	mockedRewardedAd.mockReturnValue(rewardedState({ status: 'closed', earnedReward: true }))
 	const { rerender } = await render(
 		<PremiumLockModal
 			visible
@@ -207,7 +222,7 @@ it('別のゲームで開き直したとき、再度リワード獲得でお試�
 
 	mockedRewardedAd.mockReturnValue(rewardedState({}))
 	await rerender(<PremiumLockModal visible={false} gameId="" gameTitle="" onClose={onClose} />)
-	mockedRewardedAd.mockReturnValue(rewardedState({ isLoaded: true, isEarnedReward: true }))
+	mockedRewardedAd.mockReturnValue(rewardedState({ status: 'closed', earnedReward: true }))
 	await rerender(
 		<PremiumLockModal visible gameId="daut-dice" gameTitle="ダウトダイス" onClose={onClose} />,
 	)
