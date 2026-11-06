@@ -1,6 +1,6 @@
 import { router } from 'expo-router'
 import { useRef, useState } from 'react'
-import { ImageBackground, StyleSheet, Text, View } from 'react-native'
+import { Image, StyleSheet, Text, View } from 'react-native'
 import Animated, {
 	useAnimatedStyle,
 	useSharedValue,
@@ -81,7 +81,14 @@ export function BombGame() {
 		i === board.soloIndex ? 'solo' : i === board.allIndex ? 'all' : null
 
 	return (
-		<ImageBackground source={require('@/assets/images/bomb/bg.jpg')} style={styles.container}>
+		<View style={styles.container}>
+			{/* ImageBackground は RN 0.88 で非推奨のため、絶対配置の Image で背景を敷く */}
+			<Image
+				testID="bomb-background"
+				source={require('@/assets/images/bomb/bg.jpg')}
+				style={styles.background}
+				resizeMode="cover"
+			/>
 			{/* 文字とパネルの視認性を保つ暗めスクリム */}
 			<View style={styles.scrim} />
 			<View style={styles.status}>
@@ -134,12 +141,23 @@ export function BombGame() {
 					</Text>
 				</View>
 			</ResultOverlay>
-		</ImageBackground>
+		</View>
 	)
 }
 
 const styles = StyleSheet.create({
 	container: { flex: 1, backgroundColor: BOMB.bg },
+	// RN の Image は元画像（1600×896）の width/height をスタイルの先頭に差し込むため、
+	// 幅・高さも 100% で上書きしてコンテナ全面に広げる（旧 ImageBackground と同じ挙動）
+	background: {
+		position: 'absolute',
+		top: 0,
+		right: 0,
+		bottom: 0,
+		left: 0,
+		width: '100%',
+		height: '100%',
+	},
 	scrim: {
 		position: 'absolute',
 		top: 0,

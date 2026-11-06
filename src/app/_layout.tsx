@@ -54,6 +54,8 @@ export default function RootLayout() {
 					name="gallery"
 					options={{
 						headerShown: true,
+						// iOS 26 以降の expo-router（SDK 58）は既定でヘッダーを透過させるため明示的に戻す
+						headerTransparent: false,
 						title: 'デザインギャラリー',
 						headerStyle: { backgroundColor: colors.background },
 						headerTintColor: colors.text,
@@ -68,6 +70,7 @@ export default function RootLayout() {
 					name="settings"
 					options={{
 						headerShown: true,
+						headerTransparent: false,
 						title: '設定とアクティビティ',
 						headerStyle: { backgroundColor: colors.background },
 						headerTintColor: colors.text,

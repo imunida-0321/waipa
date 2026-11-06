@@ -5,15 +5,17 @@ import type { GameMeta } from '@/games/registry'
 import { maybeShowGameExitInterstitial } from '@/lib/ads'
 import { GameScreen } from '../game-screen'
 
-type BeforeRemoveHandler = () => void
+type RemovedHandler = () => void
 
-let mockBeforeRemoveHandler: BeforeRemoveHandler | undefined
-const mockRemoveBeforeRemoveListener = jest.fn()
-const mockNavigationAddListener = jest.fn((eventName: string, handler: BeforeRemoveHandler) => {
-	if (eventName === 'beforeRemove') {
-		mockBeforeRemoveHandler = handler
+// expo-router（SDK 58）では beforeRemove が廃止され、ルートが外れてアンマウントされた
+// 後に届く removed イベントで退出を検知する
+let mockRemovedHandler: RemovedHandler | undefined
+const mockRemoveRemovedListener = jest.fn()
+const mockNavigationAddListener = jest.fn((eventName: string, handler: RemovedHandler) => {
+	if (eventName === 'removed') {
+		mockRemovedHandler = handler
 	}
-	return mockRemoveBeforeRemoveListener
+	return mockRemoveRemovedListener
 })
 
 jest.mock('@react-native-async-storage/async-storage', () =>
@@ -120,7 +122,7 @@ const maybeShowGameExitInterstitialMock = jest.mocked(maybeShowGameExitInterstit
 
 beforeEach(async () => {
 	jest.clearAllMocks()
-	mockBeforeRemoveHandler = undefined
+	mockRemovedHandler = undefined
 	await AsyncStorage.clear()
 	await playersStore.hydrate()
 	await playersStore.setCount(2)
@@ -240,31 +242,48 @@ it('イントロで閉じたときはインタースティシャルを呼ばな�
 	expect(maybeShowGameExitInterstitialMock).not.toHaveBeenCalled()
 })
 
-it('イントロ表示中は beforeRemove リスナーを登録せずインタースティシャルを呼ばない', async () => {
+it('イントロ表示中は removed リスナーを登録せずインタースティシャルを呼ばない', async () => {
 	await render(<GameScreen meta={baseMeta} />)
 
-	expect(mockNavigationAddListener).not.toHaveBeenCalledWith('beforeRemove', expect.any(Function))
-	expect(mockBeforeRemoveHandler).toBeUndefined()
+	expect(mockNavigationAddListener).not.toHaveBeenCalledWith('removed', expect.any(Function))
+	expect(mockRemovedHandler).toBeUndefined()
 	expect(maybeShowGameExitInterstitialMock).not.toHaveBeenCalled()
 })
 
-it('play ステージの beforeRemove でインタースティシャルを1回呼ぶ', async () => {
+it('play ステージの removed でインタースティシャルを1回呼ぶ', async () => {
 	const { getByText } = await render(<GameScreen meta={baseMeta} />)
 	await act(async () => {
 		fireEvent.press(getByText('ゲームスタート'))
 	})
 	await waitFor(() => {
-		expect(mockNavigationAddListener).toHaveBeenCalledWith('beforeRemove', expect.any(Function))
+		expect(mockNavigationAddListener).toHaveBeenCalledWith('removed', expect.any(Function))
 	})
 
 	await act(async () => {
-		mockBeforeRemoveHandler?.()
+		mockRemovedHandler?.()
 	})
 
 	expect(maybeShowGameExitInterstitialMock).toHaveBeenCalledTimes(1)
 })
 
-it('play ステージの戻るボタンは router.back を呼び、広告表示は beforeRemove に任せる', async () => {
+it('アンマウント後に届く removed でも広告を出せるよう、購読解除は次のマイクロタスクまで遅らせる', async () => {
+	const { getByText, unmount } = await render(<GameScreen meta={baseMeta} />)
+	await act(async () => {
+		fireEvent.press(getByText('ゲームスタート'))
+	})
+
+	await act(async () => {
+		unmount()
+		// removed はエフェクトのクリーンアップより後に届く
+		expect(mockRemoveRemovedListener).not.toHaveBeenCalled()
+		mockRemovedHandler?.()
+	})
+
+	expect(maybeShowGameExitInterstitialMock).toHaveBeenCalledTimes(1)
+	expect(mockRemoveRemovedListener).toHaveBeenCalledTimes(1)
+})
+
+it('play ステージの戻るボタンは router.back を呼び、広告表示は removed に任せる', async () => {
 	// eslint-disable-next-line @typescript-eslint/no-require-imports
 	const { router } = require('expo-router')
 	const { getByText } = await render(<GameScreen meta={baseMeta} />)

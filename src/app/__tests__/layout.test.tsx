@@ -11,6 +11,8 @@ import RootLayout from '../_layout'
 jest.mock('expo-splash-screen', () => ({
 	preventAutoHideAsync: jest.fn(async () => {}),
 }))
+const mockScreenOptions: Record<string, Record<string, unknown> | undefined> = {}
+
 jest.mock('expo-router', () => {
 	// eslint-disable-next-line @typescript-eslint/no-require-imports
 	const React = require('react')
@@ -18,8 +20,16 @@ jest.mock('expo-router', () => {
 	const { Text } = require('react-native')
 	const Stack = ({ children }: { children?: import('react').ReactNode }) =>
 		React.createElement(React.Fragment, null, children)
-	const StackScreen = ({ name }: { name: string }) =>
-		React.createElement(Text, null, `screen:${name}`)
+	const StackScreen = ({
+		name,
+		options,
+	}: {
+		name: string
+		options?: Record<string, unknown>
+	}) => {
+		mockScreenOptions[name] = options
+		return React.createElement(Text, null, `screen:${name}`)
+	}
 	StackScreen.displayName = 'Stack.Screen'
 	Stack.Screen = StackScreen
 	return {
@@ -112,6 +122,17 @@ describe('RootLayout', () => {
 			'diceRoll2',
 			'heartbeat',
 		])
+	})
+
+	it('ネイティブヘッダーを出す画面は透過させない（iOS 26 以降の expo-router 既定値を打ち消す）', async () => {
+		await render(<RootLayout />)
+
+		for (const name of ['gallery', 'settings']) {
+			expect(mockScreenOptions[name]).toMatchObject({
+				headerShown: true,
+				headerTransparent: false,
+			})
+		}
 	})
 
 	it('起動時に広告を初期化する', async () => {

@@ -22,11 +22,15 @@ export function GameScreen({ meta }: { meta: GameMeta }) {
 	const [stage, setStage] = useState<Stage>('intro')
 	const [howToVisible, setHowToVisible] = useState(false)
 
+	// プレイ中に画面を離れたらインタースティシャルを出す。removed はルートが外れて
+	// アンマウントされた後に届く（effect のクリーンアップより後）ので、購読解除は
+	// 次のマイクロタスクまで遅らせる（expo-router SDK 58 で beforeRemove は廃止）
 	useEffect(() => {
 		if (stage !== 'play') return
-		return navigation.addListener('beforeRemove', () => {
+		const unsubscribe = navigation.addListener('removed', () => {
 			maybeShowGameExitInterstitial()
 		})
+		return () => queueMicrotask(unsubscribe)
 	}, [navigation, stage])
 
 	useEffect(() => {

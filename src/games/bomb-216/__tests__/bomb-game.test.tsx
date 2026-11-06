@@ -1,4 +1,5 @@
 import { act, fireEvent, render } from '@testing-library/react-native'
+import { StyleSheet } from 'react-native'
 import { BombGame } from '../bomb-game'
 
 jest.mock('@react-native-async-storage/async-storage', () =>
@@ -89,6 +90,22 @@ const press = async (element: Parameters<typeof fireEvent.press>[0]) => {
 }
 
 describe('BombGame', () => {
+	it('背景画像は画像の固有サイズではなくコンテナ全面に広がる', async () => {
+		// RN の Image は元画像の width/height をスタイルの先頭に差し込むため、
+		// 絶対配置に加えて幅・高さも明示的に上書きしないと全面に広がらない
+		const { getByTestId } = await render(<BombGame />)
+		const style = StyleSheet.flatten(getByTestId('bomb-background').props.style)
+		expect(style).toMatchObject({
+			position: 'absolute',
+			top: 0,
+			right: 0,
+			bottom: 0,
+			left: 0,
+			width: '100%',
+			height: '100%',
+		})
+	})
+
 	it('16タイル（番号表記なし）と残数・確率を表示する', async () => {
 		const { getByText, queryByText, getByTestId } = await render(<BombGame />)
 		expect(getByTestId('tile-0')).toBeTruthy()
