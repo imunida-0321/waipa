@@ -5,7 +5,9 @@ type Listener = (payload?: unknown) => void
 export type MockAd = {
 	addAdEventListener: jest.Mock
 	load: jest.Mock
-	show: jest.Mock
+	// v17 の show() は Promise を返す（v17.2 以降、未ロード・表示中・表示拒否は reject）
+	show: jest.Mock<Promise<void>, []>
+	destroy: jest.Mock
 	_emit: (type: string, payload?: unknown) => void
 }
 
@@ -18,7 +20,8 @@ function makeAd(): MockAd {
 			return () => own.get(type)?.delete(fn)
 		}),
 		load: jest.fn(),
-		show: jest.fn(),
+		show: jest.fn(async () => {}),
+		destroy: jest.fn(),
 		_emit(type: string, payload?: unknown) {
 			own.get(type)?.forEach((fn) => fn(payload))
 		},
@@ -63,12 +66,21 @@ export const RewardedAd = {
 
 export const BannerAd = () => null
 
+// v17 のオプション形式（useRewardedAd({ adUnitId, autoLoad })）の戻り値
 export const useRewardedAd = jest.fn(() => ({
-	isLoaded: false,
-	isEarnedReward: false,
-	error: undefined,
+	status: 'idle',
+	error: null,
+	autoLoad: false,
+	clicked: false,
+	impression: false,
+	revenue: null,
+	responseInfo: null,
+	reward: null,
+	earnedReward: false,
 	load: jest.fn(),
 	show: jest.fn(),
+	destroy: jest.fn(),
+	retry: jest.fn(),
 }))
 
 export const useForeground = jest.fn()

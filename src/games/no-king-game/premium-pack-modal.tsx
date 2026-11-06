@@ -20,7 +20,11 @@ type Props = {
 // 動画リワード視聴でこのゲームセッション中のみ解放（退出で再ロック）。プレミアムは常時解放
 export function PremiumPackModal({ visible, onClose }: Props) {
 	const unlocked = usePackUnlocked(KING_PREMIUM_PACK)
-	const { isLoaded, isEarnedReward, load, show } = useRewardedAd(AD_UNIT_IDS.packUnlockRewarded)
+	// v17 のオプション形式。開くたびに読み込むため autoLoad: false にして表示時に load() する
+	const { status, earnedReward, load, show } = useRewardedAd({
+		adUnitId: AD_UNIT_IDS.packUnlockRewarded,
+		autoLoad: false,
+	})
 	const [fetchFailed, setFetchFailed] = useState(false)
 
 	const unlockIfTopicsAvailable = useCallback(() => {
@@ -50,7 +54,7 @@ export function PremiumPackModal({ visible, onClose }: Props) {
 	}, [visible, unlocked, load])
 
 	useEffect(() => {
-		if (!isEarnedReward) return
+		if (!earnedReward) return
 		if (unlockIfTopicsAvailable()) return
 		void topicsStore.refreshPremiumPack(KING_PREMIUM_PACK).then((ok) => {
 			if (ok) {
@@ -60,7 +64,7 @@ export function PremiumPackModal({ visible, onClose }: Props) {
 			}
 			setFetchFailed(true)
 		})
-	}, [isEarnedReward, unlockIfTopicsAvailable])
+	}, [earnedReward, unlockIfTopicsAvailable])
 
 	return (
 		<Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
@@ -87,7 +91,7 @@ export function PremiumPackModal({ visible, onClose }: Props) {
 								</Text>
 								<GradientButton
 									title="動画を見て解放する"
-									disabled={!isLoaded}
+									disabled={status !== 'loaded'}
 									onPress={() => show()}
 								/>
 								{fetchFailed ? (

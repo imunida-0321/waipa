@@ -19,7 +19,12 @@ type Props = {
 // プレミアム限定ゲームの案内。閉じてから遷移し、背後にモーダルを残さない
 export function PremiumLockModal({ visible, gameId, gameTitle, onClose }: Props) {
 	const { canOffer, used } = useTrialOffer(gameId)
-	const { isLoaded, isEarnedReward, load, show } = useRewardedAd(AD_UNIT_IDS.trialRewarded)
+	// v17 のオプション形式。autoLoad は広告インスタンスごとに 1 回しか自動読み込みしないため、
+	// モーダルを開くたびに読み込めるよう autoLoad: false にして表示時に明示的に load() する
+	const { status, earnedReward, load, show } = useRewardedAd({
+		adUnitId: AD_UNIT_IDS.trialRewarded,
+		autoLoad: false,
+	})
 	const rewardHandled = useRef(false)
 
 	function handleUpgrade() {
@@ -33,22 +38,22 @@ export function PremiumLockModal({ visible, gameId, gameTitle, onClose }: Props)
 		}
 	}, [visible, canOffer, load])
 
-	// 新しい動画の load で SDK が isEarnedReward を false に戻したら次の獲得を受け付ける。
+	// 新しい動画の load で SDK が earnedReward を false に戻したら次の獲得を受け付ける。
 	// 前のゲームの獲得状態が残ったまま開き直しても、視聴なしで誤って開始しないための二重ガード
 	useEffect(() => {
-		if (!isEarnedReward) {
+		if (!earnedReward) {
 			rewardHandled.current = false
 		}
-	}, [isEarnedReward])
+	}, [earnedReward])
 
 	useEffect(() => {
-		if (!visible || !isEarnedReward || rewardHandled.current) return
+		if (!visible || !earnedReward || rewardHandled.current) return
 		rewardHandled.current = true
 		void trialStore.startTrial(gameId).then(() => {
 			onClose()
 			router.push(`/game/${gameId}`)
 		})
-	}, [gameId, isEarnedReward, onClose, visible])
+	}, [earnedReward, gameId, onClose, visible])
 
 	return (
 		<Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
@@ -71,7 +76,7 @@ export function PremiumLockModal({ visible, gameId, gameTitle, onClose }: Props)
 								<View style={styles.buttonWrap}>
 									<GradientButton
 										title="動画を見てお試しプレイ"
-										disabled={!isLoaded}
+										disabled={status !== 'loaded'}
 										onPress={() => show()}
 									/>
 								</View>

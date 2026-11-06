@@ -21,15 +21,17 @@ export const AdEventType = { LOADED: 'loaded', ERROR: 'error', CLOSED: 'closed' 
 
 export const BannerAdSize = { ANCHORED_ADAPTIVE_BANNER: 'ANCHORED_ADAPTIVE_BANNER' }
 
+// v17 に合わせ show は Promise を返し、destroy を持つ
 type StubAd = {
 	addAdEventListener: (type: string, listener: Listener) => () => void
 	load: () => void
-	show: () => void
+	show: () => Promise<void>
+	destroy: () => void
 }
 
 export const InterstitialAd = {
 	createForAdRequest(_unitId: string): StubAd {
-		return { addAdEventListener: () => noop, load: noop, show: noop }
+		return { addAdEventListener: () => noop, load: noop, show: async () => {}, destroy: noop }
 	},
 }
 
@@ -37,16 +39,17 @@ export function BannerAd(_props: { unitId: string; size: string }): null {
 	return null
 }
 
-// isLoaded が常に false なので「動画を見て〜」ボタンは disabled のまま。
+// v17 のオプション形式（useRewardedAd({ adUnitId, autoLoad })）と同じ形。
+// status が常に 'idle' なので「動画を見て〜」ボタンは disabled のまま。
 // 毎レンダー同一参照を返し、呼び出し元 useEffect の依存配列 (load) で再実行を起こさない
 const rewardedAdStub = {
-	isLoaded: false,
-	isEarnedReward: false,
-	error: undefined,
+	status: 'idle' as const,
+	error: null,
+	earnedReward: false,
 	load: noop,
 	show: noop,
 }
 
-export function useRewardedAd(_unitId: string) {
+export function useRewardedAd(_options: { adUnitId: string | null; autoLoad?: boolean }) {
 	return rewardedAdStub
 }

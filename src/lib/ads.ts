@@ -31,6 +31,8 @@ export async function initAds(): Promise<void> {
 }
 
 function preloadInterstitial() {
+	// v17 では命令的に作った広告の後始末は呼び出し側の責任。作り直す前に使い終わった広告を破棄する
+	interstitial?.destroy()
 	interstitialLoaded = false
 	interstitialFailed = false
 	interstitial = InterstitialAd.createForAdRequest(AD_UNIT_IDS.gameExitInterstitial)
@@ -54,7 +56,9 @@ export function maybeShowGameExitInterstitial(): void {
 	if (playExitCount % INTERSTITIAL_EVERY_N_EXITS !== 0) return
 	if (interstitialLoaded && interstitial) {
 		interstitialLoaded = false
-		interstitial.show()
+		// v17.2 以降、未ロード・表示中・表示拒否は Promise の reject で返る。
+		// 未処理の reject にせず、表示できなかった広告は破棄して次の退出に備えて読み込み直す
+		interstitial.show().catch(preloadInterstitial)
 		return
 	}
 	if (interstitialFailed) {
