@@ -135,6 +135,14 @@ describe('RootLayout', () => {
 		}
 	})
 
+	it('ホームから開くヘッダー付き画面の戻るボタンは「ホーム」と表示する（ルート名 index を出さない）', async () => {
+		await render(<RootLayout />)
+
+		for (const name of ['gallery', 'settings']) {
+			expect(mockScreenOptions[name]).toMatchObject({ headerBackTitle: 'ホーム' })
+		}
+	})
+
 	it('起動時に広告を初期化する', async () => {
 		initAdsMock.mockClear()
 		await render(<RootLayout />)
