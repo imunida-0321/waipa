@@ -1,6 +1,6 @@
 import { router } from 'expo-router'
 import { useRef, useState } from 'react'
-import { ImageBackground, StyleSheet, Text, View } from 'react-native'
+import { Image, StyleSheet, Text, View } from 'react-native'
 import Animated, {
 	useAnimatedStyle,
 	useSharedValue,
@@ -81,7 +81,13 @@ export function BombGame() {
 		i === board.soloIndex ? 'solo' : i === board.allIndex ? 'all' : null
 
 	return (
-		<ImageBackground source={require('@/assets/images/bomb/bg.jpg')} style={styles.container}>
+		<View style={styles.container}>
+			{/* ImageBackground は RN 0.88 で非推奨のため、絶対配置の Image で背景を敷く */}
+			<Image
+				source={require('@/assets/images/bomb/bg.jpg')}
+				style={StyleSheet.absoluteFill}
+				resizeMode="cover"
+			/>
 			{/* 文字とパネルの視認性を保つ暗めスクリム */}
 			<View style={styles.scrim} />
 			<View style={styles.status}>
@@ -134,7 +140,7 @@ export function BombGame() {
 					</Text>
 				</View>
 			</ResultOverlay>
-		</ImageBackground>
+		</View>
 	)
 }
 
