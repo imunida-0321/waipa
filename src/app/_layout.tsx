@@ -56,6 +56,8 @@ export default function RootLayout() {
 						headerShown: true,
 						// iOS 26 以降の expo-router（SDK 58）は既定でヘッダーを透過させるため明示的に戻す
 						headerTransparent: false,
+						// ホームは title を持たないため、未指定だとルート名「index」が戻るボタンに出る
+						headerBackTitle: 'ホーム',
 						title: 'デザインギャラリー',
 						headerStyle: { backgroundColor: colors.background },
 						headerTintColor: colors.text,
@@ -71,6 +73,7 @@ export default function RootLayout() {
 					options={{
 						headerShown: true,
 						headerTransparent: false,
+						headerBackTitle: 'ホーム',
 						title: '設定とアクティビティ',
 						headerStyle: { backgroundColor: colors.background },
 						headerTintColor: colors.text,
