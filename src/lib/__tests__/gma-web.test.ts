@@ -14,12 +14,13 @@ describe('gma.web (web 向け no-op スタブ)', () => {
 		await expect(mobileAds().initialize()).resolves.toBeDefined()
 	})
 
-	it('InterstitialAd.createForAdRequest が no-op の広告オブジェクトを返す', () => {
+	it('InterstitialAd.createForAdRequest が no-op の広告オブジェクトを返す（v17 と同じく show は Promise）', async () => {
 		const ad = InterstitialAd.createForAdRequest('unit-id')
+		const unsubscribe = ad.addAdEventListener(AdEventType.LOADED, () => {})
+		ad.load()
+		await expect(ad.show()).resolves.toBeUndefined()
 		expect(() => {
-			const unsubscribe = ad.addAdEventListener(AdEventType.LOADED, () => {})
-			ad.load()
-			ad.show()
+			ad.destroy()
 			unsubscribe()
 		}).not.toThrow()
 	})
@@ -30,10 +31,10 @@ describe('gma.web (web 向け no-op スタブ)', () => {
 		).toBeNull()
 	})
 
-	it('useRewardedAd は常に未ロード状態を返し load/show が例外を投げない', () => {
-		const hook = useRewardedAd('unit-id')
-		expect(hook.isLoaded).toBe(false)
-		expect(hook.isEarnedReward).toBe(false)
+	it('useRewardedAd（v17 のオプション形式）は常に idle を返し load/show が例外を投げない', () => {
+		const hook = useRewardedAd({ adUnitId: 'unit-id', autoLoad: false })
+		expect(hook.status).toBe('idle')
+		expect(hook.earnedReward).toBe(false)
 		expect(() => {
 			hook.load()
 			hook.show()
