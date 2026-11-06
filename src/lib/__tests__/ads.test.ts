@@ -92,6 +92,31 @@ describe('maybeShowGameExitInterstitial', () => {
 		expect(adsMock._interstitials[1]?.load).toHaveBeenCalledTimes(1)
 	})
 
+	it('表示後に作り直すとき、使い終わった広告を destroy する', async () => {
+		await initAds()
+		const first = adsMock._interstitials[0]
+		first._emit('loaded')
+		maybeShowGameExitInterstitial()
+		first._emit('closed')
+		expect(first.destroy).toHaveBeenCalledTimes(1)
+		expect(adsMock._interstitials[1]?.destroy).not.toHaveBeenCalled()
+	})
+
+	it('show() が reject されても未処理にせず、広告を破棄して読み込み直す', async () => {
+		await initAds()
+		const first = adsMock._interstitials[0]
+		first.show.mockRejectedValueOnce(new Error('show declined'))
+		first._emit('loaded')
+
+		maybeShowGameExitInterstitial()
+		await Promise.resolve()
+		await Promise.resolve()
+
+		expect(first.destroy).toHaveBeenCalledTimes(1)
+		expect(adsMock.InterstitialAd.createForAdRequest).toHaveBeenCalledTimes(2)
+		expect(adsMock._interstitials[1]?.load).toHaveBeenCalledTimes(1)
+	})
+
 	it('未ロードなら表示しない（クラッシュもしない）', async () => {
 		await initAds()
 		maybeShowGameExitInterstitial()
