@@ -169,7 +169,7 @@ flowchart TD
 `src/app/_layout.tsx` がマウント時に次の処理をします。
 
 1. `initPremium()` で RevenueCat を設定し、購読状態を取得する
-2. 購読状態が確定したら、`initAds()` で ATT の許可を確認し、AdMob を初期化して、インタースティシャルを先読みする。プレミアムなら何もしない
+2. 購読状態が確定したら、`initAds()` で ATT の許可を確認し、AdMob を初期化して、インタースティシャルを先読みする。プレミアムなら何もせず、あとで購読が切れた時点で初期化する
 3. `settingsStore`・`playersStore`・`trialStore` を AsyncStorage から復元する
 4. `topicsStore`・`wordPairsStore` をキャッシュから復元し、続けて Supabase から取り直す
 5. 効果音を登録する
@@ -189,7 +189,7 @@ flowchart TD
 
 ### RevenueCat の購読状態
 
-- RevenueCat の SDK を呼ぶのは `src/lib/premium.ts` だけです。画面やストアは `usePremium()`（React 用）か `isPremiumUnlocked()`（それ以外）で状態を読みます。
+- RevenueCat の SDK を呼ぶのは `src/lib/premium.ts` だけです。画面やストアは `usePremium()`（React 用）か `isPremiumUnlocked()`（それ以外）で状態を読みます。状態の変化を受け取るには `subscribePremium()` を使います。
 - entitlement `premium`（`src/constants/purchases.ts`）が有効なら、プレミアムと判定します。
 - 購入は `purchasePremium()`、復元は `restorePremium()` で行います。どちらも結果を文字列で返し、例外は投げません。
 - **API キーが未設定のときは RevenueCat を初期化しません**。この状態では、開発ビルドならプレミアム扱い、本番ビルドなら非プレミアム扱いになります。
@@ -200,6 +200,7 @@ flowchart TD
 - 初期化とインタースティシャルの表示は `src/lib/ads.ts` が行い、SDK は `src/lib/gma.ts` が再エクスポートします。
 - インタースティシャルを出すかどうかは `adsEnabled()` で判定し、その中身は `!isPremiumUnlocked()` です。
 - ホームのバナーは `useAdsEnabled()` で判定します。AdMob の初期化が済み、かつ非プレミアムのあいだだけ表示します。
+- `ads.ts` は購読状態の変化を監視します。購読者として起動したあとで購読が切れると、その時点で広告を初期化します。
 - 配置、表示条件、頻度の定数は [ADS.md](ADS.md) にまとめてあります。
 
 ### web ビルド用のスタブ
