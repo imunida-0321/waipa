@@ -6,7 +6,7 @@ import {
 } from '@/lib/att'
 import { createStore, useStore } from '@/lib/create-store'
 import mobileAds, { AdEventType, InterstitialAd } from '@/lib/gma'
-import { isPremiumUnlocked, usePremium } from '@/lib/premium'
+import { isPremiumUnlocked, subscribePremium, usePremium } from '@/lib/premium'
 
 // プレミアム購読者には一切広告を出さない。判定源は isPremiumUnlocked() のみ
 export function adsEnabled(): boolean {
@@ -24,15 +24,18 @@ export function useAdsEnabled(): boolean {
 }
 
 let initialized = false
+let watchingPremium = false
 let interstitial: InterstitialAd | null = null
 let interstitialLoaded = false
 let interstitialFailed = false
 let playExitCount = 0
 
-// 起動時、購読状態が確定したあとに1回だけ呼ぶ（冒頭の adsEnabled() の判定が購読状態を反映するように）。
-// ATT → AdMob 初期化 → 先読み
+// 起動時、購読状態が確定したあとに呼ぶ（冒頭の adsEnabled() の判定が購読状態を反映するように）。
+// ATT → AdMob 初期化 → 先読み。初期化は1回だけで、プレミアムなら何もしない
 export async function initAds(): Promise<void> {
-	if (initialized || !adsEnabled()) return
+	if (initialized) return
+	watchPremium()
+	if (!adsEnabled()) return
 	initialized = true
 	const { status } = await getTrackingPermissionsAsync()
 	if (status === PermissionStatus.UNDETERMINED) {
@@ -41,6 +44,16 @@ export async function initAds(): Promise<void> {
 	await mobileAds().initialize()
 	readyStore.setState(true)
 	preloadInterstitial()
+}
+
+// 購読者として起動すると initAds() は何もせずに終わる。そのあとで購読が切れたときに広告を出せるよう、
+// 購読状態が変わるたびに initAds() を呼び直す（初期化済みかプレミアムなら何もしないので、何度呼んでもよい）
+function watchPremium() {
+	if (watchingPremium) return
+	watchingPremium = true
+	subscribePremium(() => {
+		void initAds()
+	})
 }
 
 function preloadInterstitial() {
@@ -82,6 +95,7 @@ export function maybeShowGameExitInterstitial(): void {
 // テスト用: モジュール状態を初期化
 export function _resetForTest() {
 	initialized = false
+	watchingPremium = false
 	readyStore.setState(false)
 	interstitial = null
 	interstitialLoaded = false

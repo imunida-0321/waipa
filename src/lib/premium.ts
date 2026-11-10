@@ -86,15 +86,16 @@ export function isPremiumUnlocked(): boolean {
 	return unlocked
 }
 
+// 購読状態が変わるたびに呼ばれるリスナーを登録する。戻り値で解除する
+export function subscribePremium(listener: () => void): () => void {
+	listeners.add(listener)
+	return () => {
+		listeners.delete(listener)
+	}
+}
+
 export function usePremium(): boolean {
-	return useSyncExternalStore(
-		(fn) => {
-			listeners.add(fn)
-			return () => listeners.delete(fn)
-		},
-		isPremiumUnlocked,
-		isPremiumUnlocked,
-	)
+	return useSyncExternalStore(subscribePremium, isPremiumUnlocked, isPremiumUnlocked)
 }
 
 export async function getPremiumPackages(): Promise<PremiumPackages | null> {

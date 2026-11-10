@@ -3,7 +3,10 @@ import { initAds, maybeShowGameExitInterstitial, _resetForTest } from '@/lib/ads
 
 jest.mock('react-native-google-mobile-ads')
 jest.mock('expo-tracking-transparency')
-jest.mock('@/lib/premium', () => ({ isPremiumUnlocked: jest.fn(() => false) }))
+jest.mock('@/lib/premium', () => ({
+	isPremiumUnlocked: jest.fn(() => false),
+	subscribePremium: jest.fn(() => () => {}),
+}))
 jest.mock('@/constants/ads', () => ({
 	...jest.requireActual('@/constants/ads'),
 	INTERSTITIAL_EVERY_N_EXITS: 3,

@@ -1,4 +1,4 @@
-import { act, render } from '@testing-library/react-native'
+import { act, render, waitFor } from '@testing-library/react-native'
 import Purchases, { type CustomerInfo } from 'react-native-purchases'
 import { HomeBannerAd } from '@/components/home/home-banner-ad'
 import { ENTITLEMENT_ID } from '@/constants/purchases'
@@ -92,5 +92,20 @@ describe('HomeBannerAd', () => {
 		})
 
 		expect(queryByTestId('home-banner-ad')).toBeNull()
+	})
+
+	it('購読者として起動したあとで購読が切れたら、広告を初期化してバナーを表示する', async () => {
+		purchasesMock._setCustomerInfo(customerInfo(true))
+		const { queryByTestId } = await render(<HomeBannerAd />)
+		await startUp()
+		expect(queryByTestId('home-banner-ad')).toBeNull()
+
+		await act(async () => {
+			purchasesMock._emitCustomerInfo(customerInfo(false))
+		})
+
+		await waitFor(() => {
+			expect(queryByTestId('home-banner-ad')).not.toBeNull()
+		})
 	})
 })

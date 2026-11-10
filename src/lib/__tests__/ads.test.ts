@@ -1,4 +1,4 @@
-import { act, renderHook } from '@testing-library/react-native'
+import { act, renderHook, waitFor } from '@testing-library/react-native'
 import type * as AdsMock from '../../../__mocks__/react-native-google-mobile-ads'
 import {
 	getTrackingPermissionsAsync,
@@ -12,7 +12,7 @@ import {
 	useAdsEnabled,
 	_resetForTest,
 } from '@/lib/ads'
-import { isPremiumUnlocked, usePremium } from '@/lib/premium'
+import { isPremiumUnlocked, subscribePremium, usePremium } from '@/lib/premium'
 
 // ファクトリなしの jest.mock はルート __mocks__ の手動モックを使う
 // （jest-expo では自動適用されないため、テスト対象と同一インスタンスを共有するには明示が必要）
@@ -20,14 +20,21 @@ jest.mock('react-native-google-mobile-ads')
 jest.mock('expo-tracking-transparency')
 jest.mock('@/lib/premium', () => ({
 	isPremiumUnlocked: jest.fn(() => false),
+	subscribePremium: jest.fn(() => () => {}),
 	usePremium: jest.fn(() => false),
 }))
 
 const adsMock = jest.requireMock('react-native-google-mobile-ads') as typeof AdsMock
 const mockedPremium = jest.mocked(isPremiumUnlocked)
+const mockedSubscribePremium = jest.mocked(subscribePremium)
 const mockedUsePremium = jest.mocked(usePremium)
 const mockedGetAtt = jest.mocked(getTrackingPermissionsAsync)
 const mockedRequestAtt = jest.mocked(requestTrackingPermissionsAsync)
+
+// ads.ts が premium.ts に登録したリスナーを呼び、購読状態が変わったことを伝える
+function notifyPremiumChanged() {
+	mockedSubscribePremium.mock.calls.forEach(([listener]) => listener())
+}
 
 function attResponse(status: PermissionStatus) {
 	return {
@@ -111,6 +118,52 @@ describe('initAds', () => {
 		await initAds()
 		expect(adsMock.InterstitialAd.createForAdRequest).toHaveBeenCalledTimes(1)
 		expect(adsMock._interstitials[0]?.load).toHaveBeenCalledTimes(1)
+	})
+})
+
+describe('購読状態が変わったとき', () => {
+	it('プレミアムで起動したあと購読が切れたら、その時点で広告を初期化する', async () => {
+		mockedPremium.mockReturnValue(true)
+		await initAds()
+		expect(adsMock._initialize).not.toHaveBeenCalled()
+
+		mockedPremium.mockReturnValue(false)
+		notifyPremiumChanged()
+
+		await waitFor(() => {
+			expect(adsMock._interstitials).toHaveLength(1)
+		})
+		expect(mockedRequestAtt).toHaveBeenCalledTimes(1)
+		expect(adsMock._initialize).toHaveBeenCalledTimes(1)
+	})
+
+	it('通知を受けてもプレミアムのままなら、広告を初期化しない', async () => {
+		mockedPremium.mockReturnValue(true)
+		await initAds()
+
+		notifyPremiumChanged()
+
+		expect(mockedSubscribePremium).toHaveBeenCalledTimes(1)
+		expect(mockedGetAtt).not.toHaveBeenCalled()
+		expect(adsMock._initialize).not.toHaveBeenCalled()
+	})
+
+	it('初期化済みなら、通知を受けても初期化し直さない', async () => {
+		await initAds()
+		expect(adsMock._initialize).toHaveBeenCalledTimes(1)
+
+		notifyPremiumChanged()
+
+		expect(mockedGetAtt).toHaveBeenCalledTimes(1)
+		expect(adsMock._initialize).toHaveBeenCalledTimes(1)
+	})
+
+	it('initAds を何度呼んでも、購読状態の監視は1回しか登録しない', async () => {
+		mockedPremium.mockReturnValue(true)
+		await initAds()
+		await initAds()
+
+		expect(mockedSubscribePremium).toHaveBeenCalledTimes(1)
 	})
 })
 

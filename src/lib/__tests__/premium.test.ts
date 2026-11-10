@@ -14,6 +14,7 @@ import {
 	isPremiumUnlocked,
 	purchasePremium,
 	restorePremium,
+	subscribePremium,
 	usePremium,
 } from '../premium'
 import * as premiumModule from '../premium'
@@ -229,6 +230,33 @@ describe('初期化とプレミアム状態', () => {
 
 		expect(result.current).toBe(true)
 		expect(isPremiumUnlocked()).toBe(true)
+	})
+
+	it('subscribePremium のリスナーは、購読状態が変わるたびに呼ばれる', async () => {
+		process.env.EXPO_PUBLIC_REVENUECAT_API_KEY_IOS = 'ios-key'
+		purchasesMock._setCustomerInfo(makeCustomerInfo(true))
+		await initPremium()
+		const listener = jest.fn()
+		subscribePremium(listener)
+
+		purchasesMock._emitCustomerInfo(makeCustomerInfo(false))
+		expect(listener).toHaveBeenCalledTimes(1)
+
+		purchasesMock._emitCustomerInfo(makeCustomerInfo(true))
+		expect(listener).toHaveBeenCalledTimes(2)
+	})
+
+	it('subscribePremium の戻り値で解除すると、以後は呼ばれない', async () => {
+		process.env.EXPO_PUBLIC_REVENUECAT_API_KEY_IOS = 'ios-key'
+		purchasesMock._setCustomerInfo(makeCustomerInfo(true))
+		await initPremium()
+		const listener = jest.fn()
+		const unsubscribe = subscribePremium(listener)
+
+		unsubscribe()
+		purchasesMock._emitCustomerInfo(makeCustomerInfo(false))
+
+		expect(listener).not.toHaveBeenCalled()
 	})
 })
 
