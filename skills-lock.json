@@ -114,6 +114,12 @@
 			"sourceType": "github",
 			"skillPath": "plugins/expo/skills/web-to-native/SKILL.md",
 			"computedHash": "80590c29476850ecbfc0a483515056614e15f274010e4aa2fc4edd76224e28b6"
+		},
+		"yomiyasu": {
+			"source": "nanaism/yomiyasu",
+			"sourceType": "github",
+			"skillPath": "skills/yomiyasu/SKILL.md",
+			"computedHash": "931929b8d7be2c1413927dec7c7ad44b2fba5caee2cd8394a52e7727d3a2c959"
 		}
 	}
 }
