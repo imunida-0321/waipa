@@ -65,9 +65,10 @@
 # 技術スタック
 
 ・Expo (React Native) — iOS / Android 両対応
-・Supabase — 認証・お題配信・課金検証（MVP ではリアルタイム同期は使わない）
+・Supabase — お題配信（anon キーでの読み取りのみ。認証・書き込み・リアルタイム同期は使っていない）
 ・AdMob — バナー＋インタースティシャル＋リワード広告
-・RevenueCat — プレミアム課金（月額 ¥150 / 年額 ¥1,100）
+・RevenueCat — プレミアム課金（月額 ¥150 / 年額 ¥1,100）。購読の検証も RevenueCat が担う
+・全体の構造（画面遷移・ディレクトリの責務・外部サービスとの接続・プレミアム判定の流れ）は docs/ARCHITECTURE.md を参照。これらを変える PR では docs/ARCHITECTURE.md も一緒に更新する
 
 # MVPスコープ（2026-07-06 確定）
 
