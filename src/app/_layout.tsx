@@ -20,8 +20,11 @@ export default function RootLayout() {
 	const colorScheme = useColorScheme()
 
 	useEffect(() => {
-		initAds()
+		// 購読者に ATT 要求や広告の初期化を走らせないよう、購読状態が確定してから広告を初期化する。
+		// 購読状態を取得できなかったときは非プレミアム扱いのまま初期化する（issue #158）
 		initPremium()
+			.catch(() => {})
+			.then(initAds)
 		settingsStore.hydrate()
 		playersStore.hydrate()
 		trialStore.hydrate()

@@ -4,12 +4,23 @@ import {
 	PermissionStatus,
 	requestTrackingPermissionsAsync,
 } from '@/lib/att'
+import { createStore, useStore } from '@/lib/create-store'
 import mobileAds, { AdEventType, InterstitialAd } from '@/lib/gma'
-import { isPremiumUnlocked } from '@/lib/premium'
+import { isPremiumUnlocked, usePremium } from '@/lib/premium'
 
 // プレミアム購読者には一切広告を出さない。判定源は isPremiumUnlocked() のみ
 export function adsEnabled(): boolean {
 	return !isPremiumUnlocked()
+}
+
+// AdMob の初期化が済んだかどうか。initAds() はプレミアムなら初期化しないので、購読者では false のまま
+const readyStore = createStore(false)
+
+// 常設の広告枠（ホームのバナー）の表示判定。初期化が済むまでは出さず、購読状態の変化にも追従する
+export function useAdsEnabled(): boolean {
+	const ready = useStore(readyStore)
+	const premiumUnlocked = usePremium()
+	return ready && !premiumUnlocked
 }
 
 let initialized = false
@@ -18,7 +29,8 @@ let interstitialLoaded = false
 let interstitialFailed = false
 let playExitCount = 0
 
-// 初回起動時（ホーム表示直後）に1回だけ呼ぶ。ATT → AdMob 初期化 → 先読み
+// 起動時、購読状態が確定したあとに1回だけ呼ぶ（冒頭の adsEnabled() の判定が購読状態を反映するように）。
+// ATT → AdMob 初期化 → 先読み
 export async function initAds(): Promise<void> {
 	if (initialized || !adsEnabled()) return
 	initialized = true
@@ -27,6 +39,7 @@ export async function initAds(): Promise<void> {
 		await requestTrackingPermissionsAsync()
 	}
 	await mobileAds().initialize()
+	readyStore.setState(true)
 	preloadInterstitial()
 }
 
@@ -69,6 +82,7 @@ export function maybeShowGameExitInterstitial(): void {
 // テスト用: モジュール状態を初期化
 export function _resetForTest() {
 	initialized = false
+	readyStore.setState(false)
 	interstitial = null
 	interstitialLoaded = false
 	interstitialFailed = false
