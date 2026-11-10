@@ -6,6 +6,7 @@ import { registerSound } from '@/lib/sound'
 import { topicsStore } from '@/lib/topics-store'
 import { wordPairsStore } from '@/lib/word-pairs-store'
 import { initAds } from '@/lib/ads'
+import { initPremium } from '@/lib/premium'
 import RootLayout from '../_layout'
 
 jest.mock('expo-splash-screen', () => ({
@@ -61,8 +62,10 @@ jest.mock('@/lib/sound', () => ({
 	registerSound: jest.fn(),
 }))
 jest.mock('@/lib/ads', () => ({ initAds: jest.fn() }))
+jest.mock('@/lib/premium', () => ({ initPremium: jest.fn(async () => {}) }))
 
 const initAdsMock = initAds as jest.MockedFunction<typeof initAds>
+const initPremiumMock = initPremium as jest.MockedFunction<typeof initPremium>
 const registerSoundMock = registerSound as jest.MockedFunction<typeof registerSound>
 const settingsHydrateMock = settingsStore.hydrate as jest.MockedFunction<
 	typeof settingsStore.hydrate
@@ -147,5 +150,34 @@ describe('RootLayout', () => {
 		initAdsMock.mockClear()
 		await render(<RootLayout />)
 		expect(initAdsMock).toHaveBeenCalledTimes(1)
+	})
+
+	it('購読状態の確定を待ってから広告を初期化する（購読者に ATT 要求や初期化を走らせない）', async () => {
+		initAdsMock.mockClear()
+		let resolvePremium: () => void = () => {}
+		initPremiumMock.mockReturnValueOnce(
+			new Promise<void>((resolve) => {
+				resolvePremium = resolve
+			}),
+		)
+
+		await render(<RootLayout />)
+		expect(initAdsMock).not.toHaveBeenCalled()
+
+		await act(async () => {
+			resolvePremium()
+		})
+		expect(initAdsMock).toHaveBeenCalledTimes(1)
+	})
+
+	it('購読状態の取得に失敗しても広告は初期化する', async () => {
+		initAdsMock.mockClear()
+		initPremiumMock.mockRejectedValueOnce(new Error('購読状態を取得できない'))
+
+		await render(<RootLayout />)
+
+		await waitFor(() => {
+			expect(initAdsMock).toHaveBeenCalledTimes(1)
+		})
 	})
 })

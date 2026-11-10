@@ -1,20 +1,31 @@
+import { act, renderHook } from '@testing-library/react-native'
 import type * as AdsMock from '../../../__mocks__/react-native-google-mobile-ads'
 import {
 	getTrackingPermissionsAsync,
 	PermissionStatus,
 	requestTrackingPermissionsAsync,
 } from 'expo-tracking-transparency'
-import { adsEnabled, initAds, maybeShowGameExitInterstitial, _resetForTest } from '@/lib/ads'
-import { isPremiumUnlocked } from '@/lib/premium'
+import {
+	adsEnabled,
+	initAds,
+	maybeShowGameExitInterstitial,
+	useAdsEnabled,
+	_resetForTest,
+} from '@/lib/ads'
+import { isPremiumUnlocked, usePremium } from '@/lib/premium'
 
 // ファクトリなしの jest.mock はルート __mocks__ の手動モックを使う
 // （jest-expo では自動適用されないため、テスト対象と同一インスタンスを共有するには明示が必要）
 jest.mock('react-native-google-mobile-ads')
 jest.mock('expo-tracking-transparency')
-jest.mock('@/lib/premium', () => ({ isPremiumUnlocked: jest.fn(() => false) }))
+jest.mock('@/lib/premium', () => ({
+	isPremiumUnlocked: jest.fn(() => false),
+	usePremium: jest.fn(() => false),
+}))
 
 const adsMock = jest.requireMock('react-native-google-mobile-ads') as typeof AdsMock
 const mockedPremium = jest.mocked(isPremiumUnlocked)
+const mockedUsePremium = jest.mocked(usePremium)
 const mockedGetAtt = jest.mocked(getTrackingPermissionsAsync)
 const mockedRequestAtt = jest.mocked(requestTrackingPermissionsAsync)
 
@@ -32,6 +43,7 @@ beforeEach(() => {
 	adsMock._resetAdsMock()
 	_resetForTest()
 	mockedPremium.mockReturnValue(false)
+	mockedUsePremium.mockReturnValue(false)
 	mockedGetAtt.mockResolvedValue(attResponse(PermissionStatus.UNDETERMINED))
 })
 
@@ -40,6 +52,28 @@ describe('adsEnabled', () => {
 		expect(adsEnabled()).toBe(true)
 		mockedPremium.mockReturnValue(true)
 		expect(adsEnabled()).toBe(false)
+	})
+})
+
+describe('useAdsEnabled', () => {
+	it('広告の初期化が済むまでは false', async () => {
+		const { result } = await renderHook(() => useAdsEnabled())
+		expect(result.current).toBe(false)
+	})
+
+	it('広告の初期化が済んだら true になる', async () => {
+		const { result } = await renderHook(() => useAdsEnabled())
+		await act(async () => {
+			await initAds()
+		})
+		expect(result.current).toBe(true)
+	})
+
+	it('プレミアムなら、初期化が済んでいても false', async () => {
+		await initAds()
+		mockedUsePremium.mockReturnValue(true)
+		const { result } = await renderHook(() => useAdsEnabled())
+		expect(result.current).toBe(false)
 	})
 })
 
