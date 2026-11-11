@@ -46,14 +46,17 @@ export function PremiumLockModal({ visible, gameId, gameTitle, onClose }: Props)
 		}
 	}, [earnedReward])
 
+	// リワードの獲得は、広告がまだ画面に出ているうち（status: showing）に通知される。
+	// その時点でモーダルを閉じると、上に重なっている広告ごと閉じられ、遷移先の画面が
+	// タップを受け付けなくなる。広告が閉じられる（closed）のを待ってから進む（issue #168）
 	useEffect(() => {
-		if (!visible || !earnedReward || rewardHandled.current) return
+		if (!visible || !earnedReward || status !== 'closed' || rewardHandled.current) return
 		rewardHandled.current = true
 		void trialStore.startTrial(gameId).then(() => {
 			onClose()
 			router.push(`/game/${gameId}`)
 		})
-	}, [earnedReward, gameId, onClose, visible])
+	}, [earnedReward, gameId, onClose, status, visible])
 
 	return (
 		<Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
