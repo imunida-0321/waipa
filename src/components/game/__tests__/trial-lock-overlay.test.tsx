@@ -47,6 +47,24 @@ it('お試しを消費し切った非プレミアムユーザーにはロック�
 	expect(getByText('ホームへ戻る')).toBeTruthy()
 })
 
+// jest は React Compiler を通さないので、この不具合そのもの（Compiler が結果を gameId だけで
+// キャッシュする）はここでは再現しない。描画中の変化を拾うことの回帰テストとして置く
+it('表示中にお試しを使い切ったら、その時点でロックオーバーレイを出す（issue #178）', async () => {
+	const { trialStore } = requireTrialStore()
+	trialStore._resetForTest()
+	await trialStore.startTrial('burst-chicken')
+
+	const { getByTestId, queryByTestId } = await render(<TrialLockOverlay gameId="burst-chicken" />)
+	expect(queryByTestId('trial-lock-overlay')).toBeNull()
+
+	await act(async () => {
+		trialStore.consumeRound('burst-chicken')
+		trialStore.consumeRound('burst-chicken')
+	})
+
+	expect(getByTestId('trial-lock-overlay')).toBeTruthy()
+})
+
 it('未消費・非トライアル・プレミアムでは表示しない', async () => {
 	const { trialStore } = requireTrialStore()
 	trialStore._resetForTest()
