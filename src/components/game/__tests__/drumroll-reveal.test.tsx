@@ -1,5 +1,5 @@
 import { render } from '@testing-library/react-native'
-import { Text } from 'react-native'
+import { StyleSheet, Text, type StyleProp, type ViewStyle } from 'react-native'
 import { DrumrollReveal } from '../drumroll-reveal'
 
 jest.mock('lottie-react-native', () => {
@@ -47,4 +47,35 @@ it('revealed: lottie={false} なら celebrate 素材を再生せず children の
 	)
 	expect(getByText('4.98秒')).toBeTruthy()
 	expect(queryByTestId('lottie-view')).toBeNull()
+})
+
+// RNTL v14 の要素型と react-test-renderer の型が非互換のため、必要な形だけの構造的型で受ける
+type StyledNode = { parent: StyledNode | null; props: { style?: StyleProp<ViewStyle> } }
+
+// 祖先の要素に指定されている alignSelf を集める
+function ancestorAlignSelfs(node: StyledNode): unknown[] {
+	const values: unknown[] = []
+	for (let current = node.parent; current; current = current.parent) {
+		const value = StyleSheet.flatten(current.props.style)?.alignSelf
+		if (value !== undefined) values.push(value)
+	}
+	return values
+}
+
+it('revealed: 既定では children を親の幅に広げない（内容の幅のまま中央に置く）', async () => {
+	const { getByText } = await render(
+		<DrumrollReveal phase="revealed">
+			<Text>4番！</Text>
+		</DrumrollReveal>,
+	)
+	expect(ancestorAlignSelfs(getByText('4番！'))).not.toContain('stretch')
+})
+
+it('revealed: fill なら children を親の幅いっぱいに広げる（issue #167）', async () => {
+	const { getByText } = await render(
+		<DrumrollReveal phase="revealed" fill>
+			<Text>ランキング</Text>
+		</DrumrollReveal>,
+	)
+	expect(ancestorAlignSelfs(getByText('ランキング'))).toContain('stretch')
 })

@@ -36,7 +36,9 @@ export function RoundResult({ state, names, onRetry, onHome }: Props) {
 							style={[styles.row, losers.includes(r.index) && styles.loserRow]}
 						>
 							<View style={[styles.bar, { backgroundColor: barColor }]} />
-							<Text style={styles.name}>{names[r.index]}</Text>
+							<Text style={styles.name} numberOfLines={1}>
+								{names[r.index]}
+							</Text>
 							<Text style={styles.mine}>地雷: {state.mines[r.index]}</Text>
 							<Text style={[styles.score, r.exploded && styles.explodedScore]}>
 								{r.exploded ? '💥' : ''}

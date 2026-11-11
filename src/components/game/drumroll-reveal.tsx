@@ -18,10 +18,12 @@ type Props = PropsWithChildren<{
 	phase: DrumrollPhase
 	/** false で Lottie 素材を使わず reanimated 演出のみにする（5秒STOP の隠しタイマー等、集中を要する画面向け） */
 	lottie?: boolean
+	/** true で children を親の幅いっぱいに広げる（ランキングなど横幅を使う内容向け）。既定は内容の幅に縮めて中央に置く */
+	fill?: boolean
 }>
 
 // rolling: 「？？？」がドクドク脈打つ / revealed: children がドン！とスケールイン
-export function DrumrollReveal({ phase, children, lottie = true }: Props) {
+export function DrumrollReveal({ phase, children, lottie = true, fill = false }: Props) {
 	const pulse = useSharedValue(1)
 	const pop = useSharedValue(0)
 
@@ -67,7 +69,7 @@ export function DrumrollReveal({ phase, children, lottie = true }: Props) {
 				{lottie && (
 					<LottieEffect source={lottieAssets.celebrate} style={styles.celebrate} />
 				)}
-				<Animated.View style={popStyle}>{children}</Animated.View>
+				<Animated.View style={[popStyle, fill && styles.fill]}>{children}</Animated.View>
 			</View>
 		)
 	}
@@ -80,6 +82,7 @@ export function DrumrollReveal({ phase, children, lottie = true }: Props) {
 
 const styles = StyleSheet.create({
 	center: { alignItems: 'center', justifyContent: 'center', minHeight: 120 },
+	fill: { alignSelf: 'stretch' },
 	question: { ...typography.hero, fontSize: 48 },
 	effect: { width: 160, height: 120 },
 	// 紙吹雪は画面全体に降らせる。DrumrollReveal は画面中央付近に置かれる前提で
