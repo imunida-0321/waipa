@@ -145,3 +145,15 @@ describe('ガラス面', () => {
 		expect(hasAncestorTestId(getByText(/地雷: 70/), 'glass-surface-pseudo')).toBe(true)
 	})
 })
+
+it('名前は1行に収め、長い名前は末尾を省略する（issue #167）', async () => {
+	const { getByText } = await render(
+		<RoundResult
+			state={base}
+			names={['あか', 'あお', 'ながいなまえのひと']}
+			onRetry={jest.fn()}
+			onHome={jest.fn()}
+		/>,
+	)
+	expect(getByText('ながいなまえのひと').props.numberOfLines).toBe(1)
+})

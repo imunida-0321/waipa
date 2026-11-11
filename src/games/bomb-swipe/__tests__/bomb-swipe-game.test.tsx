@@ -1,4 +1,5 @@
 import { act, fireEvent, render } from '@testing-library/react-native'
+import { StyleSheet, type StyleProp, type ViewStyle } from 'react-native'
 import { haptics } from '@/lib/haptics'
 import { playSound } from '@/lib/sound'
 import { BombSwipeGame } from '../bomb-swipe-game'
@@ -172,6 +173,33 @@ it('全員終了でリザルトに敗者と答え合わせが表示される', a
 		jest.advanceTimersByTime(3000) // ドラムロール消化
 	})
 	expect(getByText(/あおさんの負け/)).toBeTruthy()
+})
+
+// RNTL v14 の要素型と react-test-renderer の型が非互換のため、必要な形だけの構造的型で受ける
+type StyledNode = { parent: StyledNode | null; props: { style?: StyleProp<ViewStyle> } }
+
+// 祖先の要素に指定されている alignSelf を集める
+function ancestorAlignSelfs(node: StyledNode): unknown[] {
+	const values: unknown[] = []
+	for (let current = node.parent; current; current = current.parent) {
+		const value = StyleSheet.flatten(current.props.style)?.alignSelf
+		if (value !== undefined) values.push(value)
+	}
+	return values
+}
+
+it('リザルトは画面の幅いっぱいに広げる（名前の欄がつぶれない・issue #167）', async () => {
+	const { getByText, getByTestId } = await render(<BombSwipeGame />)
+	await press(getByText(/スワイプ開始/))
+	await press(getByTestId('mock-release-50'))
+	await press(getByText(/次へ/))
+	await press(getByText(/スワイプ開始/))
+	await press(getByTestId('mock-release-60'))
+	await press(getByText(/次へ/))
+	await act(async () => {
+		jest.advanceTimersByTime(3000) // ドラムロール消化
+	})
+	expect(ancestorAlignSelfs(getByText(/あおさんの負け/))).toContain('stretch')
 })
 
 it('決着画面到達でトライアルの1ラウンドを消費する', async () => {
