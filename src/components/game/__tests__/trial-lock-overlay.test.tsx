@@ -47,8 +47,8 @@ it('お試しを消費し切った非プレミアムユーザーにはロック�
 	expect(getByText('ホームへ戻る')).toBeTruthy()
 })
 
-// jest は React Compiler を通さないので、この不具合そのもの（Compiler が結果を gameId だけで
-// キャッシュする）はここでは再現しない。描画中の変化を拾うことの回帰テストとして置く
+// React Compiler は、購読したフックの戻り値に依存しない呼び出しを引数だけでキャッシュする。
+// jest でも Compiler を通しているので（jest.config.js）、その書き方に戻るとここで落ちる
 it('表示中にお試しを使い切ったら、その時点でロックオーバーレイを出す（issue #178）', async () => {
 	const { trialStore } = requireTrialStore()
 	trialStore._resetForTest()
