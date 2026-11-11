@@ -79,7 +79,7 @@ export function BombSwipeGame() {
 	if (state.phase === 'result') {
 		return (
 			<View style={styles.container}>
-				<DrumrollReveal phase={drum.phase === 'idle' ? 'rolling' : drum.phase}>
+				<DrumrollReveal phase={drum.phase === 'idle' ? 'rolling' : drum.phase} fill>
 					<RoundResult
 						state={state}
 						names={names}
