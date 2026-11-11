@@ -13,6 +13,10 @@ jest.mock('@react-native-async-storage/async-storage', () =>
 jest.mock('@/lib/haptics', () => ({
 	haptics: { tap: jest.fn(), heavy: jest.fn(), success: jest.fn() },
 }))
+// SizeSelect が含むカスタムお題のシートが、安全領域の余白を読む
+jest.mock('react-native-safe-area-context', () => ({
+	useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
+}))
 jest.mock('expo-linear-gradient', () => {
 	// eslint-disable-next-line @typescript-eslint/no-require-imports
 	const { View } = require('react-native')
