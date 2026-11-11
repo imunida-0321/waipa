@@ -39,7 +39,9 @@ export function NoKingGame() {
 
 	if (state.phase === 'deal') {
 		return (
+			// 人が替わるたびに作り直し、「番号を見た」状態を次の人に引き継がない（issue #169）
 			<DealPass
+				key={state.dealIndex}
 				round={state.round}
 				dealIndex={state.dealIndex}
 				playerCount={state.playerCount}
