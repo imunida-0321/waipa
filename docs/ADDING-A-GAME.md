@@ -4,7 +4,7 @@
 
 ## 仕組みの前提
 
-ゲームは **registry 駆動**です。各ゲームの `meta.ts` に `GameMeta` を書き、[src/games/registry.ts](../src/games/registry.ts) の `games` 配列に並べると、ホームのゲーム一覧グリッド・イントロ画面・ゲーム本体（`src/app/game/[id].tsx` の動的ルート）がすべて自動でつながります。**`src/app/` 側の変更は不要**です。全体の構造は [ARCHITECTURE.md](ARCHITECTURE.md) を参照してください。
+ゲームは **registry 駆動**です。各ゲームの `meta.ts` に `GameMeta` を書き、[src/games/registry.ts](../src/games/registry.ts) の `games` 配列に並べると、ホームのゲーム一覧グリッド・イントロ画面・ゲーム本体（`src/app/game/[id].tsx` の動的ルート）がすべて自動でつながります。**`src/app/` 側の変更は不要**です。全体の構造は Notion の基本設計書（リンクは [DESIGN.md](DESIGN.md)）を参照してください。ゲームを追加したら、Notion の画面設計書にもそのゲームのページを足します。
 
 ## アーキテクチャ — 純関数 engine + reducer + フェーズ分岐画面
 
