@@ -1,8 +1,8 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { act, fireEvent, render } from '@testing-library/react-native'
-import { StyleSheet } from 'react-native'
+import { StyleSheet, type StyleProp, type ViewStyle } from 'react-native'
 import { customPunishmentsStore, getActiveSet } from '@/lib/custom-punishments-store'
-import { glass } from '@/theme/tokens'
+import { glass, spacing } from '@/theme/tokens'
 import { CustomPunishmentsSheet } from '../custom-punishments-sheet'
 
 jest.mock('@react-native-async-storage/async-storage', () =>
@@ -11,6 +11,10 @@ jest.mock('@react-native-async-storage/async-storage', () =>
 )
 jest.mock('@/lib/haptics', () => ({
 	haptics: { tap: jest.fn(), heavy: jest.fn(), success: jest.fn() },
+}))
+// ノッチのある iPhone を想定した安全領域（上=ステータスバー、下=ホームインジケータ）
+jest.mock('react-native-safe-area-context', () => ({
+	useSafeAreaInsets: () => ({ top: 59, bottom: 34, left: 0, right: 0 }),
 }))
 jest.mock('expo-linear-gradient', () => {
 	// eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -142,5 +146,32 @@ describe('ガラス面', () => {
 		const segmentStyle = StyleSheet.flatten(activeSegment.props.style)
 
 		expect(segmentStyle.backgroundColor).toBe(glass.fallbackFill)
+	})
+})
+
+// RNTL v14 の要素型と react-test-renderer の型が非互換のため、必要な形だけの構造的型で受ける
+type StyledNode = { parent: StyledNode | null; props: { style?: StyleProp<ViewStyle> } }
+
+// 祖先の要素に指定されている余白の値を集める
+function ancestorPaddings(node: StyledNode, key: 'paddingTop' | 'paddingBottom'): number[] {
+	const values: number[] = []
+	for (let current = node.parent; current; current = current.parent) {
+		const value = StyleSheet.flatten(current.props.style)?.[key]
+		if (typeof value === 'number') values.push(value)
+	}
+	return values
+}
+
+describe('安全領域（issue #166）', () => {
+	it('ヘッダーを、上の安全領域（ステータスバー）のぶんだけ下げる', async () => {
+		const utils = await render(<CustomPunishmentsSheet visible onClose={jest.fn()} />)
+		expect(ancestorPaddings(utils.getByLabelText('閉じる'), 'paddingTop')).toContain(59)
+	})
+
+	it('「完了」ボタンを、下の安全領域（ホームインジケータ）のぶんだけ上げる', async () => {
+		const utils = await render(<CustomPunishmentsSheet visible onClose={jest.fn()} />)
+		expect(ancestorPaddings(utils.getByText('完了'), 'paddingBottom')).toContain(
+			34 + spacing.md,
+		)
 	})
 })
