@@ -19,7 +19,7 @@ Notion のページは非公開です。開けるのは、ワークスペース�
 Claude Code で作業するときは、次の2つがこの決まりを支えます。
 
 - スキル [notion-design-docs](../.claude/skills/notion-design-docs/SKILL.md): どの変更でどのページを直すか、文章とスクリーンショットの直し方、画像を Notion に送るスクリプト
-- フック [require-notion-note.sh](../.claude/hooks/require-notion-note.sh): `gh pr create` の前に develop との差分を見て、画面・ゲーム・構成に関わるファイル（`src/app`・`src/components`・`src/games`・`src/lib`・`src/constants`・`src/theme`・`app.json`・`package.json`。テストは除く）が変わっているのに、PR の説明に「Notion」の文字が無ければ PR の作成を止めます
+- フック [require-notion-note.sh](../.claude/hooks/require-notion-note.sh): `gh pr create` の前に develop との差分を見て、画面・ゲーム・構成に関わるファイル（`src/app`・`src/components`・`src/games`・`src/lib`・`src/constants`・`src/theme`・`app.json`・`package.json`。テストは除く）が変わっているのに、PR の説明に「## Notion」の見出しが無ければ PR の作成を止めます
 
 2026-11-12 までは、全体構成を `docs/ARCHITECTURE.md`、画面設計書を `docs/screens/` に md で置いていました（Issue #182 で Notion へ移行）。当時の内容は git の履歴から読めます。
 

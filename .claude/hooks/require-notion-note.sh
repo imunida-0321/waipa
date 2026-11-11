@@ -1,6 +1,6 @@
 #!/bin/bash
 # PreToolUse hook: gh pr create の前に、Notion の基本設計書の確認を求める。
-# PR の差分に画面・ゲーム・構成に関わるファイルが含まれるのに、PR の説明に「Notion」の文字が無ければ止める。
+# PR の差分に画面・ゲーム・構成に関わるファイルが含まれるのに、PR の説明に「## Notion」の見出しが無ければ止める。
 # 直し方は .claude/skills/notion-design-docs/SKILL.md、決まりは CLAUDE.md と docs/DESIGN.md にある。
 
 input=$(cat)
@@ -11,10 +11,18 @@ printf '%s' "$cmd" | grep -qE '(^|[^[:alnum:]_-])gh[[:space:]]+pr[[:space:]]+cre
 
 cd "${CLAUDE_PROJECT_DIR:-.}" 2>/dev/null || exit 0
 
-# PR の説明（コマンドに直接書いたもの、または --body-file）に Notion の記載があれば通す
-printf '%s' "$cmd" | grep -q 'Notion' && exit 0
+# PR の説明に「## Notion」の見出しがあれば通す。タイトルやファイル名に Notion の文字があるだけでは通さない。
+# 説明は、コマンドに直接書いたもの（ヒアドキュメントなら実際の改行、--body "...\n..." なら \n の文字）か、--body-file のファイル。
+# 見出しの直後は、空白・行末・「\n」の \・本文を閉じる引用符だけを認める（「## Notion連携」などは見出しとみなさない）
+heading="##[[:space:]]+Notion([[:space:]\\\\\"']|\$)"
+if printf '%s\n' "$cmd" | grep -qE "^[[:space:]]*${heading}"; then
+	exit 0
+fi
+if printf '%s' "$cmd" | grep -qE "\\\\n[[:space:]]*${heading}"; then
+	exit 0
+fi
 body_file=$(printf '%s' "$cmd" | grep -oE -- '(--body-file|-F)[= ]+[^[:space:]]+' | head -1 | sed -E 's/^(--body-file|-F)[= ]+//' | tr -d "'\"")
-if [ -n "$body_file" ] && [ -f "$body_file" ] && grep -q 'Notion' "$body_file"; then
+if [ -n "$body_file" ] && [ -f "$body_file" ] && grep -qE "^[[:space:]]*${heading}" "$body_file"; then
 	exit 0
 fi
 

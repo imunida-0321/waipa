@@ -62,12 +62,16 @@ def send(path, file_id, token):
 def main():
     template = None
     ok = ng = 0
-    for line in sys.stdin:
+    for lineno, line in enumerate(sys.stdin, 1):
         if not line.strip() or line.lstrip().startswith('#'):
             continue
-        parts = line.split()
+        # authorization の値をそのまま貼っても読めるよう、Bearer を取り除く
+        line = line.replace('Bearer ', '')
+        # パスに空白が入っていても読めるよう、後ろの3列から切り出す
+        parts = line.strip().rsplit(None, 3)
         if len(parts) != 4:
-            print(f'NG 列の数が4ではありません: {line.strip()}')
+            # 行にはトークンが含まれるので、中身は表示しない
+            print(f'NG {lineno} 行目: 列が {len(parts)} 個しかありません（パス、ID、期限、トークンの4列が必要）')
             ng += 1
             continue
         path, file_id, expires_iso, token = Path(parts[0]), parts[1], parts[2], parts[3]
@@ -76,7 +80,13 @@ def main():
             ng += 1
             continue
         if '.' in token:
-            template = decode_payload(token)
+            try:
+                template = decode_payload(token)
+            except Exception:
+                # トークンの中身は表示しない
+                print(f'NG {lineno} 行目: トークンを読み取れません。authorization の値をそのまま渡してください')
+                ng += 1
+                continue
         elif template is None:
             print(f'NG {path}: 署名だけでは送れません。1行目には完全なトークンを渡してください')
             ng += 1
