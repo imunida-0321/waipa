@@ -71,9 +71,12 @@ export function isTrialActive(gameId: string): boolean {
 	return store.getState().active?.gameId === gameId
 }
 
-export function isTrialExhausted(gameId: string): boolean {
-	const state = store.getState()
+function exhausted(state: TrialState, gameId: string): boolean {
 	return state.active?.gameId === gameId && state.active.consumedRounds >= TRIAL_ROUNDS
+}
+
+export function isTrialExhausted(gameId: string): boolean {
+	return exhausted(store.getState(), gameId)
 }
 
 function useTrialState(): TrialState {
@@ -91,9 +94,11 @@ export function useTrialOffer(gameId: string): { canOffer: boolean; used: boolea
 	)
 }
 
+// 購読した state から結果を導く。useTrialState() の戻り値を捨てて isTrialExhausted() を呼ぶと、
+// React Compiler がその結果を gameId だけをキーにキャッシュし、ストアが変わっても
+// 再計算されない（issue #178）
 export function useTrialExhausted(gameId: string): boolean {
-	useTrialState()
-	return isTrialExhausted(gameId)
+	return exhausted(useTrialState(), gameId)
 }
 
 export function useTrialRoundConsumer(gameId: string, isRoundEnd: boolean): void {
