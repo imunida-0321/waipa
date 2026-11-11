@@ -10,6 +10,7 @@
 | ゲームを追加する手順                  | [ADDING-A-GAME.md](ADDING-A-GAME.md)        |
 | 広告の配置と表示条件                  | [ADS.md](ADS.md)                            |
 | Supabase のテーブル・お題パック・運用 | [supabase/README.md](../supabase/README.md) |
+| 画面ごとの表示項目・操作・遷移        | [screens/README.md](screens/README.md)      |
 | 機能ごとの設計の経緯                  | [superpowers/specs/](superpowers/specs/)    |
 
 このドキュメントは、ディレクトリ構成、ゲームの共通インターフェース、外部サービスとの接続のいずれかを変える PR で一緒に更新します。
