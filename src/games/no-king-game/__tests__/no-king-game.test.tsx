@@ -154,3 +154,19 @@ it('プレミアム解放中で限定お題が未取得ならマウント時に�
 	expect(refreshPremiumPack).toHaveBeenCalledTimes(1)
 	expect(refreshPremiumPack).toHaveBeenCalledWith('king_premium')
 })
+
+it('2人目以降も、自分の番号を表示するまで「確認した」ボタンは押せない', async () => {
+	const { getByText, getByLabelText } = await render(<NoKingGame />)
+	await act(async () => fireEvent.press(getByText('番号を配る')))
+
+	// 1人目は番号を見てから次の人へ渡す
+	const pad = getByLabelText('長押しで自分の番号を表示')
+	await act(async () => fireEvent(pad, 'pressIn'))
+	await act(async () => fireEvent(pad, 'pressOut'))
+	await act(async () => fireEvent.press(getByText('確認した（次の人へ）')))
+	expect(getByText(/2人目の人にスマホを渡してください/)).toBeTruthy()
+
+	// 2人目はまだ番号を見ていないので、確認ボタンを押しても進まない
+	await act(async () => fireEvent.press(getByText('確認した（次の人へ）')))
+	expect(getByText(/2人目の人にスマホを渡してください/)).toBeTruthy()
+})
