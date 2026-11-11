@@ -1,4 +1,4 @@
-import { fireEvent, render, waitFor } from '@testing-library/react-native'
+import { act, fireEvent, render, waitFor } from '@testing-library/react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { router } from 'expo-router'
 import { useRewardedAd } from 'react-native-google-mobile-ads'
@@ -52,6 +52,7 @@ type TrialStoreModule = {
 		startTrial: (gameId: string) => Promise<void>
 		endTrial: () => void
 	}
+	isTrialActive: (gameId: string) => boolean
 }
 
 function requireTrialStore() {
@@ -183,6 +184,43 @@ it('リワード獲得後に startTrial して閉じ、対象ゲームへ遷移�
 		expect(router.push).toHaveBeenCalledWith('/game/burst-chicken')
 	})
 	await expect(AsyncStorage.getItem(storageKey)).resolves.toBe(JSON.stringify(['burst-chicken']))
+	expect(onClose).toHaveBeenCalledTimes(1)
+})
+
+it('リワードを獲得しても、広告を閉じるまではお試しを始めず、閉じも遷移もしない（issue #168）', async () => {
+	const { trialStore, isTrialActive } = requireTrialStore()
+	trialStore._resetForTest()
+	const onClose = jest.fn()
+	// リワードの獲得は、広告がまだ画面に出ているうち（showing）に通知される
+	mockedRewardedAd.mockReturnValue(rewardedState({ status: 'showing', earnedReward: true }))
+	const { rerender } = await render(
+		<PremiumLockModal
+			visible
+			gameId="burst-chicken"
+			gameTitle="バーストチキン"
+			onClose={onClose}
+		/>,
+	)
+	await act(async () => {})
+
+	expect(isTrialActive('burst-chicken')).toBe(false)
+	expect(onClose).not.toHaveBeenCalled()
+	expect(router.push).not.toHaveBeenCalled()
+
+	// 広告を閉じたら、お試しを始めてゲームへ進む
+	mockedRewardedAd.mockReturnValue(rewardedState({ status: 'closed', earnedReward: true }))
+	await rerender(
+		<PremiumLockModal
+			visible
+			gameId="burst-chicken"
+			gameTitle="バーストチキン"
+			onClose={onClose}
+		/>,
+	)
+
+	await waitFor(() => {
+		expect(router.push).toHaveBeenCalledWith('/game/burst-chicken')
+	})
 	expect(onClose).toHaveBeenCalledTimes(1)
 })
 
