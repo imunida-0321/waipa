@@ -14,7 +14,12 @@ Notion のページは非公開です。開けるのは、ワークスペース�
 
 - ディレクトリ構成、ゲームの共通インターフェース、外部サービスとの接続を変える PR では、Notion の「全体構成」も直します。
 - 画面の表示や操作を変える PR では、Notion の該当する「画面設計書」のページも直します。
-- Notion を直したときは、PR の説明にその旨とページのリンクを書きます。Notion の変更は PR の差分に出ないためです。
+- PR の説明には「## Notion」の節を入れ、直したページのリンク、または直さなかった理由を書きます。Notion の変更は PR の差分に出ないためです。
+
+Claude Code で作業するときは、次の2つがこの決まりを支えます。
+
+- スキル [notion-design-docs](../.claude/skills/notion-design-docs/SKILL.md): どの変更でどのページを直すか、文章とスクリーンショットの直し方、画像を Notion に送るスクリプト
+- フック [require-notion-note.sh](../.claude/hooks/require-notion-note.sh): `gh pr create` の前に develop との差分を見て、画面・ゲーム・構成に関わるファイル（`src/app`・`src/components`・`src/games`・`src/lib`・`src/constants`・`src/theme`・`app.json`・`package.json`。テストは除く）が変わっているのに、PR の説明に「## Notion」の見出しが無ければ PR の作成を止めます
 
 2026-11-12 までは、全体構成を `docs/ARCHITECTURE.md`、画面設計書を `docs/screens/` に md で置いていました（Issue #182 で Notion へ移行）。当時の内容は git の履歴から読めます。
 
