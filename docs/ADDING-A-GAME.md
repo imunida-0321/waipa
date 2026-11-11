@@ -4,7 +4,7 @@
 
 ## 仕組みの前提
 
-ゲームは **registry 駆動**です。[src/games/registry.ts](../src/games/registry.ts) に `GameMeta` を1件登録すると、ホームのゲーム一覧グリッド・イントロ画面・ゲーム本体（`src/app/game/[id].tsx` の動的ルート）がすべて自動でつながります。**`src/app/` 側の変更は不要**です。
+ゲームは **registry 駆動**です。各ゲームの `meta.ts` に `GameMeta` を書き、[src/games/registry.ts](../src/games/registry.ts) の `games` 配列に並べると、ホームのゲーム一覧グリッド・イントロ画面・ゲーム本体（`src/app/game/[id].tsx` の動的ルート）がすべて自動でつながります。**`src/app/` 側の変更は不要**です。全体の構造は [ARCHITECTURE.md](ARCHITECTURE.md) を参照してください。
 
 ## アーキテクチャ — 純関数 engine + reducer + フェーズ分岐画面
 
@@ -12,6 +12,7 @@
 
 ```
 src/games/<game-id>/
+├── meta.ts               # GameMeta（タイトル・人数・遊び方・エントリのコンポーネント）
 ├── engine.ts             # 運要素・判定ロジックの純関数（UI 非依存）
 ├── reducer.ts            # フェーズ遷移・プレイヤー送り
 ├── <game-id>-game.tsx    # エントリ。フェーズに応じて画面を出し分け
@@ -37,31 +38,49 @@ engine → reducer → 画面の順に、それぞれ RED（失敗するテス�
 - タイマーを使うテストは `jest.useFakeTimers()` + `await act(async () => ...)`（React 19 では同期 act が失敗する。参照: [kimagure-ox のテスト](../src/games/kimagure-ox/__tests__/)）
 - 乱数は注入可能にするか `jest.spyOn` でモックし、結果を決定的にする
 
-### 3. registry.ts に GameMeta を登録
+### 3. meta.ts に GameMeta を書き、registry.ts に並べる
+
+まず `src/games/<ゲームID>/meta.ts` に `GameMeta` を書きます。
 
 ```ts
-{
-	id: 'cross-derby',                      // ゲームID（ケバブケース。画像ディレクトリ名と一致させる）
+// src/games/cross-derby/meta.ts
+import type { GameMeta } from '../types'
+import { CrossDerbyGame } from './cross-derby-game'
+
+export const meta: GameMeta = {
+	id: 'cross-derby', // ゲームID（ケバブケース。画像ディレクトリ名と一致させる）
 	title: 'クロスダービー',
-	tagline: '好きな馬を選んで競わせろ！',   // ホームカードのキャッチコピー（1〜2行）
-	emoji: '🏇',                            // 画像未設定時のサムネイル
-	gradient: ['#E85BF7', '#7B5CFA'],       // カードのグラデーション
+	tagline: '好きな馬を選んで競わせろ！', // ホームカードのキャッチコピー（1〜2行）
+	emoji: '🏇', // 画像未設定時のサムネイル
+	gradient: ['#E85BF7', '#7B5CFA'], // カードのグラデーション
 	minPlayers: 2,
 	maxPlayers: 8,
-	requiresPlayers: true,                  // プレイヤー登録（名前・色）が必要なら true
-	premium: true,                          // プレミアム限定ならtrue（ホームでマスク＋👑バッジ）
+	requiresPlayers: true, // プレイヤー登録（名前・色）が必要なら true
+	premium: true, // プレミアム限定ならtrue（ホームでマスク＋👑バッジ）
 	catchCopy: 'イントロ画面のキャッチ\n（改行可。未指定なら tagline）',
 	summary: 'イントロ画面の遊び方ダイジェスト（未指定なら howToPlay を連結）',
 	thumbnail: require('@/assets/images/cross-derby/intro.jpg'),
 	cardThumbnail: require('@/assets/images/cross-derby/card.jpg'),
 	howToPlay: [
-		'① 〜しよう！',                      // 既存ゲームに合わせて ①〜④ の番号付き・命令形
+		'① 〜しよう！', // 既存ゲームに合わせて ①〜④ の番号付き・命令形
 		'② 〜！',
 		'③ 〜！',
 		'④ 〜？',
 	],
 	Component: CrossDerbyGame,
 }
+```
+
+次に `src/games/registry.ts` で import し、`games` 配列に並べます。配列の順がホームの表示順です。
+
+```ts
+// src/games/registry.ts
+import { meta as crossDerbyMeta } from './cross-derby/meta'
+
+export const games: readonly GameMeta[] = [
+	// …既存のゲーム
+	crossDerbyMeta,
+]
 ```
 
 ### 4. 画像を用意する（任意）
@@ -76,15 +95,16 @@ engine → reducer → 画面の順に、それぞれ RED（失敗するテス�
 ### 5. 確認してPR
 
 - `npm test` / `npm run typecheck` / `npm run lint` / `npm run format:check` を全部通す
-- `npm start` で実機/Expo Go 起動し、「ホームにカードが出る → イントロ（遊び方）→ プレイ → リザルト」を一周して確認
+- `npm run ios` / `npm run android` で開発ビルドを起動し、「ホームにカードが出る → イントロ（遊び方）→ プレイ → リザルト」を一周して確認（広告 SDK などのネイティブモジュールを使っているため、Expo Go では動かない）
 - `develop` 宛てに PR（registry のテスト `src/games/__tests__/registry.test.ts` が新ゲームで落ちていないことも確認）
 
 ## チェックリスト
 
 - [ ] engine が純関数で、単体テストがある
 - [ ] タイマー系テストは fake timers + `await act`
-- [ ] registry に登録し、ホームのグリッドに表示される
+- [ ] `meta.ts` を作って registry に並べ、ホームのグリッドに表示される
 - [ ] `howToPlay` が既存ゲームのトーン（①〜④・命令形・絵文字）に揃っている
 - [ ] プレミアム限定なら `premium: true`（非プレミアムでロックモーダルが出ること）
+- [ ] プレミアム限定なら、エントリのコンポーネントで `useTrialRoundConsumer(gameId, isRoundEnd)` を呼んでいる（呼ばないと、お試しプレイのラウンドが消費されない）
 - [ ] `npm test` 全件グリーン・typecheck / lint / format 通過
 - [ ] 実機で一周プレイして動作確認
