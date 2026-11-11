@@ -74,27 +74,5 @@
 		"typecheck": "tsc --noEmit",
 		"test": "jest"
 	},
-	"jest": {
-		"preset": "jest-expo",
-		"setupFiles": [
-			"<rootDir>/jest.setup.js"
-		],
-		"collectCoverageFrom": [
-			"src/**/*.{ts,tsx}",
-			"!src/**/__tests__/**",
-			"!src/**/*.d.ts"
-		],
-		"testPathIgnorePatterns": [
-			"/node_modules/",
-			"<rootDir>/.claude/"
-		],
-		"moduleNameMapper": {
-			"^@/assets/(.*)$": "<rootDir>/assets/$1",
-			"^@/(.*)$": "<rootDir>/src/$1"
-		},
-		"transformIgnorePatterns": [
-			"node_modules/(?!((jest-)?react-native|@react-native(-community)?|expo(nent)?(-.*)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|expo-router|expo-modules-core|react-native-reanimated|react-native-worklets)/)"
-		]
-	},
 	"private": true
 }

@@ -1,4 +1,5 @@
 import { render } from '@testing-library/react-native'
+import React from 'react'
 import { StyleSheet, Text, View, type ViewProps } from 'react-native'
 import { GlassSurface, resolveGlassMode } from '../glass-surface'
 
@@ -50,6 +51,9 @@ describe('GlassSurface', () => {
 
 	it('Liquid Glass 利用可能時は GlassView で描画する', async () => {
 		jest.resetModules()
+		// React Compiler を通した GlassSurface は React のランタイムを使う。モジュールを読み直すと
+		// React が二重になるので、元のインスタンスに固定する
+		jest.doMock('react', () => React)
 		jest.doMock('expo-glass-effect', () => ({
 			GlassView: ({ children, ...props }: ViewProps) => <View {...props}>{children}</View>,
 			isLiquidGlassAvailable: () => true,
@@ -64,5 +68,6 @@ describe('GlassSurface', () => {
 		)
 		expect(getByTestId('glass-surface-native')).toBeTruthy()
 		jest.dontMock('expo-glass-effect')
+		jest.dontMock('react')
 	})
 })

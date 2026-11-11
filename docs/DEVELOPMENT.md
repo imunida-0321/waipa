@@ -55,6 +55,10 @@ RED のテストと GREEN の実装はコミットを分け、RED の失敗ロ�
 
 React 19 では同期 `act` / `renderHook` はタイマー系テストで失敗するため、必ず `await act(async () => ...)` を使います（参照実装: `src/games/kimagure-ox/__tests__/`）。
 
+テストでも、Metro のビルドと同じく React Compiler を通します（設定は `jest.config.js`。テストファイル自体は通しません）。React Compiler は、購読したフックの戻り値に依存しない呼び出しを、引数だけをキーにキャッシュします。フックやコンポーネントの中でストアの値を使うときは、`useStore(...)` などの戻り値から導いてください。戻り値を捨てて `store.getState()` を読む関数を呼ぶと、ストアが変わっても再計算されません（issue #178）。
+
+`jest.resetModules()` のあとでコンポーネントを読み直して描画するテストは、`jest.doMock('react', () => React)` で React を元のインスタンスに固定します（参照実装: `src/components/ui/__tests__/glass-surface.test.tsx`）。
+
 カバレッジは `npx jest --coverage` で計測できます（2026-07-15 時点: Lines 85.97%）。目標値の強制はまだ設けていませんが、80% を下回らないことを目安にします。
 
 ## コーディング規約
