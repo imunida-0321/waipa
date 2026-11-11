@@ -17,6 +17,10 @@ jest.mock('@/lib/haptics', () => ({
 jest.mock('expo-router', () => ({
 	router: { push: jest.fn(), replace: jest.fn(), back: jest.fn() },
 }))
+// SizeSelect が含むカスタムお題のシートが、安全領域の余白を読む
+jest.mock('react-native-safe-area-context', () => ({
+	useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
+}))
 jest.mock('expo-linear-gradient', () => {
 	// eslint-disable-next-line @typescript-eslint/no-require-imports
 	const { View } = require('react-native')

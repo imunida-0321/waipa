@@ -10,6 +10,7 @@ import {
 	TextInput,
 	View,
 } from 'react-native'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { GlassSurface } from '@/components/ui/glass-surface'
 import { GradientButton } from '@/components/ui/gradient-button'
 import {
@@ -35,6 +36,8 @@ type PunishmentType = CustomPunishment['type']
 type FormState = { mode: 'add' } | { mode: 'edit'; item: CustomPunishment }
 
 export function CustomPunishmentsSheet({ visible, onClose }: Props) {
+	// 全画面の Modal は安全領域の外まで広がるので、上下の余白を自分で取る（issue #166）
+	const insets = useSafeAreaInsets()
 	const custom = useCustomPunishments()
 	const activeSet = getActiveSet(custom)
 	const [selectedType, setSelectedType] = useState<PunishmentType>('normal')
@@ -90,7 +93,7 @@ export function CustomPunishmentsSheet({ visible, onClose }: Props) {
 
 	return (
 		<Modal visible={visible} animationType="slide" onRequestClose={onClose}>
-			<View style={styles.screen}>
+			<View style={[styles.screen, { paddingTop: insets.top }]}>
 				<View style={styles.header}>
 					<Pressable
 						accessibilityRole="button"
@@ -276,7 +279,7 @@ export function CustomPunishmentsSheet({ visible, onClose }: Props) {
 					</ScrollView>
 				)}
 
-				<View style={styles.footer}>
+				<View style={[styles.footer, { paddingBottom: insets.bottom + spacing.md }]}>
 					<Pressable accessibilityRole="button" onPress={onClose} style={styles.doneBtn}>
 						<Text style={styles.doneLabel}>完了</Text>
 					</Pressable>
